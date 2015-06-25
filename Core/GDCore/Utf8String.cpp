@@ -31,6 +31,14 @@ String::String(const sf::String &string) : m_string()
     m_string = gd::utf8::FromSfString(string);
 }
 
+String::String(const std::u32string &string) : m_string()
+{
+    for( std::u32string::const_iterator it = string.begin(); it != string.end(); it++ )
+    {
+        push_back(*it);
+    }
+}
+
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
 String::String(const wxString &string) : m_string()
@@ -164,6 +172,27 @@ std::string String::ToUTF8() const
     return m_string;
 }
 
+std::vector<String> String::Split(char32_t delimiter) const
+{
+    std::vector<String> splittedStrings(1);
+    String::const_iterator it = begin();
+
+    for(; it != end(); ++it)
+    {
+        char32_t codepoint = *it;
+        if(codepoint == delimiter) //It's the delimiter, insert a new String in the vector
+        {
+            splittedStrings.emplace_back();
+        }
+        else
+        {
+            splittedStrings.back().push_back(codepoint);
+        }
+    }
+
+    return splittedStrings;
+}
+
 String String::substr( String::size_type start, String::size_type length ) const
 {
     String str;
@@ -186,6 +215,13 @@ bool String::operator==(const String &other) const
     return (m_string == other.m_string);
 }
 
+String::value_type String::operator[](const String::size_type position) const
+{
+    const_iterator it = begin();
+    std::advance(it, position);
+    return *it;
+}
+
 String& String::operator+=(const String &other)
 {
     m_string += other.m_string;
@@ -202,11 +238,9 @@ String& String::operator+=(const wxString &other)
 
 #endif
 
-String::value_type String::operator[](const String::size_type position) const
+void String::push_back(String::value_type character)
 {
-    const_iterator it = begin();
-    std::advance(it, position);
-    return *it;
+    ::utf8::unchecked::append(character, std::back_inserter(m_string));
 }
 
 String operator+(String lhs, const String &rhs)

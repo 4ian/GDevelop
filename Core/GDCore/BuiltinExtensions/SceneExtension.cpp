@@ -27,20 +27,20 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(gd::Plat
         .AddCodeOnlyParameter("currentScene", "");
 
     extension.AddCondition("DepartScene",
+                   _("At the beginning of the scene"),
+                   _("Is true only when scene just begins."),
                    GD_T("At the beginning of the scene"),
-                   GD_T("Is true only when scene just begins."),
-                   GD_T("At the beginning of the scene"),
-                   GD_T("Scene"),
+                   _("Scene"),
                    "res/conditions/depart24.png",
                    "res/conditions/depart.png")
         .AddCodeOnlyParameter("currentScene", "")
         .MarkAsSimple();
 
     extension.AddAction("Scene",
-                   GD_T("Go to a scene"),
-                   GD_T("Change and start the specified scene."),
+                   _("Go to a scene"),
+                   _("Change and start the specified scene."),
                    GD_T("Go to scene _PARAM1_"),
-                   GD_T("Scene"),
+                   _("Scene"),
                    "res/actions/goscene24.png",
                    "res/actions/goscene.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -48,20 +48,20 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(gd::Plat
         .MarkAsAdvanced();
 
     extension.AddAction("Quit",
+                   _("Quit the game"),
+                   _("Quit the game"),
                    GD_T("Quit the game"),
-                   GD_T("Quit the game"),
-                   GD_T("Quit the game"),
-                   GD_T("Scene"),
+                   _("Scene"),
                    "res/actions/quit24.png",
                    "res/actions/quit.png")
         .AddCodeOnlyParameter("currentScene", "")
         .MarkAsAdvanced();
 
     extension.AddAction("SceneBackground",
-                   GD_T("Change background color"),
-                   GD_T("Change the background color of the scene."),
+                   _("Change background color"),
+                   _("Change the background color of the scene."),
                    GD_T("Set background color to _PARAM1_"),
-                   GD_T("Scene"),
+                   _("Scene"),
                    "res/actions/background24.png",
                    "res/actions/background.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -69,10 +69,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(gd::Plat
         .MarkAsAdvanced();
 
     extension.AddAction("DisableInputWhenFocusIsLost",
-                   GD_T("Disable input when focus is lost"),
-                   GD_T("Set if the keyboard and mouse buttons must be taken into account even\nif the window is not active."),
+                   _("Disable input when focus is lost"),
+                   _("Set if the keyboard and mouse buttons must be taken into account even\nif the window is not active."),
                    GD_T("Disable input when focus is lost: _PARAM1_"),
-                   GD_T("Scene"),
+                   _("Scene"),
                    "res/actions/window24.png",
                    "res/actions/window.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -80,10 +80,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(gd::Plat
         .MarkAsAdvanced();
 
     extension.AddCondition("Egal",
-               GD_T("Compare two expressions"),
-               GD_T("Test the two expression"),
+               _("Compare two expressions"),
+               _("Test the two expression"),
                GD_T("_PARAM0_ _PARAM1_ _PARAM2_"),
-               GD_T("Other"),
+               _("Other"),
                "res/conditions/egal24.png",
                "res/conditions/egal.png")
         .AddParameter("expression", GD_T("Expression 1"), "",false)

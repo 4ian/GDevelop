@@ -8,6 +8,7 @@
 #define EXTENSIONSLOADER_H
 #include <string>
 #include <vector>
+#include "GDCore/Utf8String.h"
 namespace gd { class Platform; }
 
 namespace gd

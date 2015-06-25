@@ -30,10 +30,10 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension & extension)
     obj.SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
 
     obj.AddAction("Width",
-                   GD_T("Width"),
-                   GD_T("Modify the width of a Tiled Sprite."),
+                   _("Width"),
+                   _("Modify the width of a Tiled Sprite."),
                    GD_T("Do _PARAM1__PARAM2_ to the width of _PARAM0_"),
-                   GD_T("Size and angle"),
+                   _("Size and angle"),
                    "res/actions/scaleWidth24.png",
                    "res/actions/scaleWidth.png")
 
@@ -43,10 +43,10 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension & extension)
         .SetFunctionName("SetWidth").SetManipulatedType("number").SetGetter("GetWidth").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
 
     obj.AddCondition("Width",
-                   GD_T("Width"),
-                   GD_T("Test the width of a Tiled Sprite."),
+                   _("Width"),
+                   _("Test the width of a Tiled Sprite."),
                    GD_T("The width of _PARAM0_ is _PARAM1__PARAM2_"),
-                   GD_T("Size and angle"),
+                   _("Size and angle"),
                    "res/conditions/scaleWidth24.png",
                    "res/conditions/scaleWidth.png")
         .AddParameter("object", GD_T("Object"), "TiledSprite", false)
@@ -57,10 +57,10 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension & extension)
 
 
     obj.AddAction("Height",
-                   GD_T("Height"),
-                   GD_T("Modify the height of a Tiled Sprite."),
+                   _("Height"),
+                   _("Modify the height of a Tiled Sprite."),
                    GD_T("Do _PARAM1__PARAM2_ to the height of _PARAM0_"),
-                   GD_T("Size and angle"),
+                   _("Size and angle"),
                    "res/actions/scaleHeight24.png",
                    "res/actions/scaleHeight.png")
 
@@ -71,10 +71,10 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension & extension)
 
 
     obj.AddCondition("Height",
-                   GD_T("Height"),
-                   GD_T("Test the height of a Tiled Sprite."),
+                   _("Height"),
+                   _("Test the height of a Tiled Sprite."),
                    GD_T("The height of _PARAM0_ is _PARAM1__PARAM2_"),
-                   GD_T("Size and angle"),
+                   _("Size and angle"),
                    "res/conditions/scaleHeight24.png",
                    "res/conditions/scaleHeight.png")
         .AddParameter("object", GD_T("Object"), "TiledSprite", false)
@@ -85,10 +85,10 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension & extension)
 
 
     obj.AddAction("Angle",
-                   GD_T("Angle"),
-                   GD_T("Modify the angle of a Tiled Sprite."),
+                   _("Angle"),
+                   _("Modify the angle of a Tiled Sprite."),
                    GD_T("Do _PARAM1__PARAM2_ to the angle of _PARAM0_"),
-                   GD_T("Size and angle"),
+                   _("Size and angle"),
                    "res/actions/rotate24.png",
                    "res/actions/rotate.png")
 
@@ -100,10 +100,10 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension & extension)
 
 
     obj.AddCondition("Angle",
-                   GD_T("Angle"),
-                   GD_T("Test the angle of a Tiled Sprite."),
+                   _("Angle"),
+                   _("Test the angle of a Tiled Sprite."),
                    GD_T("The angle of _PARAM0_ is _PARAM1__PARAM2_"),
-                   GD_T("Size and angle"),
+                   _("Size and angle"),
                    "res/conditions/rotate24.png",
                    "res/conditions/rotate.png")
 
@@ -114,10 +114,10 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension & extension)
         .SetFunctionName("GetAngle").SetManipulatedType("number").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
 
     obj.AddAction("XOffset",
-                   GD_T("Image X Offset"),
-                   GD_T("Modify the offset used on the X axis when displaying the image."),
+                   _("Image X Offset"),
+                   _("Modify the offset used on the X axis when displaying the image."),
                    GD_T("Do _PARAM1__PARAM2_ to the X offset of _PARAM0_"),
-                   GD_T("Image offset"),
+                   _("Image offset"),
                    "res/conditions/scaleWidth24.png",
                    "res/conditions/scaleWidth.png")
         .AddParameter("object", GD_T("Object"), "TiledSprite", false)
@@ -128,10 +128,10 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension & extension)
 
 
     obj.AddCondition("XOffset",
-                   GD_T("Image X Offset"),
-                   GD_T("Test the offset used on the X axis when displaying the image."),
+                   _("Image X Offset"),
+                   _("Test the offset used on the X axis when displaying the image."),
                    GD_T("The X offset of _PARAM0_ is _PARAM1__PARAM2_"),
-                   GD_T("Image offset"),
+                   _("Image offset"),
                    "res/conditions/scaleWidth24.png",
                    "res/conditions/scaleWidth.png")
         .AddParameter("object", GD_T("Object"), "TiledSprite", false)
@@ -141,10 +141,10 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension & extension)
         .SetFunctionName("GetXOffset").SetManipulatedType("number").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
 
     obj.AddAction("YOffset",
-                   GD_T("Image Y Offset"),
-                   GD_T("Modify the offset used on the Y axis when displaying the image."),
+                   _("Image Y Offset"),
+                   _("Modify the offset used on the Y axis when displaying the image."),
                    GD_T("Do _PARAM1__PARAM2_ to the Y offset of _PARAM0_"),
-                   GD_T("Image offset"),
+                   _("Image offset"),
                    "res/conditions/scaleWidth24.png",
                    "res/conditions/scaleWidth.png")
         .AddParameter("object", GD_T("Object"), "TiledSprite", false)
@@ -155,10 +155,10 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension & extension)
 
 
     obj.AddCondition("YOffset",
-                   GD_T("Image Y Offset"),
-                   GD_T("Test the offset used on the Y axis when displaying the image."),
+                   _("Image Y Offset"),
+                   _("Test the offset used on the Y axis when displaying the image."),
                    GD_T("The Y offset of _PARAM0_ is _PARAM1__PARAM2_"),
-                   GD_T("Image offset"),
+                   _("Image offset"),
                    "res/conditions/scaleWidth24.png",
                    "res/conditions/scaleWidth.png")
         .AddParameter("object", GD_T("Object"), "TiledSprite", false)

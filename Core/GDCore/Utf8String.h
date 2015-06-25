@@ -10,6 +10,7 @@
 #include <iostream>
 #include <iterator>
 #include <string>
+#include <vector>
 #include <SFML/System/String.hpp>
 
 #include "GDCore/Utf8Tools.h"
@@ -115,6 +116,17 @@ public:
      * Constructs an empty string.
      */
     String();
+
+    /**
+     * Constructs a String from a std::u32string.
+     *
+     * **Usage :**
+     *
+     * \code
+     * gd::String str(U"A UTF32 encoded string.");
+     * \endcode
+     */
+    String(const std::u32string &string);
 
     /**
      * Constructs a string from an sf::String.
@@ -329,6 +341,9 @@ public:
 
     /**
      * Returns the code point at the specified position
+     * \warning This operator has a linear complexity on the character's position. 
+     * You should avoid to use it in a loop and use the iterators provided by this
+     * class instead.
      */
     value_type operator[](const size_type position) const;
 
@@ -359,6 +374,8 @@ public:
 
 #endif
 
+    void push_back(value_type character);
+
 /**
  * \}
  */
@@ -367,6 +384,21 @@ public:
  * \name String operations
  * \{
  */
+
+    /**
+     * Split the string with a delimiter
+     * \param delimiter delimiter (an UTF32 codepoint)
+     * \return a std::vector containing all the gd::String objects
+     *
+     * **Usage :**
+     *
+     * \code
+     * gd::utf8::String str = GD_U8("10;20;30;40");
+     * std::vector<gd::utf8::String> splittedStr = str.Split(U';'); //the U prefix is mandatory to get a char32_t from the literal
+     * //Now the vector contains "10", "20", "30" and "40" as gd::String objects
+     * \endcode
+     */
+    std::vector<String> Split(char32_t delimiter) const;
 
     /**
      * Returns a sub-string starting from "start" and with length "length".
@@ -385,6 +417,7 @@ public:
 
     /**
      * Compares the current string with another.
+     * \todo Implement it !
      */
     int compare( const String &other );
 
@@ -480,6 +513,12 @@ typedef utf8::String String;
  * \section Limitations Limitations
  * The String class stores internally the string as an UTF8 encoded std::string. This creates some limitations : it's
  * impossible to edit a single character with operator[]() nor at because the new character length might not be the same.
+ *
+ * \section Performance Performance
+ * The UTF8 encoding has the advantage to reduce the RAM consumption compared to UTF16 or UTF32 for strings using a lot 
+ * of latin characters. But the characters variable length brings some performance issues compared to fixed size encoding.
+ * That's why the complexity of each methods is written in their documentation. As instance, the size() method is linear 
+ * on the string size and so is the operator[]().
  *
  * \section Conversion Conversions from/to other string types
  * The String handles implicit conversion with sf::String and wxString (implicit constructor and implicit conversion 

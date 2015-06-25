@@ -20,10 +20,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsJoystickExtension(gd::P
 
     #if defined(GD_IDE_ONLY)
     extension.AddCondition("JoystickButtonDown",
-                   GD_T("A button of a joystick is pressed"),
-                   GD_T("Test if a button of a joystick is pressed."),
+                   _("A button of a joystick is pressed"),
+                   _("Test if a button of a joystick is pressed."),
                    GD_T("The button _PARAM2_ of joystick _PARAM1_ is pressed"),
-                   GD_T("Joystick"),
+                   _("Joystick"),
                    "res/conditions/joystick24.png",
                    "res/conditions/joystick.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -31,10 +31,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsJoystickExtension(gd::P
         .AddParameter("expression", GD_T("Button"), "",false);
 
     extension.AddCondition("JoystickAxis",
-                   GD_T("Value of an axis of a joystick"),
-                   GD_T("Test the value of an axis of a joystick."),
+                   _("Value of an axis of a joystick"),
+                   _("Test the value of an axis of a joystick."),
                    GD_T("The value of the axis _PARAM2_ of joystick _PARAM1_ is _PARAM3__PARAM4_"),
-                   GD_T("Joystick"),
+                   _("Joystick"),
                    "res/conditions/joystick24.png",
                    "res/conditions/joystick.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -45,10 +45,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsJoystickExtension(gd::P
         .SetManipulatedType("number");
 
     extension.AddAction("GetJoystickAxis",
-                   GD_T("Get the value of the axis of a joystick"),
-                   GD_T("Save in the variable the value of the axis of the joystick ( from -100 to 100 )."),
+                   _("Get the value of the axis of a joystick"),
+                   _("Save in the variable the value of the axis of the joystick ( from -100 to 100 )."),
                    GD_T("Save in _PARAM3_ the value of axis _PARAM2_ of joystick _PARAM1_"),
-                   GD_T("Joystick"),
+                   _("Joystick"),
                    "res/actions/joystick24.png",
                    "res/actions/joystick.png")
         .AddCodeOnlyParameter("currentScene", "")

@@ -29,10 +29,10 @@ void DeclareTextEntryObjectExtension(gd::PlatformExtension & extension)
     obj.SetIncludeFile("TextEntryObject/TextEntryObject.h");
 
     obj.AddAction("String",
-                   GD_T("Text in memory"),
-                   GD_T("Modify text in memory of the object"),
+                   _("Text in memory"),
+                   _("Modify text in memory of the object"),
                    GD_T("Do _PARAM1__PARAM2_ to the text in memory of _PARAM0_"),
-                   "",
+                   _(""),
                    "CppPlatform/Extensions/textentry24.png",
                    "CppPlatform/Extensions/textentryicon.png")
 
@@ -42,10 +42,10 @@ void DeclareTextEntryObjectExtension(gd::PlatformExtension & extension)
         .SetFunctionName("SetString").SetManipulatedType("string").SetGetter("GetString").SetIncludeFile("TextEntryObject/TextEntryObject.h");
 
     obj.AddCondition("String",
-                   GD_T("Text in memory"),
-                   GD_T("Test the text of a Text Entry object."),
+                   _("Text in memory"),
+                   _("Test the text of a Text Entry object."),
                    GD_T("The text of _PARAM0_ is _PARAM1__PARAM2_"),
-                   "",
+                   _(""),
                    "CppPlatform/Extensions/textentry24.png",
                    "CppPlatform/Extensions/textentryicon.png")
 
@@ -55,10 +55,10 @@ void DeclareTextEntryObjectExtension(gd::PlatformExtension & extension)
         .SetFunctionName("GetString").SetManipulatedType("string").SetIncludeFile("TextEntryObject/TextEntryObject.h");
 
     obj.AddAction("Activate",
-                   GD_T("De/activate capturing text input"),
-                   GD_T("Activate or desactivate the capture of text entered with keyboard."),
+                   _("De/activate capturing text input"),
+                   _("Activate or desactivate the capture of text entered with keyboard."),
                    GD_T("Activate capture by _PARAM0_ of the text entered with keyboard: _PARAM1_"),
-                   GD_T("Setup"),
+                   _("Setup"),
                    "CppPlatform/Extensions/textentry24.png",
                    "CppPlatform/Extensions/textentryicon.png")
 
@@ -68,10 +68,10 @@ void DeclareTextEntryObjectExtension(gd::PlatformExtension & extension)
 
 
     obj.AddCondition("Activated",
-                   GD_T("Text input"),
-                   GD_T("Test if the object capture text entered with keyboard."),
+                   _("Text input"),
+                   _("Test if the object capture text entered with keyboard."),
                    GD_T("_PARAM0_ capture the text entered with keyboard"),
-                   GD_T("Setup"),
+                   _("Setup"),
                    "CppPlatform/Extensions/textentry24.png",
                    "CppPlatform/Extensions/textentryicon.png")
 

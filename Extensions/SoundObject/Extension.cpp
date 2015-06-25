@@ -49,10 +49,10 @@ public:
             obj.SetIncludeFile("SoundObject/SoundObject.h");
 
             obj.AddAction("Volume",
-                           GD_T("Sound level"),
-                           GD_T("Modify the sound level of a Sound object."),
+                           _("Sound level"),
+                           _("Modify the sound level of a Sound object."),
                            GD_T("Do _PARAM1__PARAM2_ to the sound level of _PARAM0_"),
-                           GD_T("Parameters"),
+                           _("Parameters"),
                            "res/actions/son24.png",
                            "res/actions/son.png")
 
@@ -63,10 +63,10 @@ public:
 
 
             obj.AddAction("Pitch",
-                           GD_T("Pitch"),
-                           GD_T("Change the pitch of a sound object."),
+                           _("Pitch"),
+                           _("Change the pitch of a sound object."),
                            GD_T("Do _PARAM1__PARAM2_ to Pitch of _PARAM0_"),
-                           GD_T("Parameters"),
+                           _("Parameters"),
                            "res/actions/son24.png",
                            "res/actions/son.png")
 
@@ -77,10 +77,10 @@ public:
 
 
             obj.AddAction("Attenuation",
-                           GD_T("Attenuation"),
-                           GD_T("Change the attenuation of a sound object."),
+                           _("Attenuation"),
+                           _("Change the attenuation of a sound object."),
                            GD_T("Do _PARAM1__PARAM2_ to the attenuation of _PARAM0_"),
-                           GD_T("Parameters"),
+                           _("Parameters"),
                            "res/actions/son24.png",
                            "res/actions/son.png")
 
@@ -91,10 +91,10 @@ public:
 
 
             obj.AddAction("ZPos",
-                           GD_T("Z Position"),
-                           GD_T("Modify the sound level of a Sound object."),
+                           _("Z Position"),
+                           _("Modify the sound level of a Sound object."),
                            GD_T("Do _PARAM1__PARAM2_ to the sound level of _PARAM0_"),
-                           GD_T("Position"),
+                           _("Position"),
                            "res/actions/son24.png",
                            "res/actions/son.png")
 
@@ -105,10 +105,10 @@ public:
 
 
             obj.AddAction("Loop",
-                           GD_T("Automatic restart"),
-                           GD_T("Activate or desactivate the looping of a sound."),
+                           _("Automatic restart"),
+                           _("Activate or desactivate the looping of a sound."),
                            GD_T("Activate looping for _PARAM0_: _PARAM1_"),
-                           GD_T("Parameters"),
+                           _("Parameters"),
                            "res/actions/son24.png",
                            "res/actions/son.png")
 
@@ -118,10 +118,10 @@ public:
 
 
             obj.AddAction("RelativeToListener",
-                           GD_T("Listener relation"),
-                           GD_T("Activate or desactivate the sound spatialisation relative to the listener."),
+                           _("Listener relation"),
+                           _("Activate or desactivate the sound spatialisation relative to the listener."),
                            GD_T("Set _PARAM0_ as relative to the listener position: _PARAM1_"),
-                           GD_T("Parameters"),
+                           _("Parameters"),
                            "res/actions/son24.png",
                            "res/actions/son.png")
 
@@ -131,10 +131,10 @@ public:
 
 
             obj.AddAction("Play",
-                           GD_T("Play"),
-                           GD_T("Play a sound."),
+                           _("Play"),
+                           _("Play a sound."),
                            GD_T("Play sound _PARAM0_"),
-                           "",
+                           _(""),
                            "res/actions/son24.png",
                            "res/actions/son.png")
 
@@ -143,10 +143,10 @@ public:
 
 
             obj.AddAction("Stop",
-                           GD_T("Stop"),
-                           GD_T("Stop a sound."),
+                           _("Stop"),
+                           _("Stop a sound."),
                            GD_T("Stop _PARAM0_"),
-                           "",
+                           _(""),
                            "res/actions/son24.png",
                            "res/actions/son.png")
 
@@ -155,10 +155,10 @@ public:
 
 
             obj.AddAction("Pause",
-                           GD_T("Pause"),
-                           GD_T("Pause a sound."),
+                           _("Pause"),
+                           _("Pause a sound."),
                            GD_T("Pause _PARAM0_"),
-                           "",
+                           _(""),
                            "res/actions/son24.png",
                            "res/actions/son.png")
 
@@ -167,10 +167,10 @@ public:
 
 
             obj.AddCondition("Volume",
-                           GD_T("Sound level"),
-                           GD_T("Test the sound level of a Sound object."),
+                           _("Sound level"),
+                           _("Test the sound level of a Sound object."),
                            GD_T("Th sound level of _PARAM0_ is _PARAM2_ _PARAM1_"),
-                           GD_T("Parameters"),
+                           _("Parameters"),
                            "res/actions/son24.png",
                            "res/actions/son.png")
 
@@ -181,10 +181,10 @@ public:
 
 
             obj.AddCondition("Pitch",
-                           GD_T("Pitch"),
-                           GD_T("Test the pitch value of a sound."),
+                           _("Pitch"),
+                           _("Test the pitch value of a sound."),
                            GD_T("Pitch of _PARAM0_ is _PARAM1__PARAM2_"),
-                           GD_T("Parameters"),
+                           _("Parameters"),
                            "res/actions/son24.png",
                            "res/actions/son.png")
 
@@ -195,10 +195,10 @@ public:
 
 
             obj.AddCondition("Attenuation",
-                           GD_T("Attenuation"),
-                           GD_T("Test the attenuation of a sound."),
+                           _("Attenuation"),
+                           _("Test the attenuation of a sound."),
                            GD_T("The attenuation of _PARAM0_ is _PARAM1__PARAM2_"),
-                           GD_T("Parameters"),
+                           _("Parameters"),
                            "res/actions/son24.png",
                            "res/actions/son.png")
 
@@ -209,10 +209,10 @@ public:
 
 
             obj.AddCondition("MinDistance",
-                           GD_T("Minimal distance"),
-                           GD_T("Test the minimal distance of a sound"),
+                           _("Minimal distance"),
+                           _("Test the minimal distance of a sound"),
                            GD_T("The minimal distance of _PARAM0_ is _PARAM1__PARAM2_"),
-                           GD_T("Parameters"),
+                           _("Parameters"),
                            "res/actions/son24.png",
                            "res/actions/son.png")
 
@@ -223,10 +223,10 @@ public:
 
 
             obj.AddCondition("ZPos",
-                           GD_T("Z Position"),
-                           GD_T("Test Z position of a sound."),
+                           _("Z Position"),
+                           _("Test Z position of a sound."),
                            GD_T("The Z position of _PARAM0_ is _PARAM1__PARAM2_"),
-                           GD_T("Parameters"),
+                           _("Parameters"),
                            "res/actions/son24.png",
                            "res/actions/son.png")
 
@@ -237,10 +237,10 @@ public:
 
 
             obj.AddCondition("Loop",
-                           GD_T("Automatic restart"),
-                           GD_T("Test if an sound is looping."),
+                           _("Automatic restart"),
+                           _("Test if an sound is looping."),
                            GD_T("_PARAM0_ is looping"),
-                           GD_T("Parameters"),
+                           _("Parameters"),
                            "res/actions/son24.png",
                            "res/actions/son.png")
 
@@ -249,10 +249,10 @@ public:
 
 
             obj.AddCondition("Playing",
-                           GD_T("Being played"),
-                           GD_T("Test if a sound is being played."),
+                           _("Being played"),
+                           _("Test if a sound is being played."),
                            GD_T("_PARAM0_ is being played"),
-                           "",
+                           _(""),
                            "res/actions/son24.png",
                            "res/actions/son.png")
 
@@ -261,10 +261,10 @@ public:
 
 
             obj.AddCondition("Paused",
-                           GD_T("Paused"),
-                           GD_T("A sound is paused"),
+                           _("Paused"),
+                           _("A sound is paused"),
                            GD_T("_PARAM0_ is paused"),
-                           "",
+                           _(""),
                            "res/actions/son24.png",
                            "res/actions/son.png")
 
@@ -273,10 +273,10 @@ public:
 
 
             obj.AddCondition("Stopped",
-                           GD_T("Stopped"),
-                           GD_T("Test if a sound is stopped."),
+                           _("Stopped"),
+                           _("Test if a sound is stopped."),
                            GD_T("_PARAM0_ is stopped"),
-                           "",
+                           _(""),
                            "res/actions/son24.png",
                            "res/actions/son.png")
 
@@ -285,10 +285,10 @@ public:
 
 
             obj.AddCondition("RelativeToListener",
-                           GD_T("Listener relation"),
-                           GD_T("Test if a sound is relative to the listener."),
+                           _("Listener relation"),
+                           _("Test if a sound is relative to the listener."),
                            GD_T("_PARAM0_ is relative to the listener"),
-                           GD_T("Parameters"),
+                           _("Parameters"),
                            "res/conditions/son24.png",
                            "res/conditions/son.png")
 
@@ -326,10 +326,10 @@ public:
         // Actions liées à l'écouteur
         #if defined(GD_IDE_ONLY)
         AddAction("ListenerX",
-                       GD_T("X position"),
-                       GD_T("Modify the X position of the listener."),
+                       _("X position"),
+                       _("Modify the X position of the listener."),
                        GD_T("Do _PARAM0__PARAM1_ to the X position of the listener"),
-                       GD_T("Listener"),
+                       _("Listener"),
                        "res/actions/son24.png",
                        "res/actions/son.png")
 
@@ -340,10 +340,10 @@ public:
 
 
         AddAction("ListenerY",
-                       GD_T("Y position"),
-                       GD_T("Modify the Y position of the listener."),
+                       _("Y position"),
+                       _("Modify the Y position of the listener."),
                        GD_T("Do _PARAM0__PARAM1_ to the Y position of the listener"),
-                       GD_T("Listener"),
+                       _("Listener"),
                        "res/actions/son24.png",
                        "res/actions/son.png")
 
@@ -354,10 +354,10 @@ public:
 
 
         AddAction("ListenerZ",
-                       GD_T("Z position"),
-                       GD_T("Modify the Z position of the listener."),
+                       _("Z position"),
+                       _("Modify the Z position of the listener."),
                        GD_T("Do _PARAM0__PARAM1_ to the Z position of the listener"),
-                       GD_T("Listener"),
+                       _("Listener"),
                        "res/actions/son24.png",
                        "res/actions/son.png")
 
@@ -368,10 +368,10 @@ public:
 
 
         AddAction("ListenerDirectionX",
-                       GD_T("Direction on X axis"),
-                       GD_T("Change the direction of the listener on X axis."),
+                       _("Direction on X axis"),
+                       _("Change the direction of the listener on X axis."),
                        GD_T("Do _PARAM1__PARAM2_ to the direction on X axis of the listener"),
-                       GD_T("Listener"),
+                       _("Listener"),
                        "res/actions/son24.png",
                        "res/actions/son.png")
 
@@ -382,10 +382,10 @@ public:
 
 
         AddAction("ListenerDirectionY",
-                       GD_T("Direction on Y axis"),
-                       GD_T("Change the direction of the listener on Y axis."),
+                       _("Direction on Y axis"),
+                       _("Change the direction of the listener on Y axis."),
                        GD_T("Do _PARAM1__PARAM2_ to the direction on Y axis of the listener"),
-                       GD_T("Listener"),
+                       _("Listener"),
                        "res/actions/son24.png",
                        "res/actions/son.png")
 
@@ -396,10 +396,10 @@ public:
 
 
         AddAction("ListenerDirectionZ",
-                       GD_T("Direction on Z axis"),
-                       GD_T("Change the direction of the listener on Z axis."),
+                       _("Direction on Z axis"),
+                       _("Change the direction of the listener on Z axis."),
                        GD_T("Do _PARAM1__PARAM2_ to the direction on Z axis of the listener"),
-                       GD_T("Listener"),
+                       _("Listener"),
                        "res/actions/son24.png",
                        "res/actions/son.png")
 
@@ -411,10 +411,10 @@ public:
 
         // Conditions liées à l'écouteur
         AddCondition("ListenerX",
-                       GD_T("X position"),
-                       GD_T("Test the position of the listener on X axis."),
+                       _("X position"),
+                       _("Test the position of the listener on X axis."),
                        GD_T("The listener X position is _PARAM1__PARAM0_"),
-                       GD_T("Listener"),
+                       _("Listener"),
                        "res/actions/son24.png",
                        "res/actions/son.png")
 
@@ -424,10 +424,10 @@ public:
             .SetFunctionName("GetListenerX").SetManipulatedType("number").SetIncludeFile("SoundObject/SoundListener.h");
 
         AddCondition("ListenerY",
-                       GD_T("Y position"),
-                       GD_T("Test the position of the listener on Y axis."),
+                       _("Y position"),
+                       _("Test the position of the listener on Y axis."),
                        GD_T("The listener Y position is _PARAM1__PARAM0_"),
-                       GD_T("Listener"),
+                       _("Listener"),
                        "res/actions/son24.png",
                        "res/actions/son.png")
 
@@ -437,10 +437,10 @@ public:
             .SetFunctionName("GetListenerY").SetManipulatedType("number").SetIncludeFile("SoundObject/SoundListener.h");
 
         AddCondition("ListenerZ",
-                       GD_T("Z position"),
-                       GD_T("Test the position of the listener on Z axis."),
+                       _("Z position"),
+                       _("Test the position of the listener on Z axis."),
                        GD_T("The listener Z position is _PARAM1__PARAM0_"),
-                       GD_T("Listener"),
+                       _("Listener"),
                        "res/actions/son24.png",
                        "res/actions/son.png")
 
@@ -450,10 +450,10 @@ public:
             .SetFunctionName("GetListenerZ").SetManipulatedType("number").SetIncludeFile("SoundObject/SoundListener.h");
 
         AddCondition("ListenerDirectionX",
-                       GD_T("X direction"),
-                       GD_T("Test the direction of the listener on X axis."),
+                       _("X direction"),
+                       _("Test the direction of the listener on X axis."),
                        GD_T("The listener X direction is _PARAM1__PARAM0_"),
-                       GD_T("Listener"),
+                       _("Listener"),
                        "res/actions/son24.png",
                        "res/actions/son.png")
 
@@ -463,10 +463,10 @@ public:
             .SetFunctionName("GetListenerDirectionX").SetManipulatedType("number").SetIncludeFile("SoundObject/SoundListener.h");
 
         AddCondition("ListenerDirectionY",
-                       GD_T("Y direction"),
-                       GD_T("Test the direction of the listener on Y axis."),
+                       _("Y direction"),
+                       _("Test the direction of the listener on Y axis."),
                        GD_T("The listener Y direction is _PARAM1__PARAM0_"),
-                       GD_T("Listener"),
+                       _("Listener"),
                        "res/actions/son24.png",
                        "res/actions/son.png")
 
@@ -479,10 +479,10 @@ public:
 
 
         AddCondition("ListenerDirectionZ",
-                       GD_T("Z direction"),
-                       GD_T("Test the direction of the listener on Z axis."),
+                       _("Z direction"),
+                       _("Test the direction of the listener on Z axis."),
                        GD_T("The listener Z direction is _PARAM1__PARAM0_"),
-                       GD_T("Listener"),
+                       _("Listener"),
                        "res/actions/son24.png",
                        "res/actions/son.png")
 

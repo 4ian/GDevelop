@@ -39,7 +39,7 @@ FileExtension::FileExtension()
         .SetFunctionName("gdjs.evtTools.storage.readStringFromJSONFile");
     GetAllActions()["DeleteGroupFichier"]
         .SetFunctionName("gdjs.evtTools.storage.deleteElementFromJSONFile");
-    GetAllActions()["DeleteFichier"].SetGroup(GD_T("Storage"))
+    GetAllActions()["DeleteFichier"].SetGroup(_("Storage"))
         .SetFunctionName("gdjs.evtTools.storage.clearJSONFile");
     GetAllActions()["LaunchFile"]
         .SetFunctionName("gdjs.evtTools.window.openURL");

@@ -21,10 +21,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(gd::Platf
     #if defined(GD_IDE_ONLY)
 
     extension.AddCondition("Timer",
-                   GD_T("Value of a timer"),
-                   GD_T("Test the time elapsed of a timer."),
+                   _("Value of a timer"),
+                   _("Test the time elapsed of a timer."),
                    GD_T("The timer _PARAM2_ is greater than _PARAM1_ seconds"),
-                   GD_T("Timers and time"),
+                   _("Timers and time"),
                    "res/conditions/timer24.png",
                    "res/conditions/timer.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -32,10 +32,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(gd::Platf
         .AddParameter("string", GD_T("Timer's name"));
 
     extension.AddCondition("TimeScale",
-                   GD_T("Time scale"),
-                   GD_T("Test the time scale."),
+                   _("Time scale"),
+                   _("Test the time scale."),
                    GD_T("The time scale is _PARAM1__PARAM2_"),
-                   GD_T("Timers and time"),
+                   _("Timers and time"),
                    "res/conditions/time24.png",
                    "res/conditions/time.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -45,10 +45,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(gd::Platf
         .SetManipulatedType("number");
 
     extension.AddCondition("TimerPaused",
-                   GD_T("State of a timer"),
-                   GD_T("Test if specified timer is paused."),
+                   _("State of a timer"),
+                   _("Test if specified timer is paused."),
                    GD_T("The timer _PARAM1_ is paused"),
-                   GD_T("Timers and time"),
+                   _("Timers and time"),
                    "res/conditions/timerPaused24.png",
                    "res/conditions/timerPaused.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -56,20 +56,20 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(gd::Platf
         .MarkAsAdvanced();
 
     extension.AddAction("ResetTimer",
-                   GD_T("Reset a timer"),
-                   GD_T("Reset the specified timer."),
+                   _("Reset a timer"),
+                   _("Reset the specified timer."),
                    GD_T("Reset the timer _PARAM1_"),
-                   GD_T("Timers and time"),
+                   _("Timers and time"),
                    "res/actions/timer24.png",
                    "res/actions/timer.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("string", GD_T("Timer's name"));
 
     extension.AddAction("PauseTimer",
-                   GD_T("Pause a timer"),
-                   GD_T("Pause a timer."),
+                   _("Pause a timer"),
+                   _("Pause a timer."),
                    GD_T("Pause timer _PARAM1_"),
-                   GD_T("Timers and time"),
+                   _("Timers and time"),
                    "res/actions/pauseTimer24.png",
                    "res/actions/pauseTimer.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -77,10 +77,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(gd::Platf
         .MarkAsAdvanced();
 
     extension.AddAction("UnPauseTimer",
-                   GD_T("Unpause a timer"),
-                   GD_T("Unpause a timer."),
+                   _("Unpause a timer"),
+                   _("Unpause a timer."),
                    GD_T("Unpause timer _PARAM1_"),
-                   GD_T("Timers and time"),
+                   _("Timers and time"),
                    "res/actions/unPauseTimer24.png",
                    "res/actions/unPauseTimer.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -88,10 +88,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(gd::Platf
         .MarkAsAdvanced();
 
     extension.AddAction("RemoveTimer",
-                   GD_T("Delete a timer"),
-                   GD_T("Delete a timer from memory."),
+                   _("Delete a timer"),
+                   _("Delete a timer from memory."),
                    GD_T("Delete timer _PARAM1_ from memory"),
-                   GD_T("Timers and time"),
+                   _("Timers and time"),
                    "res/actions/timer24.png",
                    "res/actions/timer.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -99,10 +99,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(gd::Platf
         .MarkAsAdvanced();
 
     extension.AddAction("ChangeTimeScale",
-                   GD_T("Change time scale"),
-                   GD_T("Change the time scale of the game."),
+                   _("Change time scale"),
+                   _("Change the time scale of the game."),
                    GD_T("Set time scale to _PARAM1_"),
-                   GD_T("Timers and time"),
+                   _("Timers and time"),
                    "res/actions/time24.png",
                    "res/actions/time.png")
         .AddCodeOnlyParameter("currentScene", "")

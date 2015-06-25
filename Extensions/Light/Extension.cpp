@@ -43,10 +43,10 @@ public:
         obj.SetIncludeFile("Light/LightObject.h");
 
         obj.AddAction("ChangeColor",
-                       GD_T("Color"),
-                       GD_T("Change light color."),
+                       _("Color"),
+                       _("Change light color."),
                        GD_T("Change color of _PARAM0_ to _PARAM1_"),
-                       GD_T("Setup"),
+                       _("Setup"),
                        "CppPlatform/Extensions/lightIcon24.png",
                        "CppPlatform/Extensions/lightIcon16.png")
             .AddParameter("object", GD_T("Object"), "Light", false)
@@ -56,10 +56,10 @@ public:
 
 
         obj.AddAction("Intensity",
-                       GD_T("Intensity"),
-                       GD_T("Modify the intensity of a light"),
+                       _("Intensity"),
+                       _("Modify the intensity of a light"),
                        GD_T("Do _PARAM1__PARAM2_ to the intensity of _PARAM0_"),
-                       GD_T("Setup"),
+                       _("Setup"),
                        "CppPlatform/Extensions/lightIcon24.png",
                        "CppPlatform/Extensions/lightIcon16.png")
             .AddParameter("object", GD_T("Object"), "Light", false)
@@ -70,10 +70,10 @@ public:
 
 
         obj.AddCondition("Intensity",
-                       GD_T("Intensity"),
-                       GD_T("Test the intensity of a light."),
+                       _("Intensity"),
+                       _("Test the intensity of a light."),
                        GD_T("Intensity of _PARAM0_ is _PARAM1__PARAM2_"),
-                       GD_T("Setup"),
+                       _("Setup"),
                        "CppPlatform/Extensions/lightIcon24.png",
                        "CppPlatform/Extensions/lightIcon16.png")
             .AddParameter("object", GD_T("Object"), "Light", false)
@@ -84,10 +84,10 @@ public:
 
 
         obj.AddAction("Radius",
-                       GD_T("Radius"),
-                       GD_T("Modify the radius of a light"),
+                       _("Radius"),
+                       _("Modify the radius of a light"),
                        GD_T("Do _PARAM1__PARAM2_ to radius of _PARAM0_"),
-                       GD_T("Setup"),
+                       _("Setup"),
                        "CppPlatform/Extensions/lightIcon24.png",
                        "CppPlatform/Extensions/lightIcon16.png")
             .AddParameter("object", GD_T("Object"), "Light", false)
@@ -98,10 +98,10 @@ public:
 
 
         obj.AddCondition("Radius",
-                       GD_T("Radius"),
-                       GD_T("Test the radius of a light."),
+                       _("Radius"),
+                       _("Test the radius of a light."),
                        GD_T("The radius of _PARAM0_ is _PARAM2_ _PARAM1_"),
-                       GD_T("Setup"),
+                       _("Setup"),
                        "CppPlatform/Extensions/lightIcon24.png",
                        "CppPlatform/Extensions/lightIcon16.png")
             .AddParameter("object", GD_T("Object"), "Light", false)
@@ -112,10 +112,10 @@ public:
 
 
         obj.AddAction("Quality",
-                       GD_T("Quality"),
-                       GD_T("Modify the quality of a light"),
+                       _("Quality"),
+                       _("Modify the quality of a light"),
                        GD_T("Do _PARAM1__PARAM2_ to the quality of _PARAM0_"),
-                       GD_T("Setup"),
+                       _("Setup"),
                        "CppPlatform/Extensions/lightIcon24.png",
                        "CppPlatform/Extensions/lightIcon16.png")
             .AddParameter("object", GD_T("Object"), "Light", false)
@@ -126,10 +126,10 @@ public:
 
 
         obj.AddCondition("Quality",
-                       GD_T("Quality"),
-                       GD_T("Test the quality of a light"),
+                       _("Quality"),
+                       _("Test the quality of a light"),
                        GD_T("The quality of _PARAM0_ is _PARAM1__PARAM2_"),
-                       GD_T("Setup"),
+                       _("Setup"),
                        "CppPlatform/Extensions/lightIcon24.png",
                        "CppPlatform/Extensions/lightIcon16.png")
             .AddParameter("object", GD_T("Object"), "Light", false)
@@ -140,10 +140,10 @@ public:
 
 
         obj.AddAction("ChangeGlobalColor",
-                       GD_T("Global color"),
-                       GD_T("Change scene color for a global light."),
+                       _("Global color"),
+                       _("Change scene color for a global light."),
                        GD_T("Change scene global color of _PARAM0_ to _PARAM1_"),
-                       GD_T("Setup"),
+                       _("Setup"),
                        "CppPlatform/Extensions/lightIcon24.png",
                        "CppPlatform/Extensions/lightIcon16.png")
             .AddParameter("object", GD_T("Object"), "Light", false)
@@ -153,10 +153,10 @@ public:
 
 
         obj.AddAction("SetGlobalLight",
-                       GD_T("Make a light global"),
-                       GD_T("Make a light global or simple."),
+                       _("Make a light global"),
+                       _("Make a light global or simple."),
                        GD_T("Make _PARAM0_ global : _PARAM1_"),
-                       GD_T("Light type"),
+                       _("Light type"),
                        "CppPlatform/Extensions/lightIcon24.png",
                        "CppPlatform/Extensions/lightIcon16.png")
             .AddParameter("object", GD_T("Object"), "Light", false)
@@ -166,10 +166,10 @@ public:
 
 
         obj.AddCondition("GlobalLight",
-                       GD_T("A light is global"),
-                       GD_T("Return true if light is global"),
+                       _("A light is global"),
+                       _("Return true if light is global"),
                        GD_T("_PARAM0_ is a global light"),
-                       GD_T("Light type"),
+                       _("Light type"),
                        "CppPlatform/Extensions/lightIcon24.png",
                        "CppPlatform/Extensions/lightIcon16.png")
             .AddParameter("object", GD_T("Object"), "Light", false)

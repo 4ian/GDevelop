@@ -23,10 +23,10 @@ InstructionMetadata::InstructionMetadata() :
 
 InstructionMetadata::InstructionMetadata(const std::string & extensionNamespace_,
                         const std::string & name_,
-                        const std::string & fullname_,
-                        const std::string & description_,
+                        const gd::String & fullname_,
+                        const gd::String & description_,
                         const std::string & sentence_,
-                        const std::string & group_,
+                        const gd::String & group_,
                         const std::string & icon_,
                         const std::string & smallIcon_) :
 fullname(fullname_),

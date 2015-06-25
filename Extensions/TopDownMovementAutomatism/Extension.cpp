@@ -34,10 +34,10 @@ void DeclareTopDownMovementAutomatismExtension(gd::PlatformExtension & extension
     aut.SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
 
     aut.AddAction("SimulateLeftKey",
-                   GD_T("Simulate left key press"),
-                   GD_T("Simulate a pressing on left key."),
+                   _("Simulate left key press"),
+                   _("Simulate a pressing on left key."),
                    GD_T("Simulate pressing Left for _PARAM0_"),
-                   GD_T("Controls"),
+                   _("Controls"),
                    "res/conditions/keyboard24.png",
                    "res/conditions/keyboard.png")
         .AddParameter("object", GD_T("Object"))
@@ -46,10 +46,10 @@ void DeclareTopDownMovementAutomatismExtension(gd::PlatformExtension & extension
         .SetFunctionName("SimulateLeftKey").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
 
     aut.AddAction("SimulateRightKey",
-                   GD_T("Simulate right key press"),
-                   GD_T("Simulate a pressing on right key."),
+                   _("Simulate right key press"),
+                   _("Simulate a pressing on right key."),
                    GD_T("Simulate pressing Right for _PARAM0_"),
-                   GD_T("Controls"),
+                   _("Controls"),
                    "res/conditions/keyboard24.png",
                    "res/conditions/keyboard.png")
         .AddParameter("object", GD_T("Object"))
@@ -58,10 +58,10 @@ void DeclareTopDownMovementAutomatismExtension(gd::PlatformExtension & extension
         .SetFunctionName("SimulateRightKey").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
 
     aut.AddAction("SimulateUpKey",
-                   GD_T("Simulate up key press"),
-                   GD_T("Simulate a pressing on up key ( Used when on a ladder )."),
+                   _("Simulate up key press"),
+                   _("Simulate a pressing on up key ( Used when on a ladder )."),
                    GD_T("Simulate pressing Up for _PARAM0_"),
-                   GD_T("Controls"),
+                   _("Controls"),
                    "res/conditions/keyboard24.png",
                    "res/conditions/keyboard.png")
         .AddParameter("object", GD_T("Object"))
@@ -70,10 +70,10 @@ void DeclareTopDownMovementAutomatismExtension(gd::PlatformExtension & extension
         .SetFunctionName("SimulateUpKey").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
 
     aut.AddAction("SimulateDownKey",
-                   GD_T("Simulate down key press"),
-                   GD_T("Simulate a pressing on down key ( Used when on a ladder )."),
+                   _("Simulate down key press"),
+                   _("Simulate a pressing on down key ( Used when on a ladder )."),
                    GD_T("Simulate pressing Down for _PARAM0_"),
-                   GD_T("Controls"),
+                   _("Controls"),
                    "res/conditions/keyboard24.png",
                    "res/conditions/keyboard.png")
         .AddParameter("object", GD_T("Object"))
@@ -82,10 +82,10 @@ void DeclareTopDownMovementAutomatismExtension(gd::PlatformExtension & extension
         .SetFunctionName("SimulateDownKey").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
 
     aut.AddAction("SimulateControl",
-                   GD_T("Simulate control"),
-                   GD_T("Simulate a pressing on a key.\nValid keys are Left, Right, Up, Down."),
+                   _("Simulate control"),
+                   _("Simulate a pressing on a key.\nValid keys are Left, Right, Up, Down."),
                    GD_T("Simulate pressing _PARAM2_ key for _PARAM0_"),
-                   GD_T("Controls"),
+                   _("Controls"),
                    "res/conditions/keyboard24.png",
                    "res/conditions/keyboard.png")
         .AddParameter("object", GD_T("Object"))
@@ -95,10 +95,10 @@ void DeclareTopDownMovementAutomatismExtension(gd::PlatformExtension & extension
         .SetFunctionName("SimulateControl").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
 
     aut.AddAction("IgnoreDefaultControls",
-                   GD_T("Ignore default controls"),
-                   GD_T("De/activate the use of default controls.\nIf deactivated, use the simulate actions to move the object."),
+                   _("Ignore default controls"),
+                   _("De/activate the use of default controls.\nIf deactivated, use the simulate actions to move the object."),
                    GD_T("Ignore default controls for _PARAM0_: _PARAM2_"),
-                   GD_T("Controls"),
+                   _("Controls"),
                    "res/conditions/keyboard24.png",
                    "res/conditions/keyboard.png")
         .AddParameter("object", GD_T("Object"))
@@ -108,10 +108,10 @@ void DeclareTopDownMovementAutomatismExtension(gd::PlatformExtension & extension
         .SetFunctionName("IgnoreDefaultControls").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
 
     aut.AddCondition("IsMoving",
-                   GD_T("Is moving"),
-                   GD_T("Check if the object is moving."),
+                   _("Is moving"),
+                   _("Check if the object is moving."),
                    GD_T("_PARAM0_ is moving"),
-                   "",
+                   _(""),
                    "CppPlatform/Extensions/topdownmovementicon24.png",
                    "CppPlatform/Extensions/topdownmovementicon16.png")
         .AddParameter("object", GD_T("Object"))
@@ -119,10 +119,10 @@ void DeclareTopDownMovementAutomatismExtension(gd::PlatformExtension & extension
         .SetFunctionName("IsMoving").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
 
     aut.AddAction("Acceleration",
-                   GD_T("Acceleration"),
-                   GD_T("Change the acceleration of the object"),
+                   _("Acceleration"),
+                   _("Change the acceleration of the object"),
                    GD_T("Do _PARAM2__PARAM3_ to the acceleration of _PARAM0_"),
-                   GD_T("Movement"),
+                   _("Movement"),
                    "CppPlatform/Extensions/topdownmovementicon24.png",
                    "CppPlatform/Extensions/topdownmovementicon16.png")
         .AddParameter("object", GD_T("Object"))
@@ -133,10 +133,10 @@ void DeclareTopDownMovementAutomatismExtension(gd::PlatformExtension & extension
         .SetFunctionName("SetAcceleration").SetGetter("GetAcceleration").SetManipulatedType("number").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
 
     aut.AddCondition("Acceleration",
-                   GD_T("Acceleration"),
-                   GD_T("Compare the acceleration of the object"),
+                   _("Acceleration"),
+                   _("Compare the acceleration of the object"),
                    GD_T("Acceleration of _PARAM0_ is _PARAM2__PARAM3_"),
-                   GD_T("Movement"),
+                   _("Movement"),
                    "CppPlatform/Extensions/topdownmovementicon24.png",
                    "CppPlatform/Extensions/topdownmovementicon16.png")
         .AddParameter("object", GD_T("Object"))
@@ -147,10 +147,10 @@ void DeclareTopDownMovementAutomatismExtension(gd::PlatformExtension & extension
         .SetFunctionName("GetAcceleration").SetManipulatedType("number").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
 
     aut.AddAction("Deceleration",
-                   GD_T("Deceleration"),
-                   GD_T("Change the deceleration of the object"),
+                   _("Deceleration"),
+                   _("Change the deceleration of the object"),
                    GD_T("Do _PARAM2__PARAM3_ to the deceleration of _PARAM0_"),
-                   GD_T("Movement"),
+                   _("Movement"),
                    "CppPlatform/Extensions/topdownmovementicon24.png",
                    "CppPlatform/Extensions/topdownmovementicon16.png")
         .AddParameter("object", GD_T("Object"))
@@ -161,10 +161,10 @@ void DeclareTopDownMovementAutomatismExtension(gd::PlatformExtension & extension
         .SetFunctionName("SetDeceleration").SetGetter("GetDeceleration").SetManipulatedType("number").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
 
     aut.AddCondition("Deceleration",
-                   GD_T("Deceleration"),
-                   GD_T("Compare the deceleration of the object"),
+                   _("Deceleration"),
+                   _("Compare the deceleration of the object"),
                    GD_T("Deceleration of _PARAM0_ is _PARAM2__PARAM3_"),
-                   GD_T("Movement"),
+                   _("Movement"),
                    "CppPlatform/Extensions/topdownmovementicon24.png",
                    "CppPlatform/Extensions/topdownmovementicon16.png")
         .AddParameter("object", GD_T("Object"))
@@ -175,10 +175,10 @@ void DeclareTopDownMovementAutomatismExtension(gd::PlatformExtension & extension
         .SetFunctionName("GetDeceleration").SetManipulatedType("number").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
 
     aut.AddAction("MaxSpeed",
-                   GD_T("Maximum speed"),
-                   GD_T("Change the maximum speed of the object"),
+                   _("Maximum speed"),
+                   _("Change the maximum speed of the object"),
                    GD_T("Do _PARAM2__PARAM3_ to the max. speed of _PARAM0_"),
-                   GD_T("Movement"),
+                   _("Movement"),
                    "CppPlatform/Extensions/topdownmovementicon24.png",
                    "CppPlatform/Extensions/topdownmovementicon16.png")
         .AddParameter("object", GD_T("Object"))
@@ -188,10 +188,10 @@ void DeclareTopDownMovementAutomatismExtension(gd::PlatformExtension & extension
         .SetFunctionName("SetMaxSpeed").SetGetter("GetMaxSpeed").SetManipulatedType("number").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
 
     aut.AddCondition("MaxSpeed",
-                   GD_T("Maximum speed"),
-                   GD_T("Compare the maximum speed of the object"),
+                   _("Maximum speed"),
+                   _("Compare the maximum speed of the object"),
                    GD_T("Max. speed of _PARAM0_ is _PARAM2__PARAM3_"),
-                   GD_T("Movement"),
+                   _("Movement"),
                    "CppPlatform/Extensions/topdownmovementicon24.png",
                    "CppPlatform/Extensions/topdownmovementicon16.png")
         .AddParameter("object", GD_T("Object"))
@@ -202,10 +202,10 @@ void DeclareTopDownMovementAutomatismExtension(gd::PlatformExtension & extension
         .SetFunctionName("GetMaxSpeed").SetManipulatedType("number").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
 
     aut.AddCondition("Speed",
-                   GD_T("Speed"),
-                   GD_T("Compare the speed of the object"),
+                   _("Speed"),
+                   _("Compare the speed of the object"),
                    GD_T("Speed of _PARAM0_ is _PARAM2__PARAM3_"),
-                   GD_T("Movement"),
+                   _("Movement"),
                    "CppPlatform/Extensions/topdownmovementicon24.png",
                    "CppPlatform/Extensions/topdownmovementicon16.png")
         .AddParameter("object", GD_T("Object"))
@@ -215,10 +215,10 @@ void DeclareTopDownMovementAutomatismExtension(gd::PlatformExtension & extension
         .SetFunctionName("GetSpeed").SetManipulatedType("number").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
 
     aut.AddAction("AngularMaxSpeed",
-                   GD_T("Angular maximum speed"),
-                   GD_T("Change the maximum angular speed of the object"),
+                   _("Angular maximum speed"),
+                   _("Change the maximum angular speed of the object"),
                    GD_T("Do _PARAM2__PARAM3_ to the max. angular speed of _PARAM0_"),
-                   GD_T("Movement"),
+                   _("Movement"),
                    "CppPlatform/Extensions/topdownmovementicon24.png",
                    "CppPlatform/Extensions/topdownmovementicon16.png")
         .AddParameter("object", GD_T("Object"))
@@ -229,10 +229,10 @@ void DeclareTopDownMovementAutomatismExtension(gd::PlatformExtension & extension
         .SetFunctionName("SetAngularMaxSpeed").SetGetter("GetAngularMaxSpeed").SetManipulatedType("number").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
 
     aut.AddCondition("AngularMaxSpeed",
-                   GD_T("Angular maximum speed"),
-                   GD_T("Compare the maximum angular speed of the object"),
+                   _("Angular maximum speed"),
+                   _("Compare the maximum angular speed of the object"),
                    GD_T("Max. angular speed of _PARAM0_ is _PARAM2__PARAM3_"),
-                   GD_T("Movement"),
+                   _("Movement"),
                    "CppPlatform/Extensions/topdownmovementicon24.png",
                    "CppPlatform/Extensions/topdownmovementicon16.png")
         .AddParameter("object", GD_T("Object"))
@@ -243,10 +243,10 @@ void DeclareTopDownMovementAutomatismExtension(gd::PlatformExtension & extension
         .SetFunctionName("GetAngularMaxSpeed").SetManipulatedType("number").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
 
     aut.AddAction("AngleOffset",
-                   GD_T("Rotation offset"),
-                   GD_T("Change the rotation offset applied when moving the object"),
+                   _("Rotation offset"),
+                   _("Change the rotation offset applied when moving the object"),
                    GD_T("Do _PARAM2__PARAM3_ to the rotation offset of _PARAM0_"),
-                   GD_T("Movement"),
+                   _("Movement"),
                    "CppPlatform/Extensions/topdownmovementicon24.png",
                    "CppPlatform/Extensions/topdownmovementicon16.png")
         .AddParameter("object", GD_T("Object"))
@@ -257,10 +257,10 @@ void DeclareTopDownMovementAutomatismExtension(gd::PlatformExtension & extension
         .SetFunctionName("SetAngleOffset").SetGetter("GetAngleOffset").SetManipulatedType("number").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
 
     aut.AddCondition("AngleOffset",
-                   GD_T("Rotation offset"),
-                   GD_T("Compare the rotation offset applied when moving the object"),
+                   _("Rotation offset"),
+                   _("Compare the rotation offset applied when moving the object"),
                    GD_T("Rotation offset of _PARAM0_ is _PARAM2__PARAM3_"),
-                   GD_T("Movement"),
+                   _("Movement"),
                    "CppPlatform/Extensions/topdownmovementicon24.png",
                    "CppPlatform/Extensions/topdownmovementicon16.png")
         .AddParameter("object", GD_T("Object"))
@@ -271,10 +271,10 @@ void DeclareTopDownMovementAutomatismExtension(gd::PlatformExtension & extension
         .SetFunctionName("GetAngleOffset").SetManipulatedType("number").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
 
     aut.AddAction("AllowDiagonals",
-                   GD_T("Diagonals moves"),
-                   GD_T("Allow or restrict diagonal moves"),
+                   _("Diagonals moves"),
+                   _("Allow or restrict diagonal moves"),
                    GD_T("Allow diagonal moves for _PARAM0_: _PARAM2_"),
-                   GD_T("Movement"),
+                   _("Movement"),
                    "CppPlatform/Extensions/topdownmovementicon24.png",
                    "CppPlatform/Extensions/topdownmovementicon16.png")
         .AddParameter("object", GD_T("Object"))
@@ -283,10 +283,10 @@ void DeclareTopDownMovementAutomatismExtension(gd::PlatformExtension & extension
         .SetFunctionName("SetAllowDiagonals").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
 
     aut.AddCondition("DiagonalsAllowed",
-                   GD_T("Diagonals moves"),
-                   GD_T("Return true if the object is allowed to do diagonal moves"),
+                   _("Diagonals moves"),
+                   _("Return true if the object is allowed to do diagonal moves"),
                    GD_T("Size of the extra border applied to _PARAM0_ is _PARAM2__PARAM3_"),
-                   GD_T("Movement"),
+                   _("Movement"),
                    "CppPlatform/Extensions/topdownmovementicon24.png",
                    "CppPlatform/Extensions/topdownmovementicon16.png")
         .AddParameter("object", GD_T("Object"))
@@ -295,10 +295,10 @@ void DeclareTopDownMovementAutomatismExtension(gd::PlatformExtension & extension
         .SetFunctionName("DiagonalsAllowed").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
 
     aut.AddAction("RotateObject",
-                   GD_T("Rotate the object"),
-                   GD_T("Enable or disable rotation of the object"),
+                   _("Rotate the object"),
+                   _("Enable or disable rotation of the object"),
                    GD_T("Enable rotation of _PARAM0_: _PARAM2_"),
-                   GD_T("Movement"),
+                   _("Movement"),
                    "CppPlatform/Extensions/topdownmovementicon24.png",
                    "CppPlatform/Extensions/topdownmovementicon16.png")
         .AddParameter("object", GD_T("Object"))
@@ -308,10 +308,10 @@ void DeclareTopDownMovementAutomatismExtension(gd::PlatformExtension & extension
         .SetFunctionName("SetRotateObject").SetIncludeFile("TopDownMovementAutomatism/TopDownMovementAutomatism.h");
 
     aut.AddCondition("ObjectRotated",
-                   GD_T("Object rotated"),
-                   GD_T("Return true if the object is rotated when traveling on its path."),
+                   _("Object rotated"),
+                   _("Return true if the object is rotated when traveling on its path."),
                    GD_T("_PARAM0_ is rotated when moving"),
-                   GD_T("Movement"),
+                   _("Movement"),
                    "CppPlatform/Extensions/topdownmovementicon24.png",
                    "CppPlatform/Extensions/topdownmovementicon16.png")
         .AddParameter("object", GD_T("Object"))

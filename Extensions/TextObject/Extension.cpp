@@ -33,10 +33,10 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
     obj.SetIncludeFile("TextObject/TextObject.h");
 
     obj.AddAction("String",
-                   GD_T("Modify the text"),
-                   GD_T("Modify the text of a Text object."),
+                   _("Modify the text"),
+                   _("Modify the text of a Text object."),
                    GD_T("Do _PARAM1__PARAM2_ to the text of _PARAM0_"),
-                   "",
+                   _(""),
                    "res/actions/text24.png",
                    "res/actions/text.png")
 
@@ -46,10 +46,10 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
         .SetFunctionName("SetString").SetManipulatedType("string").SetGetter("GetString").SetIncludeFile("TextObject/TextObject.h");
 
     obj.AddCondition("String",
-                   GD_T("Compare the text"),
-                   GD_T("Compare the text of a Text object."),
+                   _("Compare the text"),
+                   _("Compare the text of a Text object."),
                    GD_T("Text of _PARAM0_ is _PARAM1__PARAM2_"),
-                   "",
+                   _(""),
                    "res/conditions/text24.png",
                    "res/conditions/text.png")
 
@@ -59,10 +59,10 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
         .SetFunctionName("GetString").SetManipulatedType("string").SetIncludeFile("TextObject/TextObject.h");
 
     obj.AddAction("Font",
-                   GD_T("Font"),
-                   GD_T("Modify the font of the text."),
+                   _("Font"),
+                   _("Modify the font of the text."),
                    GD_T("Change font of _PARAM0_ to _PARAM1_"),
-                   GD_T("Font"),
+                   _("Font"),
                    "res/actions/font24.png",
                    "res/actions/font.png")
 
@@ -71,10 +71,10 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
         .SetFunctionName("ChangeFont").SetIncludeFile("TextObject/TextObject.h");
 
     obj.AddAction("Size",
-                   GD_T("Size"),
-                   GD_T("Modify the size of the text."),
+                   _("Size"),
+                   _("Modify the size of the text."),
                    GD_T("Do _PARAM1__PARAM2_ to the size of the text of _PARAM0_"),
-                   "",
+                   _(""),
                    "res/actions/characterSize24.png",
                    "res/actions/characterSize.png")
 
@@ -84,10 +84,10 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
         .SetFunctionName("SetCharacterSize").SetManipulatedType("number").SetGetter("GetCharacterSize").SetIncludeFile("TextObject/TextObject.h");
 
     obj.AddCondition("Size",
-                   GD_T("Size"),
-                   GD_T("Test the size of the text"),
+                   _("Size"),
+                   _("Test the size of the text"),
                    GD_T("The size of the text of _PARAM0_ is _PARAM1__PARAM2_"),
-                   "",
+                   _(""),
                    "res/conditions/characterSize24.png",
                    "res/conditions/characterSize.png")
 
@@ -97,10 +97,10 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
         .SetFunctionName("GetCharacterSize").SetManipulatedType("number").SetIncludeFile("TextObject/TextObject.h");
 
     obj.AddAction("ChangeColor",
-                   GD_T("Color"),
-                   GD_T("Change the color of the text. The color is white by default."),
+                   _("Color"),
+                   _("Change the color of the text. The color is white by default."),
                    GD_T("Change color of _PARAM0_ to _PARAM1_"),
-                   GD_T("Effects"),
+                   _("Effects"),
                    "res/actions/color24.png",
                    "res/actions/color.png")
 
@@ -109,10 +109,10 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
         .SetFunctionName("SetColor").SetIncludeFile("TextObject/TextObject.h");
 
     obj.AddAction("Opacity",
-                   GD_T("Opacity"),
-                   GD_T("Modify the opacity of a Text object."),
+                   _("Opacity"),
+                   _("Modify the opacity of a Text object."),
                    GD_T("Do _PARAM1__PARAM2_ to the opacity of _PARAM0_"),
-                   "",
+                   _(""),
                    "res/actions/opacity24.png",
                    "res/actions/opacity.png")
 
@@ -122,10 +122,10 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
         .SetFunctionName("SetOpacity").SetManipulatedType("number").SetGetter("GetOpacity").SetIncludeFile("TextObject/TextObject.h");
 
     obj.AddCondition("Opacity",
-                   GD_T("Opacity"),
-                   GD_T("Test the value of the opacity of a text object."),
+                   _("Opacity"),
+                   _("Test the value of the opacity of a text object."),
                    GD_T("The opacity of _PARAM0_ is _PARAM1__PARAM2_"),
-                   "",
+                   _(""),
                    "res/conditions/opacity24.png",
                    "res/conditions/opacity.png")
 
@@ -137,10 +137,10 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
 
 
     obj.AddAction("SetSmooth",
-                   GD_T("Smoothing"),
-                   GD_T("Activate or desactivate text smoothing."),
+                   _("Smoothing"),
+                   _("Activate or desactivate text smoothing."),
                    GD_T("Smooth _PARAM0_: _PARAM1_"),
-                   GD_T("Style"),
+                   _("Style"),
                    "res/actions/opacity24.png",
                    "res/actions/opacity.png")
 
@@ -149,10 +149,10 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
         .SetFunctionName("SetSmooth").SetIncludeFile("TextObject/TextObject.h");
 
     obj.AddCondition("Smoothed",
-                   GD_T("Smoothing"),
-                   GD_T("Test if an object is smoothed"),
+                   _("Smoothing"),
+                   _("Test if an object is smoothed"),
                    GD_T("_PARAM0_ is smoothed"),
-                   GD_T("Style"),
+                   _("Style"),
                    "res/conditions/opacity24.png",
                    "res/conditions/opacity.png")
 
@@ -160,10 +160,10 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
         .SetFunctionName("IsSmoothed").SetIncludeFile("TextObject/TextObject.h");
 
     obj.AddAction("SetBold",
-                   GD_T("Bold"),
-                   GD_T("De/activate bold"),
+                   _("Bold"),
+                   _("De/activate bold"),
                    GD_T("Set bold style of _PARAM0_ : _PARAM1_"),
-                   GD_T("Style"),
+                   _("Style"),
                    "res/actions/bold.png",
                    "res/actions/bold16.png")
 
@@ -172,10 +172,10 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
         .SetFunctionName("SetBold").SetIncludeFile("TextObject/TextObject.h");
 
     obj.AddCondition("IsBold",
-                   GD_T("Bold"),
-                   GD_T("Test if bold style is activated"),
+                   _("Bold"),
+                   _("Test if bold style is activated"),
                    GD_T("_PARAM0_ bold style is set"),
-                   GD_T("Style"),
+                   _("Style"),
                    "res/conditions/bold.png",
                    "res/conditions/bold16.png")
 
@@ -183,10 +183,10 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
         .SetFunctionName("IsBold").SetIncludeFile("TextObject/TextObject.h");
 
     obj.AddAction("SetItalic",
-                   GD_T("Italic"),
-                   GD_T("De/activate italic."),
+                   _("Italic"),
+                   _("De/activate italic."),
                    GD_T("Set italic style for _PARAM0_ : _PARAM1_"),
-                   GD_T("Style"),
+                   _("Style"),
                    "res/actions/italic.png",
                    "res/actions/italic16.png")
 
@@ -195,10 +195,10 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
         .SetFunctionName("SetItalic").SetIncludeFile("TextObject/TextObject.h");
 
     obj.AddCondition("IsItalic",
-                   GD_T("Italic"),
-                   GD_T("Test if the italic style is activated"),
+                   _("Italic"),
+                   _("Test if the italic style is activated"),
                    GD_T("_PARAM0_ italic style is set"),
-                   GD_T("Style"),
+                   _("Style"),
                    "res/conditions/italic.png",
                    "res/conditions/italic16.png")
 
@@ -206,10 +206,10 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
         .SetFunctionName("IsItalic").SetIncludeFile("TextObject/TextObject.h");
 
     obj.AddAction("SetUnderlined",
-                   GD_T("Underlined"),
-                   GD_T("De/activate underlined style."),
+                   _("Underlined"),
+                   _("De/activate underlined style."),
                    GD_T("Set underlined style of _PARAM0_: _PARAM1_"),
-                   GD_T("Style"),
+                   _("Style"),
                    "res/actions/underline.png",
                    "res/actions/underline16.png")
 
@@ -218,10 +218,10 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
         .SetFunctionName("SetUnderlined").SetIncludeFile("TextObject/TextObject.h");
 
     obj.AddCondition("IsUnderlined",
-                   GD_T("Underlined"),
-                   GD_T("Test if the underlined style of an object is set."),
+                   _("Underlined"),
+                   _("Test if the underlined style of an object is set."),
                    GD_T("_PARAM0_ underlined style is activated"),
-                   GD_T("Style"),
+                   _("Style"),
                    "res/conditions/underline.png",
                    "res/conditions/underline16.png")
 
@@ -229,10 +229,10 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
         .SetFunctionName("IsUnderlined").SetIncludeFile("TextObject/TextObject.h");
 
     obj.AddAction("Angle",
-                   GD_T("Angle"),
-                   GD_T("Modify the angle of a Text object."),
+                   _("Angle"),
+                   _("Modify the angle of a Text object."),
                    GD_T("Do _PARAM1__PARAM2_ to the angle of _PARAM0_"),
-                   GD_T("Rotation"),
+                   _("Rotation"),
                    "res/actions/rotate24.png",
                    "res/actions/rotate.png")
 
@@ -242,10 +242,10 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
         .SetFunctionName("SetAngle").SetManipulatedType("number").SetGetter("GetAngle").SetIncludeFile("TextObject/TextObject.h");
 
     obj.AddCondition("Angle",
-                   GD_T("Angle"),
-                   GD_T("Test the value of the angle of a text object."),
+                   _("Angle"),
+                   _("Test the value of the angle of a text object."),
                    GD_T("The angle of _PARAM0_ is _PARAM1__PARAM2_"),
-                   GD_T("Rotation"),
+                   _("Rotation"),
                    "res/conditions/rotate24.png",
                    "res/conditions/rotate.png")
 

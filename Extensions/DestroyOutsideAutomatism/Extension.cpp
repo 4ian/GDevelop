@@ -32,10 +32,10 @@ void DeclareDestroyOutsideAutomatismExtension(gd::PlatformExtension & extension)
     aut.SetIncludeFile("DestroyOutsideAutomatism/DestroyOutsideAutomatism.h");
 
     aut.AddCondition("ExtraBorder",
-                   GD_T("Additional border"),
-                   GD_T("Compare the additional border that the object must cross before being deleted."),
+                   _("Additional border"),
+                   _("Compare the additional border that the object must cross before being deleted."),
                    GD_T("The additional border of _PARAM0_ is _PARAM2__PARAM3_"),
-                   "",
+                   _(""),
                    "CppPlatform/Extensions/destroyoutsideicon24.png",
                    "CppPlatform/Extensions/destroyoutsideicon16.png")
         .AddParameter("object", GD_T("Object"))
@@ -46,10 +46,10 @@ void DeclareDestroyOutsideAutomatismExtension(gd::PlatformExtension & extension)
         .SetFunctionName("GetExtraBorder").SetIncludeFile("DestroyOutsideAutomatism/DestroyOutsideAutomatism.h");
 
     aut.AddAction("ExtraBorder",
-                   GD_T("Additional border"),
-                   GD_T("Change the additional border that the object must cross before being deleted."),
+                   _("Additional border"),
+                   _("Change the additional border that the object must cross before being deleted."),
                    GD_T("Do _PARAM2__PARAM3_ to the additional border of _PARAM0_"),
-                   "",
+                   _(""),
                    "CppPlatform/Extensions/destroyoutsideicon24.png",
                    "CppPlatform/Extensions/destroyoutsideicon16.png")
         .AddParameter("object", GD_T("Object"))

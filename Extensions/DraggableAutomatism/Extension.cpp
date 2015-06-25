@@ -32,10 +32,10 @@ void DeclareDraggableAutomatismExtension(gd::PlatformExtension & extension)
     aut.SetIncludeFile("DraggableAutomatism/DraggableAutomatism.h");
 
     aut.AddCondition("Dragged",
-                   GD_T("Being dragged"),
-                   GD_T("Check if the object is being dragged"),
+                   _("Being dragged"),
+                   _("Check if the object is being dragged"),
                    GD_T("_PARAM0_ is being dragged"),
-                   "",
+                   _(""),
                    "CppPlatform/Extensions/draggableicon24.png",
                    "CppPlatform/Extensions/draggableicon16.png")
 

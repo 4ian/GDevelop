@@ -30,10 +30,10 @@ std::map<std::string, gd::ExpressionMetadata > PlatformExtension::badStrExpressi
 #endif
 
 gd::InstructionMetadata & PlatformExtension::AddCondition(const std::string & name,
-                                       const std::string & fullname,
-                                       const std::string & description,
+                                       const gd::String & fullname,
+                                       const gd::String & description,
                                        const std::string & sentence,
-                                       const std::string & group,
+                                       const gd::String & group,
                                        const std::string & icon,
                                        const std::string & smallicon)
 {
@@ -45,10 +45,10 @@ gd::InstructionMetadata & PlatformExtension::AddCondition(const std::string & na
 }
 
 gd::InstructionMetadata & PlatformExtension::AddAction(const std::string & name,
-                                       const std::string & fullname,
-                                       const std::string & description,
+                                       const gd::String & fullname,
+                                       const gd::String & description,
                                        const std::string & sentence,
-                                       const std::string & group,
+                                       const gd::String & group,
                                        const std::string & icon,
                                        const std::string & smallicon)
 {

@@ -9,6 +9,7 @@
 #include <vector>
 #include "GDCore/Events/Expression.h"
 #include "GDCore/Tools/SPtrList.h"
+#include "GDCore/Utf8String.h"
 
 namespace gd
 {

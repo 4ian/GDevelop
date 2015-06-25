@@ -29,10 +29,10 @@ public:
         #if defined(GD_IDE_ONLY)
 
         AddAction("ShowMsgBox",
-                       GD_T("Show a message box"),
-                       GD_T("Display a message box with specified text, and a Ok button."),
+                       _("Show a message box"),
+                       _("Display a message box with specified text, and a Ok button."),
                        GD_T("Display message \"_PARAM1_\" with title \"_PARAM2_\""),
-                       GD_T("Interfaces"),
+                       _("Interfaces"),
                        "res/actions/msgbox24.png",
                        "res/actions/msgbox.png")
 
@@ -43,10 +43,10 @@ public:
             .SetFunctionName("GDpriv::CommonDialogs::ShowMessageBox").SetIncludeFile("CommonDialogs/CommonDialogs.h");
 
         AddAction("ShowOpenFile",
-                       GD_T("Show a window to choose a file"),
-                       GD_T("Display a window allowing to choose a file.\nThe name and the directory of the file will be saved in the specified variable."),
+                       _("Show a window to choose a file"),
+                       _("Display a window allowing to choose a file.\nThe name and the directory of the file will be saved in the specified variable."),
                        GD_T("Open a window so as to choose a file, and save the result in _PARAM1_"),
-                       GD_T("Interfaces"),
+                       _("Interfaces"),
                        "res/actions/openfile24.png",
                        "res/actions/openfile.png")
 
@@ -58,10 +58,10 @@ public:
             .SetFunctionName("GDpriv::CommonDialogs::ShowOpenFile").SetIncludeFile("CommonDialogs/CommonDialogs.h");
 
         AddAction("ShowTextInput",
-                       GD_T("Show a window to enter a text"),
-                       GD_T("Show a window allowing to enter a text.\nThe text will be saved in the specified scene variable."),
+                       _("Show a window to enter a text"),
+                       _("Show a window allowing to enter a text.\nThe text will be saved in the specified scene variable."),
                        GD_T("Open a text input dialog, and save the result in _PARAM1_"),
-                       GD_T("Interfaces"),
+                       _("Interfaces"),
                        "res/actions/textenter24.png",
                        "res/actions/textenter.png")
 
@@ -73,10 +73,10 @@ public:
             .SetFunctionName("GDpriv::CommonDialogs::ShowTextInput").SetIncludeFile("CommonDialogs/CommonDialogs.h");
 
         AddAction("ShowYesNoMsgBox",
-                       GD_T("Display a Yes/No message box"),
-                       GD_T("Open a message box allowing to choose Yes or No.\nThe answer ( \"yes\"/\"no\" ) will be saved in the specified variable."),
+                       _("Display a Yes/No message box"),
+                       _("Open a message box allowing to choose Yes or No.\nThe answer ( \"yes\"/\"no\" ) will be saved in the specified variable."),
                        GD_T("Open a Yes/No message box, and save the result in _PARAM1_"),
-                       GD_T("Interfaces"),
+                       _("Interfaces"),
                        "res/actions/msgbox24.png",
                        "res/actions/msgbox.png")
 

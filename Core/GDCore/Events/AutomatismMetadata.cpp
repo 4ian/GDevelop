@@ -59,10 +59,10 @@ AutomatismMetadata::AutomatismMetadata(const std::string & extensionNamespace_,
 }
 
 gd::InstructionMetadata & AutomatismMetadata::AddCondition(const std::string & name,
-                                       const std::string & fullname,
-                                       const std::string & description,
+                                       const gd::String & fullname,
+                                       const gd::String & description,
                                        const std::string & sentence,
-                                       const std::string & group,
+                                       const gd::String & group,
                                        const std::string & icon,
                                        const std::string & smallicon)
 {
@@ -74,10 +74,10 @@ gd::InstructionMetadata & AutomatismMetadata::AddCondition(const std::string & n
 }
 
 gd::InstructionMetadata & AutomatismMetadata::AddAction(const std::string & name,
-                                       const std::string & fullname,
-                                       const std::string & description,
+                                       const gd::String & fullname,
+                                       const gd::String & description,
                                        const std::string & sentence,
-                                       const std::string & group,
+                                       const gd::String & group,
                                        const std::string & icon,
                                        const std::string & smallicon)
 {

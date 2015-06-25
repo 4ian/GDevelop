@@ -49,10 +49,10 @@ public:
                 aut.SetIncludeFile("PathAutomatism/PathAutomatism.h");
 
                 aut.AddAction("SetReverseAtEnd",
-                               GD_T("De/activate rounding"),
-                               GD_T("Activate or desactivate rounding"),
+                               _("De/activate rounding"),
+                               _("Activate or desactivate rounding"),
                                GD_T("Activate rounding for _PARAM0_: _PARAM2_"),
-                               GD_T("Options"),
+                               _("Options"),
                                "CppPlatform/Extensions/pathicon24.png",
                                "CppPlatform/Extensions/pathicon16.png")
 
@@ -63,10 +63,10 @@ public:
 
 
                 aut.AddAction("SetStopAtEnd",
-                               GD_T("De/activate the stop at the end of the path"),
-                               GD_T("Activate or deactivate the stop at the end of the object"),
+                               _("De/activate the stop at the end of the path"),
+                               _("Activate or deactivate the stop at the end of the object"),
                                GD_T("Stop _PARAM0_ when the end of the path is reached: _PARAM2_"),
-                               GD_T("Options"),
+                               _("Options"),
                                "CppPlatform/Extensions/pathicon24.png",
                                "CppPlatform/Extensions/pathicon16.png")
 
@@ -77,10 +77,10 @@ public:
 
 
                 aut.AddCondition("ReverseAtEnd",
-                               GD_T("Rounds"),
-                               GD_T("Return true if the object round"),
+                               _("Rounds"),
+                               _("Return true if the object round"),
                                GD_T("_PARAM0_ is rounding"),
-                               GD_T("Options"),
+                               _("Options"),
                                "CppPlatform/Extensions/pathicon24.png",
                                "CppPlatform/Extensions/pathicon16.png")
 
@@ -90,10 +90,10 @@ public:
 
 
                 aut.AddCondition("StopAtEnd",
-                               GD_T("Stop at the end of the path"),
-                               GD_T("Return true if the object stops at the end of its path."),
+                               _("Stop at the end of the path"),
+                               _("Return true if the object stops at the end of its path."),
                                GD_T("_PARAM0_ stops at the end of the path"),
-                               GD_T("Options"),
+                               _("Options"),
                                "CppPlatform/Extensions/pathicon24.png",
                                "CppPlatform/Extensions/pathicon16.png")
 
@@ -103,10 +103,10 @@ public:
 
 
                 aut.AddAction("Reverse",
-                               GD_T("Invert the movement on the path"),
-                               GD_T("Invert the movement on the path."),
+                               _("Invert the movement on the path"),
+                               _("Invert the movement on the path."),
                                GD_T("Invert the sens of the movement of _PARAM0_ on its path"),
-                               GD_T("Movement"),
+                               _("Movement"),
                                "CppPlatform/Extensions/pathicon24.png",
                                "CppPlatform/Extensions/pathicon16.png")
 
@@ -116,10 +116,10 @@ public:
 
 
                 aut.AddCondition("GetSegment",
-                               GD_T("Number of the segment on the path"),
-                               GD_T("True if the number of the current segment on the path satisfies the test."),
+                               _("Number of the segment on the path"),
+                               _("True if the number of the current segment on the path satisfies the test."),
                                GD_T("The number of the current segment of the path of _PARAM0_ is _PARAM2__PARAM3_"),
-                               GD_T("Position"),
+                               _("Position"),
                                "CppPlatform/Extensions/pathicon24.png",
                                "CppPlatform/Extensions/pathicon16.png")
 
@@ -131,10 +131,10 @@ public:
 
 
                 aut.AddAction("EnterSegment",
-                               GD_T("Position on the segment of a path"),
-                               GD_T("Put the object directly on specific segment of the path"),
+                               _("Position on the segment of a path"),
+                               _("Put the object directly on specific segment of the path"),
                                GD_T("Do _PARAM2__PARAM3_ to number of the current segment of _PARAM0_"),
-                               GD_T("Position"),
+                               _("Position"),
                                "CppPlatform/Extensions/pathicon24.png",
                                "CppPlatform/Extensions/pathicon16.png")
 
@@ -151,10 +151,10 @@ public:
 
 
                 aut.AddCondition("GetPosition",
-                               GD_T("Position of the object on the segment"),
-                               GD_T("Return true if the position on the path satisfy the test.\nPosition on a segment is a value between 0 and 1."),
+                               _("Position of the object on the segment"),
+                               _("Return true if the position on the path satisfy the test.\nPosition on a segment is a value between 0 and 1."),
                                GD_T("The position of _PARAM0_ on the current segment is _PARAM2__PARAM3_"),
-                               GD_T("Position"),
+                               _("Position"),
                                "CppPlatform/Extensions/pathicon24.png",
                                "CppPlatform/Extensions/pathicon16.png")
 
@@ -166,10 +166,10 @@ public:
 
 
                 aut.AddAction("SetPosition",
-                               GD_T("Put the object on a precise position of the current segment"),
-                               GD_T("Put the object on a precise position on the current segment."),
+                               _("Put the object on a precise position of the current segment"),
+                               _("Put the object on a precise position on the current segment."),
                                GD_T("Put _PARAM0_ on _PARAM2__PARAM3_ on the current segment"),
-                               GD_T("Position"),
+                               _("Position"),
                                "CppPlatform/Extensions/pathicon24.png",
                                "CppPlatform/Extensions/pathicon16.png")
 
@@ -186,10 +186,10 @@ public:
 
 
                 aut.AddCondition("GetPathName",
-                               GD_T("Path name"),
-                               GD_T("Test the path name."),
+                               _("Path name"),
+                               _("Test the path name."),
                                GD_T("The name of the current path of _PARAM0_ is _PARAM1__PARAM2_"),
-                               GD_T("Path"),
+                               _("Path"),
                                "CppPlatform/Extensions/pathicon24.png",
                                "CppPlatform/Extensions/pathicon16.png")
 
@@ -201,10 +201,10 @@ public:
 
 
                 aut.AddAction("SetPathName",
-                               GD_T("Change the path"),
-                               GD_T("Change the path used."),
+                               _("Change the path"),
+                               _("Change the path used."),
                                GD_T("Set _PARAM2_ as the current path of _PARAM0_"),
-                               GD_T("Path"),
+                               _("Path"),
                                "CppPlatform/Extensions/pathicon24.png",
                                "CppPlatform/Extensions/pathicon16.png")
 
@@ -220,10 +220,10 @@ public:
 
 
                 aut.AddCondition("GetOffsetX",
-                               GD_T("X position of the path"),
-                               GD_T("Return true if the X position satisfies the test."),
+                               _("X position of the path"),
+                               _("Return true if the X position satisfies the test."),
                                GD_T("The X position of the path of _PARAM0_ is _PARAM2__PARAM3_"),
-                               GD_T("Path position"),
+                               _("Path position"),
                                "CppPlatform/Extensions/pathicon24.png",
                                "CppPlatform/Extensions/pathicon16.png")
 
@@ -235,10 +235,10 @@ public:
 
 
                 aut.AddAction("SetOffsetX",
-                               GD_T("Modify the path X position"),
-                               GD_T("Change the path X position."),
+                               _("Modify the path X position"),
+                               _("Change the path X position."),
                                GD_T("Do _PARAM2__PARAM3_ to the X position of the path of _PARAM0_"),
-                               GD_T("Path position"),
+                               _("Path position"),
                                "CppPlatform/Extensions/pathicon24.png",
                                "CppPlatform/Extensions/pathicon16.png")
 
@@ -255,10 +255,10 @@ public:
 
 
                 aut.AddCondition("GetOffsetY",
-                               GD_T("Path Y position"),
-                               GD_T("Return true if the Y position satisfies the test."),
+                               _("Path Y position"),
+                               _("Return true if the Y position satisfies the test."),
                                GD_T("The Y position of the path of _PARAM0_ is _PARAM2__PARAM3_"),
-                               GD_T("Path position"),
+                               _("Path position"),
                                "CppPlatform/Extensions/pathicon24.png",
                                "CppPlatform/Extensions/pathicon16.png")
 
@@ -270,10 +270,10 @@ public:
 
 
                 aut.AddAction("SetOffsetY",
-                               GD_T("Modify the path Y position"),
-                               GD_T("Change the path Y position."),
+                               _("Modify the path Y position"),
+                               _("Change the path Y position."),
                                GD_T("Do _PARAM2__PARAM3_ to the Y position of the path of _PARAM0_"),
-                               GD_T("Path position"),
+                               _("Path position"),
                                "CppPlatform/Extensions/pathicon24.png",
                                "CppPlatform/Extensions/pathicon16.png")
 
@@ -290,10 +290,10 @@ public:
 
 
                 aut.AddCondition("GetFollowAngle",
-                               GD_T("Automatic rotation"),
-                               GD_T("Return true if the object's angle is automatically updated."),
+                               _("Automatic rotation"),
+                               _("Return true if the object's angle is automatically updated."),
                                GD_T("The angle of _PARAM0_ is automatically updated on the path"),
-                               GD_T("Options"),
+                               _("Options"),
                                "CppPlatform/Extensions/pathicon24.png",
                                "CppPlatform/Extensions/pathicon16.png")
 
@@ -303,10 +303,10 @@ public:
 
 
                 aut.AddAction("SetFollowAngle",
-                               GD_T("De/activate automatic rotation"),
-                               GD_T("Activate or deactivate the automatic update of the angle of the object on the path."),
+                               _("De/activate automatic rotation"),
+                               _("Activate or deactivate the automatic update of the angle of the object on the path."),
                                GD_T("Activate automatic rotation of _PARAM0_: _PARAM2_"),
-                               GD_T("Options"),
+                               _("Options"),
                                "CppPlatform/Extensions/pathicon24.png",
                                "CppPlatform/Extensions/pathicon16.png")
 
@@ -317,10 +317,10 @@ public:
 
 
                 aut.AddCondition("GetAngleOffset",
-                               GD_T("Angle offset"),
-                               GD_T("Return true if the angle offset satifies the condition."),
+                               _("Angle offset"),
+                               _("Return true if the angle offset satifies the condition."),
                                GD_T("The angle offset of _PARAM0_ is _PARAM2__PARAM3_"),
-                               GD_T("Options"),
+                               _("Options"),
                                "CppPlatform/Extensions/pathicon24.png",
                                "CppPlatform/Extensions/pathicon16.png")
 
@@ -332,10 +332,10 @@ public:
 
 
                 aut.AddAction("SetAngleOffset",
-                               GD_T("Change the angle offset"),
-                               GD_T("Change the angle offset"),
+                               _("Change the angle offset"),
+                               _("Change the angle offset"),
                                GD_T("Do _PARAM2__PARAM3_ to angle offset of _PARAM0_"),
-                               GD_T("Options"),
+                               _("Options"),
                                "CppPlatform/Extensions/pathicon24.png",
                                "CppPlatform/Extensions/pathicon16.png")
 
@@ -352,10 +352,10 @@ public:
 
 
                 aut.AddCondition("GetSpeed",
-                               GD_T("Speed"),
-                               GD_T("Return true if the speed satisfy the condition."),
+                               _("Speed"),
+                               _("Return true if the speed satisfy the condition."),
                                GD_T("The speed of _PARAM0_ on the path is _PARAM2__PARAM3_"),
-                               GD_T("Movement"),
+                               _("Movement"),
                                "CppPlatform/Extensions/pathicon24.png",
                                "CppPlatform/Extensions/pathicon16.png")
 
@@ -367,10 +367,10 @@ public:
 
 
                 aut.AddAction("SetSpeed",
-                               GD_T("Change the speed"),
-                               GD_T("Change the speed of the object on the path."),
+                               _("Change the speed"),
+                               _("Change the speed of the object on the path."),
                                GD_T("Do _PARAM1__PARAM2_ to the speed of _PARAM0_ on the path"),
-                               GD_T("Movement"),
+                               _("Movement"),
                                "CppPlatform/Extensions/pathicon24.png",
                                "CppPlatform/Extensions/pathicon16.png")
 

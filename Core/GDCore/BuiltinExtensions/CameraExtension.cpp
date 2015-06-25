@@ -20,10 +20,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(gd::Pla
 
     #if defined(GD_IDE_ONLY)
     extension.AddCondition("CameraX",
-                   GD_T("Camera center X position"),
-                   GD_T("Compare the X position of a the center of a camera."),
+                   _("Camera center X position"),
+                   _("Compare the X position of a the center of a camera."),
                    GD_T("X position of camera _PARAM4_ is _PARAM1__PARAM2_ ( Layer: _PARAM3_ )"),
-                   GD_T("Layers and cameras"),
+                   _("Layers and cameras"),
                    "res/conditions/camera24.png",
                    "res/conditions/camera.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -35,10 +35,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(gd::Pla
         .SetManipulatedType("number");
 
     extension.AddCondition("CameraY",
-                   GD_T("Camera center Y position"),
-                   GD_T("Compare the Y position of a the center of a camera."),
+                   _("Camera center Y position"),
+                   _("Compare the Y position of a the center of a camera."),
                    GD_T("The Y position of camera _PARAM4_ is _PARAM1__PARAM2_  ( Layer: _PARAM3_ )"),
-                   GD_T("Layers and cameras"),
+                   _("Layers and cameras"),
                    "res/conditions/camera24.png",
                    "res/conditions/camera.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -50,10 +50,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(gd::Pla
         .SetManipulatedType("number");
 
     extension.AddAction("CameraX",
-                   GD_T("Camera center X position"),
-                   GD_T("Change X position of the center of the specified camera."),
+                   _("Camera center X position"),
+                   _("Change X position of the center of the specified camera."),
                    GD_T("Do _PARAM1__PARAM2_ to X position of camera _PARAM4_ ( Layer: _PARAM3_ )"),
-                   GD_T("Layers and cameras"),
+                   _("Layers and cameras"),
                    "res/conditions/camera24.png",
                    "res/conditions/camera.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -65,10 +65,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(gd::Pla
         .SetManipulatedType("number");
 
     extension.AddAction("CameraY",
-                   GD_T("Camera center Y position"),
-                   GD_T("Change Y position of the center of the specified camera."),
+                   _("Camera center Y position"),
+                   _("Change Y position of the center of the specified camera."),
                    GD_T("Do _PARAM1__PARAM2_ to Y position of camera _PARAM4_ ( Layer: _PARAM3_ )"),
-                   GD_T("Layers and cameras"),
+                   _("Layers and cameras"),
                    "res/conditions/camera24.png",
                    "res/conditions/camera.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -80,10 +80,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(gd::Pla
         .SetManipulatedType("number");
 
     extension.AddCondition("CameraWidth",
-                   GD_T("Width of a camera"),
-                   GD_T("Test the width of a camera of a layer"),
+                   _("Width of a camera"),
+                   _("Test the width of a camera of a layer"),
                    GD_T("The width of camera _PARAM2_ of layer _PARAM1_ is _PARAM3__PARAM4_"),
-                   GD_T("Layers and cameras"),
+                   _("Layers and cameras"),
                    "res/conditions/camera24.png",
                    "res/conditions/camera.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -95,10 +95,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(gd::Pla
         .SetManipulatedType("number");
 
     extension.AddCondition("CameraHeight",
-                   GD_T("Height of a camera"),
-                   GD_T("Test the height of a camera of a layer"),
+                   _("Height of a camera"),
+                   _("Test the height of a camera of a layer"),
                    GD_T("The height of camera _PARAM2_ of layer _PARAM1_ is _PARAM3__PARAM4_"),
-                   GD_T("Layers and cameras"),
+                   _("Layers and cameras"),
                    "res/conditions/camera24.png",
                    "res/conditions/camera.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -110,10 +110,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(gd::Pla
         .SetManipulatedType("number");
 
     extension.AddCondition("CameraAngle",
-                   GD_T("Angle of a camera of a layer"),
-                   GD_T("Test a camera angle."),
+                   _("Angle of a camera of a layer"),
+                   _("Test a camera angle."),
                    GD_T("Angle of camera is _PARAM1__PARAM2_ ( layer : _PARAM3_, camera : _PARAM4_ )"),
-                   GD_T("Layers and cameras"),
+                   _("Layers and cameras"),
                    "res/conditions/camera24.png",
                    "res/conditions/camera.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -125,10 +125,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(gd::Pla
         .SetManipulatedType("number");
 
     extension.AddAction("RotateCamera",
-                   GD_T("Change camera angle"),
-                   GD_T("This action modify the angle of a camera of the specified layer."),
+                   _("Change camera angle"),
+                   _("This action modify the angle of a camera of the specified layer."),
                    GD_T("Do _PARAM1__PARAM2_ to angle of camera ( layer : _PARAM3_, camera : _PARAM4_ )"),
-                   GD_T("Layers and cameras"),
+                   _("Layers and cameras"),
                    "res/actions/camera24.png",
                    "res/actions/camera.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -139,10 +139,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(gd::Pla
         .SetManipulatedType("number");
 
     extension.AddAction("AddCamera",
-                   GD_T("Add a camera to a layer"),
-                   GD_T("This action add a camera to a layer"),
+                   _("Add a camera to a layer"),
+                   _("This action add a camera to a layer"),
                    GD_T("Add a camera to layer _PARAM1_"),
-                   GD_T("Layers and cameras"),
+                   _("Layers and cameras"),
                    "res/actions/camera24.png",
                    "res/actions/camera.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -156,10 +156,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(gd::Pla
         .MarkAsComplex();
 
     extension.AddAction("DeleteCamera",
-                   GD_T("Delete a camera of a layer"),
-                   GD_T("Remove the specified camera from a layer"),
+                   _("Delete a camera of a layer"),
+                   _("Remove the specified camera from a layer"),
                    GD_T("Delete camera _PARAM2_ from layer _PARAM1_"),
-                   GD_T("Layers and cameras"),
+                   _("Layers and cameras"),
                    "res/actions/camera24.png",
                    "res/actions/camera.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -168,10 +168,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(gd::Pla
         .MarkAsComplex();
 
     extension.AddAction("CameraSize",
-                   GD_T("Modify the size of a camera"),
-                   GD_T("This action modify the size of a camera of the specified layer. The zoom will be reset."),
+                   _("Modify the size of a camera"),
+                   _("This action modify the size of a camera of the specified layer. The zoom will be reset."),
                    GD_T("Change the size of camera _PARAM2_ of _PARAM1_ to _PARAM3_*_PARAM4_"),
-                   GD_T("Layers and cameras"),
+                   _("Layers and cameras"),
                    "res/actions/camera24.png",
                    "res/actions/camera.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -182,10 +182,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(gd::Pla
         .MarkAsComplex();
 
     extension.AddAction("CameraViewport",
-                   GD_T("Modify the render zone of a camera"),
-                   GD_T("This action modify the render zone of a camera of the specified layer."),
+                   _("Modify the render zone of a camera"),
+                   _("This action modify the render zone of a camera of the specified layer."),
                    GD_T("Set the render zone of camera _PARAM2_ from layer _PARAM1_ to PARAM3_;_PARAM4_ _PARAM5_;_PARAM6_"),
-                   GD_T("Layers and cameras"),
+                   _("Layers and cameras"),
                    "res/actions/camera24.png",
                    "res/actions/camera.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -198,10 +198,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(gd::Pla
         .MarkAsComplex();
 
     extension.AddAction("ZoomCamera",
-                   GD_T("Change camera zoom."),
-                   GD_T("Change camera zoom."),
+                   _("Change camera zoom."),
+                   _("Change camera zoom."),
                    GD_T("Change camera zoom to _PARAM1_ ( layer : _PARAM2_, camera : _PARAM3_ )"),
-                   GD_T("Layers and cameras"),
+                   _("Layers and cameras"),
                    "res/actions/camera24.png",
                    "res/actions/camera.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -210,10 +210,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(gd::Pla
         .AddParameter("expression", GD_T("Camera number ( default : 0 )"), "",true).SetDefaultValue("0");
 
     extension.AddAction("FixCamera",
-                   GD_T("Center the camera on an object within limits"),
-                   GD_T("Center the camera on the specified object, without leaving the specified limits."),
+                   _("Center the camera on an object within limits"),
+                   _("Center the camera on the specified object, without leaving the specified limits."),
                    GD_T("Center the camera on _PARAM1_ ( limit : from _PARAM2_;_PARAM3_ to _PARAM4_;_PARAM5_ )  ( layer : _PARAM7_, camera : _PARAM8_ )"),
-                   GD_T("Layers and cameras"),
+                   _("Layers and cameras"),
                    "res/actions/camera24.png",
                    "res/actions/camera.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -228,10 +228,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(gd::Pla
         .MarkAsAdvanced();
 
     extension.AddAction("CentreCamera",
-                   GD_T("Center the camera on an object"),
-                   GD_T("Center the camera on the specified object."),
+                   _("Center the camera on an object"),
+                   _("Center the camera on the specified object."),
                    GD_T("Center camera on _PARAM1_ ( layer : _PARAM3_, camera : _PARAM4_ )"),
-                   GD_T("Layers and cameras"),
+                   _("Layers and cameras"),
                    "res/actions/camera24.png",
                    "res/actions/camera.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -242,10 +242,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(gd::Pla
         .MarkAsSimple();
 
     extension.AddAction("ShowLayer",
-                   GD_T("Show a layer"),
-                   GD_T("Show a layer."),
+                   _("Show a layer"),
+                   _("Show a layer."),
                    GD_T("Show layer _PARAM1_"),
-                   GD_T("Layers and cameras"),
+                   _("Layers and cameras"),
                    "res/actions/layer24.png",
                    "res/actions/layer.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -253,10 +253,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(gd::Pla
         .MarkAsAdvanced();
 
     extension.AddAction("HideLayer",
-                   GD_T("Hide a layer"),
-                   GD_T("Hide a layer."),
+                   _("Hide a layer"),
+                   _("Hide a layer."),
                    GD_T("Hide layer _PARAM1_"),
-                   GD_T("Layers and cameras"),
+                   _("Layers and cameras"),
                    "res/actions/layer24.png",
                    "res/actions/layer.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -264,10 +264,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(gd::Pla
         .MarkAsAdvanced();
 
     extension.AddCondition("LayerVisible",
-                   GD_T("Visibility of a layer"),
-                   GD_T("Test if a layer is displayed"),
+                   _("Visibility of a layer"),
+                   _("Test if a layer is displayed"),
                    GD_T("Layer _PARAM1_ is visible"),
-                   GD_T("Layers and cameras"),
+                   _("Layers and cameras"),
                    "res/conditions/layer24.png",
                    "res/conditions/layer.png")
         .AddCodeOnlyParameter("currentScene", "")

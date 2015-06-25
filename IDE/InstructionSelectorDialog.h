@@ -25,6 +25,7 @@
 #include <wx/bmpbuttn.h>
 #include "GDCore/Events/Expression.h"
 #include "GDCore/IDE/Dialogs/ParameterControlsHelper.h"
+#include "GDCore/Utf8String.h"
 namespace gd { class Layout; }
 namespace gd { class Project; }
 namespace gd { class InstructionMetadata; }
@@ -109,14 +110,14 @@ private:
 	void OninstructionsTreeItemActivated(wxTreeEvent& event);
 	void OnobjectinstructionsTreeItemActivated(wxTreeEvent& event);
 	void RefreshObjectsLists();
-    bool MatchSearchCriteria(std::string search, const gd::InstructionMetadata & instrMetadata);
+    bool MatchSearchCriteria(gd::String search, const gd::InstructionMetadata & instrMetadata);
 
     /**
      * \brief Find & Select the instruction in the tree, in the children of the specified item.
      * \return true if th instruction was found and selected.
      */
     bool SelectInstruction(const std::string &type, wxTreeItemId parent);
-	wxTreeItemId GetGroupItem(wxTreeCtrl * treeCtrl, wxTreeItemId parent, std::string groupStr, bool insertIfNotExist = true);
+	wxTreeItemId GetGroupItem(wxTreeCtrl * treeCtrl, wxTreeItemId parent, gd::String groupStr, bool insertIfNotExist = true);
 
 	const bool editingAction; ///< True if an action is being edited, false if it's a condition.
 	wxImageList * imageList;

@@ -32,10 +32,10 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension & extension)
     obj.SetIncludeFile("PanelSpriteObject/PanelSpriteObject.h");
 
     obj.AddAction("Width",
-                   GD_T("Width"),
-                   GD_T("Modify the width of a Panel Sprite."),
+                   _("Width"),
+                   _("Modify the width of a Panel Sprite."),
                    GD_T("Do _PARAM1__PARAM2_ to the width of _PARAM0_"),
-                   GD_T("Size and angle"),
+                   _("Size and angle"),
                    "res/actions/scaleWidth24.png",
                    "res/actions/scaleWidth.png")
 
@@ -45,10 +45,10 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension & extension)
         .SetFunctionName("SetWidth").SetManipulatedType("number").SetGetter("GetWidth").SetIncludeFile("PanelSpriteObject/PanelSpriteObject.h");
 
     obj.AddCondition("Width",
-                   GD_T("Width"),
-                   GD_T("Test the width of a Panel Sprite."),
+                   _("Width"),
+                   _("Test the width of a Panel Sprite."),
                    GD_T("The width of _PARAM0_ is _PARAM1__PARAM2_"),
-                   GD_T("Size and angle"),
+                   _("Size and angle"),
                    "res/conditions/scaleWidth24.png",
                    "res/conditions/scaleWidth.png")
 
@@ -59,10 +59,10 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension & extension)
 
 
     obj.AddAction("Height",
-                   GD_T("Height"),
-                   GD_T("Modify the height of a Panel Sprite."),
+                   _("Height"),
+                   _("Modify the height of a Panel Sprite."),
                    GD_T("Do _PARAM1__PARAM2_ to the height of _PARAM0_"),
-                   GD_T("Size and angle"),
+                   _("Size and angle"),
                    "res/actions/scaleHeight24.png",
                    "res/actions/scaleHeight.png")
 
@@ -73,10 +73,10 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension & extension)
 
 
     obj.AddCondition("Height",
-                   GD_T("Height"),
-                   GD_T("Test the height of a Panel Sprite."),
+                   _("Height"),
+                   _("Test the height of a Panel Sprite."),
                    GD_T("The height of _PARAM0_ is _PARAM1__PARAM2_"),
-                   GD_T("Size and angle"),
+                   _("Size and angle"),
                    "res/conditions/scaleHeight24.png",
                    "res/conditions/scaleHeight.png")
 
@@ -87,10 +87,10 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension & extension)
 
 
     obj.AddAction("Angle",
-                   GD_T("Angle"),
-                   GD_T("Modify the angle of a Panel Sprite."),
+                   _("Angle"),
+                   _("Modify the angle of a Panel Sprite."),
                    GD_T("Do _PARAM1__PARAM2_ to the angle of _PARAM0_"),
-                   GD_T("Size and angle"),
+                   _("Size and angle"),
                    "res/actions/rotate24.png",
                    "res/actions/rotate.png")
 
@@ -102,10 +102,10 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension & extension)
 
 
     obj.AddCondition("Angle",
-                   GD_T("Angle"),
-                   GD_T("Test the angle of a Panel Sprite."),
+                   _("Angle"),
+                   _("Test the angle of a Panel Sprite."),
                    GD_T("The angle of _PARAM0_ is _PARAM1__PARAM2_"),
-                   GD_T("Size and angle"),
+                   _("Size and angle"),
                    "res/conditions/rotate24.png",
                    "res/conditions/rotate.png")
 
@@ -117,10 +117,10 @@ void DeclarePanelSpriteObjectExtension(gd::PlatformExtension & extension)
 
 
     obj.AddAction("Image",
-                   GD_T("Image name"),
-                   GD_T("Change the image of a Panel Sprite."),
+                   _("Image name"),
+                   _("Change the image of a Panel Sprite."),
                    GD_T("Set image _PARAM1_ on _PARAM0_"),
-                   GD_T("Image"),
+                   _("Image"),
                    "res/imageicon24.png",
                    "res/imageicon.png")
         .AddParameter("object", GD_T("Object"), "PanelSprite", false)

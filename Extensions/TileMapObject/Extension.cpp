@@ -34,10 +34,10 @@ void DeclareTileMapObjectExtension(gd::PlatformExtension & extension)
     obj.SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
 
     obj.AddCondition("Width",
-                   GD_T("Width"),
-                   GD_T("Test the width of a Tile Map Object."),
+                   _("Width"),
+                   _("Test the width of a Tile Map Object."),
                    GD_T("The width of _PARAM0_ is _PARAM1__PARAM2_"),
-                   GD_T("Size"),
+                   _("Size"),
                    "res/conditions/scaleWidth24.png",
                    "res/conditions/scaleWidth.png")
         .AddParameter("object", GD_T("Object"), "TileMap", false)
@@ -47,10 +47,10 @@ void DeclareTileMapObjectExtension(gd::PlatformExtension & extension)
         .SetFunctionName("GetWidth").SetManipulatedType("number").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
 
     obj.AddCondition("Height",
-                   GD_T("Height"),
-                   GD_T("Test the height of a Tile Map Object."),
+                   _("Height"),
+                   _("Test the height of a Tile Map Object."),
                    GD_T("The height of _PARAM0_ is _PARAM1__PARAM2_"),
-                   GD_T("Size"),
+                   _("Size"),
                    "res/conditions/scaleHeight24.png",
                    "res/conditions/scaleHeight.png")
         .AddParameter("object", GD_T("Object"), "TileMap", false)
@@ -60,10 +60,10 @@ void DeclareTileMapObjectExtension(gd::PlatformExtension & extension)
         .SetFunctionName("GetHeight").SetManipulatedType("number").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
 
     extension.AddCondition("SingleTileCollision",
-                   GD_T("Collision with one tile"),
-                   GD_T("Test if an object collides a specific tile."),
+                   _("Collision with one tile"),
+                   _("Test if an object collides a specific tile."),
                    GD_T("_PARAM4_ is in collision with the tile at _PARAM2_;_PARAM3_ (layer _PARAM1_) of _PARAM0_"),
-                   GD_T("Collisions"),
+                   _("Collisions"),
                    "res/conditions/collision24.png",
                    "res/conditions/collision.png")
         .AddParameter("objectList", GD_T("Tile Map Object"), "TileMap", false)
@@ -103,10 +103,10 @@ void DeclareTileMapObjectExtension(gd::PlatformExtension & extension)
 
 
     obj.AddAction("SetTile",
-                   GD_T("Change a tile"),
-                   GD_T("Change a tile at a specific cell."),
+                   _("Change a tile"),
+                   _("Change a tile at a specific cell."),
                    GD_T("Set tile #_PARAM4_ at the cell _PARAM2_;_PARAM3_ (layer: _PARAM1_) in _PARAM0_"),
-                   GD_T("Tiles"),
+                   _("Tiles"),
                    "CppPlatform/Extensions/TileMapIcon24.png",
                    "res/TileMapIcon16.png")
         .AddParameter("objectList", GD_T("Tile Map Object"), "TileMap", false)
@@ -136,10 +136,10 @@ void DeclareTileMapObjectExtension(gd::PlatformExtension & extension)
         .SetFunctionName("SaveAsString").SetIncludeFile("TileMapObject/RuntimeTileMapObject.h");
 
     obj.AddAction("LoadTiles",
-                   GD_T("Load the tiles from a string"),
-                   GD_T("Load the tiles from a string."),
+                   _("Load the tiles from a string"),
+                   _("Load the tiles from a string."),
                    GD_T("Load the tiles of _PARAM0_ from _PARAM1_"),
-                   GD_T("Loading"),
+                   _("Loading"),
                    "CppPlatform/Extensions/TileMapIcon24.png",
                    "res/TileMapIcon16.png")
         .AddParameter("objectList", GD_T("Tile Map Object"), "TileMap", false)
@@ -150,10 +150,10 @@ void DeclareTileMapObjectExtension(gd::PlatformExtension & extension)
 
 
     obj.AddAction("ChangeTexture",
-                   GD_T("Change the tileset texture"),
-                   GD_T("Change the tileset texture."),
+                   _("Change the tileset texture"),
+                   _("Change the tileset texture."),
                    GD_T("Change the tileset texture of _PARAM0_ to _PARAM1_"),
-                   GD_T("Tileset"),
+                   _("Tileset"),
                    "CppPlatform/Extensions/TileMapIcon24.png",
                    "res/TileMapIcon16.png")
         .AddParameter("objectList", GD_T("Tile Map Object"), "TileMap", false)

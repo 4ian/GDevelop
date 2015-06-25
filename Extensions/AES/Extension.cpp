@@ -30,10 +30,10 @@ public:
         #if defined(GD_IDE_ONLY)
 
         AddAction("EncryptFile",
-                       GD_T("Crypt a file"),
-                       GD_T("Crypt a file with AES."),
+                       _("Crypt a file"),
+                       _("Crypt a file with AES."),
                        GD_T("Crypt file _PARAM0_ to _PARAM1_ with AES"),
-                       GD_T("Encryption"),
+                       _("Encryption"),
                        "CppPlatform/Extensions/AESicon24.png",
                        "CppPlatform/Extensions/AESicon16.png")
 
@@ -45,10 +45,10 @@ public:
 
 
         AddAction("DecryptFile",
-                       GD_T("Decrypt a file"),
-                       GD_T("Decrypt a file with AES."),
+                       _("Decrypt a file"),
+                       _("Decrypt a file with AES."),
                        GD_T("Decrypt file _PARAM0_ to _PARAM1_ with AES"),
-                       GD_T("Encryption"),
+                       _("Encryption"),
                        "CppPlatform/Extensions/AESicon24.png",
                        "CppPlatform/Extensions/AESicon16.png")
 

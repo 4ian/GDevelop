@@ -28,10 +28,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
 
     #if defined(GD_IDE_ONLY)
     obj.AddAction("Opacity",
-                   GD_T("Change object's opacity"),
-                   GD_T("Change the opacity of an object."),
+                   _("Change object's opacity"),
+                   _("Change the opacity of an object."),
                    GD_T("Do _PARAM1__PARAM2_ to the opacity of _PARAM0_"),
-                   GD_T("Visibility"),
+                   _("Visibility"),
                    "res/actions/opacity24.png",
                    "res/actions/opacity.png")
 
@@ -42,10 +42,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
         .SetManipulatedType("number");
 
     obj.AddAction("ChangeAnimation",
-                   GD_T("Change the animation"),
-                   GD_T("Modify the current animation of the object."),
+                   _("Change the animation"),
+                   _("Modify the current animation of the object."),
                    GD_T("Do _PARAM1__PARAM2_ to the number of current animation of _PARAM0_"),
-                   GD_T("Animations and images"),
+                   _("Animations and images"),
                    "res/actions/animation24.png",
                    "res/actions/animation.png")
 
@@ -56,10 +56,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
         .SetManipulatedType("number");
 
     obj.AddAction("ChangeDirection",
-                   GD_T("Change the direction"),
-                   GD_T("Change the direction of the object.\nIf the object is set to automatically rotate, the direction is its angle.\nIf the object is in 8 directions mode, the valid directions are 0..7"),
+                   _("Change the direction"),
+                   _("Change the direction of the object.\nIf the object is set to automatically rotate, the direction is its angle.\nIf the object is in 8 directions mode, the valid directions are 0..7"),
                    GD_T("Do _PARAM1__PARAM2_ to the direction of _PARAM0_"),
-                   GD_T("Direction"),
+                   _("Direction"),
                    "res/actions/direction24.png",
                    "res/actions/direction.png")
 
@@ -71,10 +71,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
 
 
     obj.AddAction("ChangeSprite",
-                   GD_T("Current frame"),
-                   GD_T("Modify the current frame of the object"),
+                   _("Current frame"),
+                   _("Modify the current frame of the object"),
                    GD_T("Do _PARAM1__PARAM2_ to animation frame of _PARAM0_"),
-                   GD_T("Animations and images"),
+                   _("Animations and images"),
                    "res/actions/sprite24.png",
                    "res/actions/sprite.png")
 
@@ -85,10 +85,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
         .SetManipulatedType("number");
 
     obj.AddAction("PauseAnimation",
-                   GD_T("Pause the animation"),
-                   GD_T("Pause the current animation of the object"),
+                   _("Pause the animation"),
+                   _("Pause the current animation of the object"),
                    GD_T("Pause the current animation of _PARAM0_"),
-                   GD_T("Animations and images"),
+                   _("Animations and images"),
                    "res/actions/animation24.png",
                    "res/actions/animation.png")
 
@@ -97,10 +97,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
 
 
     obj.AddAction("PlayAnimation",
-                   GD_T("Play the animation"),
-                   GD_T("Play the current animation of the object"),
+                   _("Play the animation"),
+                   _("Play the current animation of the object"),
                    GD_T("Play the current animation of _PARAM0_"),
-                   GD_T("Animations and images"),
+                   _("Animations and images"),
                    "res/actions/animation24.png",
                    "res/actions/animation.png")
 
@@ -108,10 +108,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
         .MarkAsSimple();
 
     obj.AddAction("ChangeAnimationSpeedScale",
-                   GD_T("Animation speed scale"),
-                   GD_T("Modify the animation speed scale (1 = the default speed, >1 = faster and <1 = slower)."),
+                   _("Animation speed scale"),
+                   _("Modify the animation speed scale (1 = the default speed, >1 = faster and <1 = slower)."),
                    GD_T("Do _PARAM1__PARAM2_ to the animation speed scale of _PARAM0_"),
-                   GD_T("Animations and images"),
+                   _("Animations and images"),
                    "res/actions/animation24.png",
                    "res/actions/animation.png")
 
@@ -122,10 +122,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
         .SetManipulatedType("number");
 
     obj.AddAction("TourneVersPos",
-                   GD_T("Rotate an object toward a position"),
-                   GD_T("Rotate an object towards a position."),
+                   _("Rotate an object toward a position"),
+                   _("Rotate an object towards a position."),
                    GD_T("Rotate _PARAM0_ towards _PARAM1_;_PARAM2_"),
-                   GD_T("Direction"),
+                   _("Direction"),
                    "res/actions/direction24.png",
                    "res/actions/direction.png")
 
@@ -138,10 +138,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
 
 
     obj.AddAction("ChangeScale",
-                   GD_T("Scale"),
-                   GD_T("Modify the scale of the specified object."),
+                   _("Scale"),
+                   _("Modify the scale of the specified object."),
                    GD_T("Do _PARAM1__PARAM2_ to the scale of _PARAM0_"),
-                   GD_T("Size"),
+                   _("Size"),
                    "res/actions/scale24.png",
                    "res/actions/scale.png")
 
@@ -152,10 +152,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
 
 
     obj.AddAction("ChangeScaleWidth",
-                   GD_T("Scale on X axis"),
-                   GD_T("Modify the scale of the width of an object."),
+                   _("Scale on X axis"),
+                   _("Modify the scale of the width of an object."),
                    GD_T("Do _PARAM1__PARAM2_ to the width's scale of _PARAM0_"),
-                   GD_T("Size"),
+                   _("Size"),
                    "res/actions/scale24.png",
                    "res/actions/scale.png")
 
@@ -167,10 +167,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
 
 
     obj.AddAction("ChangeScaleHeight",
-                   GD_T("Scale on Y axis"),
-                   GD_T("Modify the scale of the height of an object."),
+                   _("Scale on Y axis"),
+                   _("Modify the scale of the height of an object."),
                    GD_T("Do _PARAM1__PARAM2_ to the height's scale of _PARAM0_"),
-                   GD_T("Size"),
+                   _("Size"),
                    "res/actions/scale24.png",
                    "res/actions/scale.png")
 
@@ -182,10 +182,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
 
 
     obj.AddCondition("Animation",
-                   GD_T("Current animation"),
-                   GD_T("Test the number of the current animation of the object."),
+                   _("Current animation"),
+                   _("Test the number of the current animation of the object."),
                    GD_T("The number of the current animation of _PARAM0_ is _PARAM1__PARAM2_"),
-                   GD_T("Animations and images"),
+                   _("Animations and images"),
                    "res/conditions/animation24.png",
                    "res/conditions/animation.png")
 
@@ -196,10 +196,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
         .SetManipulatedType("number");
 
     obj.AddCondition("Direction",
-                   GD_T("Current direction"),
-                   GD_T("Compare the direction of the object. If 8 direction mode is activated for the sprite, the value taken for direction will be from 0 to 7. Otherwise, the direction is in degrees."),
+                   _("Current direction"),
+                   _("Compare the direction of the object. If 8 direction mode is activated for the sprite, the value taken for direction will be from 0 to 7. Otherwise, the direction is in degrees."),
                    GD_T("Direction of _PARAM0_ is _PARAM1__PARAM2_"),
-                   GD_T("Direction"),
+                   _("Direction"),
                    "res/conditions/direction24.png",
                    "res/conditions/direction.png")
 
@@ -209,10 +209,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
         .SetManipulatedType("number");
 
     obj.AddCondition("Sprite",
-                   GD_T("Current frame"),
-                   GD_T("Test the number of the current animation frame."),
+                   _("Current frame"),
+                   _("Test the number of the current animation frame."),
                    GD_T("The animation frame of _PARAM0_ is _PARAM1__PARAM2_"),
-                   GD_T("Animations and images"),
+                   _("Animations and images"),
                    "res/conditions/sprite24.png",
                    "res/conditions/sprite.png")
 
@@ -223,10 +223,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
         .SetManipulatedType("number");
 
     obj.AddCondition("AnimStopped",
-                   GD_T("Animation paused"),
-                   GD_T("Test if the animation of an object is paused"),
+                   _("Animation paused"),
+                   _("Test if the animation of an object is paused"),
                    GD_T("The animation of _PARAM0_ is paused"),
-                   GD_T("Animations and images"),
+                   _("Animations and images"),
                    "res/conditions/animation24.png",
                    "res/conditions/animation.png")
 
@@ -234,10 +234,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
         .MarkAsSimple();
 
     obj.AddCondition("AnimationEnded",
-                   GD_T("Animation finished"),
-                   GD_T("Check if the animation being played by the Sprite object is finished."),
+                   _("Animation finished"),
+                   _("Check if the animation being played by the Sprite object is finished."),
                    GD_T("The animation of _PARAM0_ is finished"),
-                   GD_T("Animations and images"),
+                   _("Animations and images"),
                    "res/conditions/animation24.png",
                    "res/conditions/animation.png")
 
@@ -245,10 +245,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
         .MarkAsSimple();
 
     obj.AddCondition("ScaleWidth",
-                   GD_T("Scale on X axis"),
-                   GD_T("Compare the scale of the width of an object."),
+                   _("Scale on X axis"),
+                   _("Compare the scale of the width of an object."),
                    GD_T("The width's scale of _PARAM0_ is _PARAM1__PARAM2_"),
-                   GD_T("Size"),
+                   _("Size"),
                    "res/conditions/scaleWidth24.png",
                    "res/conditions/scaleWidth.png")
 
@@ -259,10 +259,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
         .SetManipulatedType("number");
 
     obj.AddCondition("ScaleHeight",
-                   GD_T("Scale on Y axis"),
-                   GD_T("Compare the scale of the height of an object."),
+                   _("Scale on Y axis"),
+                   _("Compare the scale of the height of an object."),
                    GD_T("The height's scale of _PARAM0_ is _PARAM1__PARAM2_"),
-                   GD_T("Size"),
+                   _("Size"),
                    "res/conditions/scaleHeight24.png",
                    "res/conditions/scaleHeight.png")
 
@@ -273,10 +273,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
         .SetManipulatedType("number");
 
     obj.AddCondition("Opacity",
-                   GD_T("Opacity"),
-                   GD_T("Compare the opacity of an object, between 0 (fully transparent) to 255 (opaque)"),
+                   _("Opacity"),
+                   _("Compare the opacity of an object, between 0 (fully transparent) to 255 (opaque)"),
                    GD_T("The opacity of _PARAM0_ is _PARAM1__PARAM2_"),
-                   GD_T("Visibility"),
+                   _("Visibility"),
                    "res/conditions/opacity24.png",
                    "res/conditions/opacity.png")
 
@@ -287,10 +287,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
         .SetManipulatedType("number");
 
     obj.AddCondition("BlendMode",
-                   GD_T("Blend mode"),
-                   GD_T("Compare the number of the blend mode currently used by an object"),
+                   _("Blend mode"),
+                   _("Compare the number of the blend mode currently used by an object"),
                    GD_T("The number of the current blend mode of _PARAM0_ is _PARAM1__PARAM2_"),
-                   GD_T("Effects"),
+                   _("Effects"),
                    "res/conditions/opacity24.png",
                    "res/conditions/opacity.png")
 
@@ -301,10 +301,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
         .SetManipulatedType("number");
 
     obj.AddAction("CopyImageOnImageOfSprite",
-                   GD_T("Copy an image on the current one of an object"),
-                   GD_T("Copy an image on the current image of an object.\nNote that the source image must be preferably kept loaded in memory."),
+                   _("Copy an image on the current one of an object"),
+                   _("Copy an image on the current image of an object.\nNote that the source image must be preferably kept loaded in memory."),
                    GD_T("Copy image _PARAM2_ on the current of _PARAM0_ at _PARAM3_;_PARAM4_"),
-                   GD_T("Effects"),
+                   _("Effects"),
                    "res/copy24.png",
                    "res/copyicon.png")
 
@@ -316,10 +316,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
         .AddParameter("yesorno", GD_T("Should the copy take in account the source transparency\?"), "",false);
 
     obj.AddAction("CreateMaskFromColorOnActualImage", //Actual is indeed a mistake : Current should have been chosen.
-                   GD_T("Make a color of the image of an object transparent"),
-                   GD_T("Make a color of the image of an object transparent."),
+                   _("Make a color of the image of an object transparent"),
+                   _("Make a color of the image of an object transparent."),
                    GD_T("Make color _PARAM1_ of the current image of _PARAM0_ transparent"),
-                   GD_T("Effects"),
+                   _("Effects"),
                    "res/actions/opacity24.png",
                    "res/actions/opacity.png")
 
@@ -328,10 +328,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
 
 
     obj.AddAction("ChangeColor",
-                   GD_T("Global color"),
-                   GD_T("Change the global color of an object. The default color is white."),
+                   _("Global color"),
+                   _("Change the global color of an object. The default color is white."),
                    GD_T("Change color of _PARAM0_ to _PARAM1_"),
-                   GD_T("Effects"),
+                   _("Effects"),
                    "res/actions/color24.png",
                    "res/actions/color.png")
 
@@ -340,10 +340,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
 
 
     obj.AddAction("ChangeBlendMode",
-                   GD_T("Blend mode"),
-                   GD_T("Change the number of the blend mode of an object.\nThe default blend mode is 0 (Alpha)."),
+                   _("Blend mode"),
+                   _("Change the number of the blend mode of an object.\nThe default blend mode is 0 (Alpha)."),
                    GD_T("Change Blend mode of _PARAM0_ to _PARAM1_"),
-                   GD_T("Effects"),
+                   _("Effects"),
                    "res/actions/color24.png",
                    "res/actions/color.png")
 
@@ -353,10 +353,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
 
 
     obj.AddAction("FlipX",
-                   GD_T("Flip the object horizontally"),
-                   GD_T("Flip the object horizontally"),
+                   _("Flip the object horizontally"),
+                   _("Flip the object horizontally"),
                    GD_T("Flip horizontally _PARAM0_ : _PARAM1_"),
-                   GD_T("Effects"),
+                   _("Effects"),
                    "res/actions/flipX24.png",
                    "res/actions/flipX.png")
 
@@ -366,10 +366,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
 
 
     obj.AddAction("FlipY",
-                   GD_T("Flip the object vertically"),
-                   GD_T("Flip the object vertically"),
+                   _("Flip the object vertically"),
+                   _("Flip the object vertically"),
                    GD_T("Flip vertically _PARAM0_ : _PARAM1_"),
-                   GD_T("Effects"),
+                   _("Effects"),
                    "res/actions/flipY24.png",
                    "res/actions/flipY.png")
 
@@ -378,30 +378,30 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
         .MarkAsSimple();
 
     obj.AddCondition("FlippedX",
-                   GD_T("Horizontally flipped"),
-                   GD_T("Return true if the object is horizontally flipped"),
+                   _("Horizontally flipped"),
+                   _("Return true if the object is horizontally flipped"),
                    GD_T("_PARAM0_ is horizontally flipped"),
-                   GD_T("Effects"),
+                   _("Effects"),
                    "res/actions/flipX24.png",
                    "res/actions/flipX.png")
 
         .AddParameter("object", GD_T("Object"), "Sprite", false);
 
     obj.AddCondition("FlippedY",
-                   GD_T("Vertically flipped"),
-                   GD_T("Return true if the object is vertically flipped"),
+                   _("Vertically flipped"),
+                   _("Return true if the object is vertically flipped"),
                    GD_T("_PARAM0_ is vertically flipped"),
-                   GD_T("Effects"),
+                   _("Effects"),
                    "res/actions/flipY24.png",
                    "res/actions/flipY.png")
 
         .AddParameter("object", GD_T("Object"), "Sprite", false);
 
     obj.AddAction("TourneVers",
-                   GD_T("Rotate an object toward another"),
-                   GD_T("Rotate an object towards another."),
+                   _("Rotate an object toward another"),
+                   _("Rotate an object towards another."),
                    GD_T("Rotate _PARAM0_ towards _PARAM1_"),
-                   GD_T("Direction"),
+                   _("Direction"),
                    "res/actions/direction24.png",
                    "res/actions/direction.png")
 
@@ -457,10 +457,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
         .AddParameter("object", GD_T("Object"), "Sprite", false);
 
     extension.AddCondition("Collision",
-                      GD_T("Collision (Pixel perfect)"),
-                      GD_T("The condition is true if there is a collision between the two objects.\nThe test is pixel-perfect."),
+                      _("Collision (Pixel perfect)"),
+                      _("The condition is true if there is a collision between the two objects.\nThe test is pixel-perfect."),
                       GD_T("_PARAM0_ is in collision with _PARAM1_ (pixel perfect)"),
-                      GD_T("Collision"),
+                      _("Collision"),
                       "res/conditions/collision24.png",
                       "res/conditions/collision.png")
         .AddParameter("objectList", GD_T("Object 1"), "Sprite", false)

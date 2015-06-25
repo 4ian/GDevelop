@@ -17,10 +17,10 @@ void Extension::ExtensionSubDeclaration3(gd::ObjectMetadata & obj)
 {
     #if defined(GD_IDE_ONLY)
     obj.AddAction("RecreateParticleSystem",
-                   GD_T("Recreate particles"),
-                   GD_T("Destroy and recreate particles, so as to take changes made to setup of the emitter in account."),
+                   _("Recreate particles"),
+                   _("Destroy and recreate particles, so as to take changes made to setup of the emitter in account."),
                    GD_T("Recreate particles of _PARAM0_"),
-                   GD_T("Setup"),
+                   _("Setup"),
                    "CppPlatform/Extensions/particleSystemicon24.png",
                    "CppPlatform/Extensions/particleSystemicon16.png")
         .AddParameter("object", GD_T("Object"), "ParticleEmitter")
@@ -28,10 +28,10 @@ void Extension::ExtensionSubDeclaration3(gd::ObjectMetadata & obj)
         .SetFunctionName("RecreateParticleSystem").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
     obj.AddAction("RendererParam1",
-                   GD_T("Rendering first parameter"),
-                   GD_T("Modify first parameter of rendering ( Size/Length ).\nParticles have to be recreated in order to take changes in account."),
+                   _("Rendering first parameter"),
+                   _("Modify first parameter of rendering ( Size/Length ).\nParticles have to be recreated in order to take changes in account."),
                    GD_T("Do _PARAM1__PARAM2_ to rendering 1st parameter of _PARAM0_"),
-                   GD_T("Setup"),
+                   _("Setup"),
                    "CppPlatform/Extensions/particleSystemicon24.png",
                    "CppPlatform/Extensions/particleSystemicon16.png")
         .AddParameter("object", GD_T("Object"), "ParticleEmitter")
@@ -41,10 +41,10 @@ void Extension::ExtensionSubDeclaration3(gd::ObjectMetadata & obj)
         .SetFunctionName("SetRendererParam1").SetManipulatedType("number").SetGetter("GetRendererParam1").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
     obj.AddCondition("RendererParam1",
-                   GD_T("Direction of gravity on Z axis"),
-                   GD_T("Test the first parameter of rendering ( Size/Length )."),
+                   _("Direction of gravity on Z axis"),
+                   _("Test the first parameter of rendering ( Size/Length )."),
                    GD_T("The 1nd rendering parameter of _PARAM0_ is _PARAM1__PARAM2_"),
-                   GD_T("Setup"),
+                   _("Setup"),
                    "CppPlatform/Extensions/particleSystemicon24.png",
                    "CppPlatform/Extensions/particleSystemicon16.png")
 
@@ -55,10 +55,10 @@ void Extension::ExtensionSubDeclaration3(gd::ObjectMetadata & obj)
         .SetFunctionName("GetRendererParam1").SetManipulatedType("number").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
     obj.AddAction("RendererParam2",
-                   GD_T("Rendering second parameter"),
-                   GD_T("Modify the second parameter of rendering ( Size/Length ).\nParticles have to be recreated in order to take changes in account."),
+                   _("Rendering second parameter"),
+                   _("Modify the second parameter of rendering ( Size/Length ).\nParticles have to be recreated in order to take changes in account."),
                    GD_T("Do _PARAM1__PARAM2_ to rendering 2nd parameter of _PARAM0_"),
-                   GD_T("Setup"),
+                   _("Setup"),
                    "CppPlatform/Extensions/particleSystemicon24.png",
                    "CppPlatform/Extensions/particleSystemicon16.png")
         .AddParameter("object", GD_T("Object"), "ParticleEmitter")
@@ -68,10 +68,10 @@ void Extension::ExtensionSubDeclaration3(gd::ObjectMetadata & obj)
         .SetFunctionName("SetRendererParam2").SetManipulatedType("number").SetGetter("GetRendererParam2").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
     obj.AddCondition("RendererParam2",
-                   GD_T("Rendering second parameter"),
-                   GD_T("Test the second parameter of rendering ( Size/Length )."),
+                   _("Rendering second parameter"),
+                   _("Test the second parameter of rendering ( Size/Length )."),
                    GD_T("The 2nd rendering parameter of _PARAM0_ is _PARAM1__PARAM2_"),
-                   GD_T("Setup"),
+                   _("Setup"),
                    "CppPlatform/Extensions/particleSystemicon24.png",
                    "CppPlatform/Extensions/particleSystemicon16.png")
         .AddParameter("object", GD_T("Object"), "ParticleEmitter")
@@ -82,10 +82,10 @@ void Extension::ExtensionSubDeclaration3(gd::ObjectMetadata & obj)
 
 
     obj.AddAction("Tank",
-                   GD_T("Capacity"),
-                   GD_T("Change the capacity of the emitter."),
+                   _("Capacity"),
+                   _("Change the capacity of the emitter."),
                    GD_T("Do _PARAM1__PARAM2_ to the capacity of _PARAM0_"),
-                   GD_T("Common"),
+                   _("Common"),
                    "CppPlatform/Extensions/particleSystemicon24.png",
                    "CppPlatform/Extensions/particleSystemicon16.png")
         .AddParameter("object", GD_T("Object"), "ParticleEmitter")
@@ -95,10 +95,10 @@ void Extension::ExtensionSubDeclaration3(gd::ObjectMetadata & obj)
         .SetFunctionName("SetTank").SetManipulatedType("number").SetGetter("GetTank").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
     obj.AddCondition("Tank",
-                   GD_T("Capacity"),
-                   GD_T("Test the capacity of the emitter."),
+                   _("Capacity"),
+                   _("Test the capacity of the emitter."),
                    GD_T("The capacity of _PARAM0_ is _PARAM1__PARAM2_"),
-                   GD_T("Common"),
+                   _("Common"),
                    "CppPlatform/Extensions/particleSystemicon24.png",
                    "CppPlatform/Extensions/particleSystemicon16.png")
         .AddParameter("object", GD_T("Object"), "ParticleEmitter")
@@ -109,10 +109,10 @@ void Extension::ExtensionSubDeclaration3(gd::ObjectMetadata & obj)
 
 
     obj.AddAction("Flow",
-                   GD_T("Flow"),
-                   GD_T("Change the flow of the emitter."),
+                   _("Flow"),
+                   _("Change the flow of the emitter."),
                    GD_T("Do _PARAM1__PARAM2_ to flow of _PARAM0_"),
-                   GD_T("Common"),
+                   _("Common"),
                    "CppPlatform/Extensions/particleSystemicon24.png",
                    "CppPlatform/Extensions/particleSystemicon16.png")
         .AddParameter("object", GD_T("Object"), "ParticleEmitter")
@@ -123,10 +123,10 @@ void Extension::ExtensionSubDeclaration3(gd::ObjectMetadata & obj)
 
 
     obj.AddCondition("Flow",
-                   GD_T("Flow"),
-                   GD_T("Test the flow of the emitter."),
+                   _("Flow"),
+                   _("Test the flow of the emitter."),
                    GD_T("The flow of _PARAM0_ is _PARAM2_ _PARAM1_"),
-                   GD_T("Common"),
+                   _("Common"),
                    "CppPlatform/Extensions/particleSystemicon24.png",
                    "CppPlatform/Extensions/particleSystemicon16.png")
         .AddParameter("object", GD_T("Object"), "ParticleEmitter")
@@ -137,10 +137,10 @@ void Extension::ExtensionSubDeclaration3(gd::ObjectMetadata & obj)
 
 
     obj.AddAction("Texture",
-                   GD_T("Image"),
-                   GD_T("Change the image of particles ( if displayed )."),
+                   _("Image"),
+                   _("Change the image of particles ( if displayed )."),
                    GD_T("Change the image of particles of _PARAM0_ to _PARAM1_"),
-                   GD_T("Common"),
+                   _("Common"),
                    "CppPlatform/Extensions/particleSystemicon24.png",
                    "CppPlatform/Extensions/particleSystemicon16.png")
         .AddParameter("object", GD_T("Object"), "ParticleEmitter")
@@ -149,10 +149,10 @@ void Extension::ExtensionSubDeclaration3(gd::ObjectMetadata & obj)
         .SetFunctionName("SetTexture").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
     obj.AddCondition("Texture",
-                   GD_T("Image"),
-                   GD_T("Test the name of the image displayed by particles."),
+                   _("Image"),
+                   _("Test the name of the image displayed by particles."),
                    GD_T("Image displayed by particles of _PARAM0_ is _PARAM1__PARAM2_"),
-                   GD_T("Common"),
+                   _("Common"),
                    "CppPlatform/Extensions/particleSystemicon24.png",
                    "CppPlatform/Extensions/particleSystemicon16.png")
         .AddParameter("object", GD_T("Object"), "ParticleEmitter")

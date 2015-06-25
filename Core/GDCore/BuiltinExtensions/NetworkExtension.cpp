@@ -20,10 +20,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsNetworkExtension(gd::Pl
 
     #if defined(GD_IDE_ONLY)
     extension.AddAction("EnvoiDataNet",
-            GD_T("Send datas to a website"),
-            GD_T("Send datas to a specified web site.\nYou need to set up a .php page on your web site so as to receive this datas.\nEnter here a password, and enter the same in the configuration of your .php page.\nRead the help file to get more informations."),
+            _("Send datas to a website"),
+            _("Send datas to a specified web site.\nYou need to set up a .php page on your web site so as to receive this datas.\nEnter here a password, and enter the same in the configuration of your .php page.\nRead the help file to get more informations."),
             GD_T("Send to _PARAM0_ the following datas : _PARAM2_, _PARAM3_,_PARAM4_,_PARAM5_,_PARAM6_,_PARAM7_"),
-            GD_T("Network"),
+            _("Network"),
             "res/actions/net24.png",
             "res/actions/net.png")
         .AddParameter("string", GD_T(".php page URL ( Don't forget the protocol http:// ) "), "",false)
@@ -37,10 +37,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsNetworkExtension(gd::Pl
         .SetHidden();
 
     extension.AddAction("SendRequest",
-            GD_T("Send a request to a web page"),
-            GD_T("Send a request to the specified web page.\n\nPlease note that for the web platform games, the game must be hosted on the same host as specified below, except if the server is configured to answer to all requests ( Cross-domain requests ). "),
+            _("Send a request to a web page"),
+            _("Send a request to the specified web page.\n\nPlease note that for the web platform games, the game must be hosted on the same host as specified below, except if the server is configured to answer to all requests ( Cross-domain requests ). "),
             GD_T("Send _PARAM3_ request to _PARAM0__PARAM1_ with body: _PARAM2_"),
-            GD_T("Network"),
+            _("Network"),
             "res/actions/net24.png",
             "res/actions/net.png")
         .AddParameter("string", GD_T("Host (Example: http://www.some-server.org/)"), "", false )
@@ -52,10 +52,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsNetworkExtension(gd::Pl
         .MarkAsComplex();
 
     extension.AddAction("DownloadFile",
-            GD_T("Download a file"),
-            GD_T("Download a file from a web site"),
+            _("Download a file"),
+            _("Download a file from a web site"),
             GD_T("Download file _PARAM1_ from _PARAM0_ under the name of _PARAM2_"),
-            GD_T("Network"),
+            _("Network"),
             "res/actions/net24.png",
             "res/actions/net.png")
         .AddParameter("string", GD_T("Host ( For example : http://www.website.com )"), "",false)
@@ -63,10 +63,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsNetworkExtension(gd::Pl
         .AddParameter("string", GD_T("Save as"), "",false);
 
     extension.AddAction("JSONToVariableStructure",
-            GD_T("Convert JSON to variable"),
-            GD_T("Parse a JSON object and store it into a variable"),
+            _("Convert JSON to variable"),
+            _("Parse a JSON object and store it into a variable"),
             GD_T("Parse JSON string _PARAM0_ and store it into variable _PARAM1_"),
-            GD_T("Network"),
+            _("Network"),
             "res/actions/net24.png",
             "res/actions/net.png")
         .AddParameter("string", GD_T("JSON string"), "",false)

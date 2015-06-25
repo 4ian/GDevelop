@@ -32,10 +32,10 @@ public:
         #if defined(GD_IDE_ONLY)
 
         AddAction("LinkObjects",
-                       GD_T("Link two objects"),
-                       GD_T("Link two objects together, so as to be able to get one from the other."),
+                       _("Link two objects"),
+                       _("Link two objects together, so as to be able to get one from the other."),
                        GD_T("Link _PARAM1_ and _PARAM2_"),
-                       GD_T("Linked objects"),
+                       _("Linked objects"),
                        "CppPlatform/Extensions/LinkedObjectsicon24.png",
                        "CppPlatform/Extensions/LinkedObjectsicon16.png")
 
@@ -46,10 +46,10 @@ public:
             .SetFunctionName("GDpriv::LinkedObjects::LinkObjects").SetIncludeFile("LinkedObjects/LinkedObjectsTools.h");
 
         AddAction("RemoveLinkBetween",
-                       GD_T("Unlink two objects"),
-                       GD_T("Unlink two objects."),
+                       _("Unlink two objects"),
+                       _("Unlink two objects."),
                        GD_T("Unlink _PARAM1_ and _PARAM2_"),
-                       GD_T("Linked objects"),
+                       _("Linked objects"),
                        "CppPlatform/Extensions/LinkedObjectsicon24.png",
                        "CppPlatform/Extensions/LinkedObjectsicon16.png")
 
@@ -60,10 +60,10 @@ public:
             .SetFunctionName("GDpriv::LinkedObjects::RemoveLinkBetween").SetIncludeFile("LinkedObjects/LinkedObjectsTools.h");
 
         AddAction("RemoveAllLinksOf",
-                       GD_T("Unlink all objects from an object"),
-                       GD_T("Unlink all objects from an object."),
+                       _("Unlink all objects from an object"),
+                       _("Unlink all objects from an object."),
                        GD_T("Unlink all objects from _PARAM1_"),
-                       GD_T("Linked objects"),
+                       _("Linked objects"),
                        "CppPlatform/Extensions/LinkedObjectsicon24.png",
                        "CppPlatform/Extensions/LinkedObjectsicon16.png")
 
@@ -73,10 +73,10 @@ public:
             .SetFunctionName("GDpriv::LinkedObjects::RemoveAllLinksOf").SetIncludeFile("LinkedObjects/LinkedObjectsTools.h");
 
         AddCondition("PickObjectsLinkedTo",
-                       GD_T("Take into account linked objects"),
-                       GD_T("Take some objects linked to the object into account for next conditions and actions.\nThe condition will return false if no object was taken into account."),
+                       _("Take into account linked objects"),
+                       _("Take some objects linked to the object into account for next conditions and actions.\nThe condition will return false if no object was taken into account."),
                        GD_T("Take into account all \"_PARAM1_\" linked to _PARAM2_"),
-                       GD_T("Linked objects"),
+                       _("Linked objects"),
                        "CppPlatform/Extensions/LinkedObjectsicon24.png",
                        "CppPlatform/Extensions/LinkedObjectsicon16.png")
 
@@ -88,10 +88,10 @@ public:
 
 
         AddAction("PickObjectsLinkedTo",
-                       GD_T("Take into account linked objects"),
-                       GD_T("Take objects linked to the object into account for next actions."),
+                       _("Take into account linked objects"),
+                       _("Take objects linked to the object into account for next actions."),
                        GD_T("Take into account all \"_PARAM1_\" linked to _PARAM2_"),
-                       GD_T("Linked objects"),
+                       _("Linked objects"),
                        "CppPlatform/Extensions/LinkedObjectsicon24.png",
                        "CppPlatform/Extensions/LinkedObjectsicon16.png")
 

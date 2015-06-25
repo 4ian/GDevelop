@@ -20,10 +20,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(gd::
 
     #if defined(GD_IDE_ONLY)
     extension.AddCondition("VarScene",
-               GD_T("Value of a variable"),
-               GD_T("Compare the value of a scene variable."),
+               _("Value of a variable"),
+               _("Compare the value of a scene variable."),
                GD_T("Variable _PARAM0_ is _PARAM1__PARAM2_"),
-               GD_T("Variables"),
+               _("Variables"),
                "res/conditions/var24.png",
                "res/conditions/var.png")
         .AddParameter("scenevar", GD_T("Variable"))
@@ -32,10 +32,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(gd::
         .SetManipulatedType("number");
 
     extension.AddCondition("VarSceneTxt",
-             GD_T("Text of a variable"),
-             GD_T("Compare the text of a scene variable."),
+             _("Text of a variable"),
+             _("Compare the text of a scene variable."),
              GD_T("The text of variable _PARAM0_ is _PARAM1__PARAM2_"),
-             GD_T("Variables"),
+             _("Variables"),
              "res/conditions/var24.png",
              "res/conditions/var.png")
         .AddParameter("scenevar", GD_T("Variable"))
@@ -44,10 +44,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(gd::
         .SetManipulatedType("string");
 
     extension.AddCondition("VariableChildExists",
-             GD_T("Child existence"),
-             GD_T("Return true if the specified child of the variable exists."),
+             _("Child existence"),
+             _("Return true if the specified child of the variable exists."),
              GD_T("Child _PARAM1_ of variable _PARAM0_ exists"),
-             GD_T("Variables/Structures"),
+             _("Variables/Structures"),
              "res/conditions/var24.png",
              "res/conditions/var.png")
         .AddParameter("scenevar", GD_T("Variable"))
@@ -55,10 +55,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(gd::
         .MarkAsAdvanced();
 
     extension.AddCondition("GlobalVariableChildExists",
-             GD_T("Child existence"),
-             GD_T("Return true if the specified child of the global variable exists."),
+             _("Child existence"),
+             _("Return true if the specified child of the global variable exists."),
              GD_T("Child _PARAM1_ of global variable _PARAM0_ exists"),
-             GD_T("Variables/Global variables/Structures"),
+             _("Variables/Global variables/Structures"),
              "res/conditions/var24.png",
              "res/conditions/var.png")
         .AddParameter("globalvar", GD_T("Variable"))
@@ -66,10 +66,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(gd::
         .MarkAsAdvanced();
 
     extension.AddCondition("VarSceneDef",
-                   GD_T("Test if a scene variable is defined"),
-                   GD_T("Test if the scene variable exist."),
+                   _("Test if a scene variable is defined"),
+                   _("Test if the scene variable exist."),
                    GD_T("Variable _PARAM0_ is defined"),
-                   GD_T("Variables"),
+                   _("Variables"),
                    "res/conditions/var24.png",
                    "res/conditions/var.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -77,10 +77,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(gd::
         .SetHidden();
 
     extension.AddCondition("VarGlobal",
-               GD_T("Value of a global variable"),
-               GD_T("Compare the value of a global variable."),
+               _("Value of a global variable"),
+               _("Compare the value of a global variable."),
                GD_T("Global variable _PARAM0_ is _PARAM1__PARAM2_"),
-               GD_T("Variables/Global variables"),
+               _("Variables/Global variables"),
                "res/conditions/var24.png",
                "res/conditions/var.png")
         .AddParameter("globalvar", GD_T("Variable"))
@@ -90,10 +90,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(gd::
         .SetManipulatedType("number");
 
     extension.AddCondition("VarGlobalTxt",
-               GD_T("Text of a global variable"),
-               GD_T("Compare the text of a global variable."),
+               _("Text of a global variable"),
+               _("Compare the text of a global variable."),
                GD_T("The text of the global variable _PARAM0_ is _PARAM1__PARAM2_"),
-               GD_T("Variables/Global variables"),
+               _("Variables/Global variables"),
                "res/conditions/var24.png",
                "res/conditions/var.png")
         .AddParameter("globalvar", GD_T("Variable"))
@@ -103,10 +103,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(gd::
         .SetManipulatedType("string");
 
     extension.AddCondition("VarGlobalDef",
-                   GD_T("Test if a global variable is defined"),
-                   GD_T("Test if a global variable exists"),
+                   _("Test if a global variable is defined"),
+                   _("Test if a global variable exists"),
                    GD_T("Global variable _PARAM0_ is defined"),
-                   GD_T("Variables/Global variables"),
+                   _("Variables/Global variables"),
                    "res/conditions/var24.png",
                    "res/conditions/var.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -115,10 +115,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(gd::
         .SetHidden();
 
     extension.AddAction("ModVarScene",
-               GD_T("Value of a variable"),
-               GD_T("Modify the value of a scene variable."),
+               _("Value of a variable"),
+               _("Modify the value of a scene variable."),
                GD_T("Do _PARAM1__PARAM2_ to variable _PARAM0_"),
-               GD_T("Variables"),
+               _("Variables"),
                "res/actions/var24.png",
                "res/actions/var.png")
         .AddParameter("scenevar", GD_T("Variable"))
@@ -127,10 +127,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(gd::
         .SetManipulatedType("number");
 
     extension.AddAction("ModVarSceneTxt",
-               GD_T("String of a variable"),
-               GD_T("Modify the text of a scene variable."),
+               _("String of a variable"),
+               _("Modify the text of a scene variable."),
                GD_T("Do _PARAM1__PARAM2_ to the text of variable _PARAM0_"),
-               GD_T("Variables"),
+               _("Variables"),
                "res/actions/var24.png",
                "res/actions/var.png")
         .AddParameter("scenevar", GD_T("Variable"))
@@ -139,10 +139,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(gd::
         .SetManipulatedType("string");
 
     extension.AddAction("ModVarGlobal",
-               GD_T("Value of a global variable"),
-               GD_T("Modify the value of a global variable"),
+               _("Value of a global variable"),
+               _("Modify the value of a global variable"),
                GD_T("Do _PARAM1__PARAM2_ to global variable _PARAM0_"),
-               GD_T("Variables/Global variables"),
+               _("Variables/Global variables"),
                "res/actions/var24.png",
                "res/actions/var.png")
         .AddParameter("globalvar", GD_T("Variable"))
@@ -152,10 +152,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(gd::
         .SetManipulatedType("number");
 
     extension.AddAction("ModVarGlobalTxt",
-               GD_T("String of a global variable"),
-               GD_T("Modify the text of a global variable."),
+               _("String of a global variable"),
+               _("Modify the text of a global variable."),
                GD_T("Do _PARAM1__PARAM2_ to the text of global variable _PARAM0_"),
-               GD_T("Variables/Global variables"),
+               _("Variables/Global variables"),
                "res/actions/var24.png",
                "res/actions/var.png")
         .AddParameter("globalvar", GD_T("Variable"))
@@ -165,10 +165,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(gd::
         .SetManipulatedType("string");
 
     extension.AddAction("VariableRemoveChild",
-               GD_T("Remove a child"),
-               GD_T("Remove a child from a variable."),
+               _("Remove a child"),
+               _("Remove a child from a variable."),
                GD_T("Remove child _PARAM1_ from variable _PARAM0_"),
-               GD_T("Variables/Structure"),
+               _("Variables/Structure"),
                "res/actions/var24.png",
                "res/actions/var.png")
         .AddParameter("scenevar", GD_T("Variable"))
@@ -176,10 +176,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(gd::
         .MarkAsAdvanced();
 
     extension.AddAction("GlobalVariableRemoveChild",
-               GD_T("Remove a child"),
-               GD_T("Remove a child from a global variable."),
+               _("Remove a child"),
+               _("Remove a child from a global variable."),
                GD_T("Remove child _PARAM1_ from global variable _PARAM0_"),
-               GD_T("Variables/Global variables/Structure"),
+               _("Variables/Global variables/Structure"),
                "res/actions/var24.png",
                "res/actions/var.png")
         .AddParameter("globalvar", GD_T("Variable"))

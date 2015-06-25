@@ -13,6 +13,7 @@
 #include "GDCore/Events/ObjectMetadata.h"
 #include "GDCore/Events/AutomatismMetadata.h"
 #include "GDCore/Events/EventMetadata.h"
+#include "GDCore/Utf8String.h"
 namespace gd { class Instruction; }
 namespace gd { class InstructionMetadata; }
 namespace gd { class ExpressionMetadata; }
@@ -93,10 +94,10 @@ public:
      * \note This method does nothing when used for GD C++ runtime.
      */
     gd::InstructionMetadata & AddCondition(const std::string & name_,
-                                           const std::string & fullname_,
-                                           const std::string & description_,
+                                           const gd::String & fullname_,
+                                           const gd::String & description_,
                                            const std::string & sentence_,
-                                           const std::string & group_,
+                                           const gd::String & group_,
                                            const std::string & icon_,
                                            const std::string & smallicon_);
 
@@ -105,10 +106,10 @@ public:
      * \note This method does nothing when used for GD C++ runtime.
      */
     gd::InstructionMetadata & AddAction(const std::string & name_,
-                                           const std::string & fullname_,
-                                           const std::string & description_,
+                                           const gd::String & fullname_,
+                                           const gd::String & description_,
                                            const std::string & sentence_,
-                                           const std::string & group_,
+                                           const gd::String & group_,
                                            const std::string & icon_,
                                            const std::string & smallicon_);
     /**

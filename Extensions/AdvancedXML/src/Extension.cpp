@@ -36,10 +36,10 @@ public:
         #if defined(GD_IDE_ONLY)
 
         AddAction("NewFile",
-                       GD_T("Create an XML document"),
-                       GD_T("Create an XML document"),
+                       _("Create an XML document"),
+                       _("Create an XML document"),
                        GD_T("Create an XML document into reference _PARAM0_"),
-                       GD_T("Advanced XML : Documents"),
+                       _("Advanced XML : Documents"),
                        "res/AdvancedXML/AdvancedXML.png",
                        "res/AdvancedXML/AdvancedXML16.png")
 
@@ -48,10 +48,10 @@ public:
             .SetFunctionName("AdvancedXML::CreateNewDocument").SetIncludeFile("AdvancedXML/src/AdvancedXMLTools.h");
 
         AddAction("LoadFile",
-                       GD_T("Load an XML file"),
-                       GD_T("Load an XML file."),
+                       _("Load an XML file"),
+                       _("Load an XML file."),
                        GD_T("Load XML File _PARAM0_ into reference _PARAM1_"),
-                       GD_T("Advanced XML : Documents"),
+                       _("Advanced XML : Documents"),
                        "res/AdvancedXML/AdvancedXMLOpen.png",
                        "res/AdvancedXML/AdvancedXMLOpen16.png")
 
@@ -61,10 +61,10 @@ public:
             .SetFunctionName("AdvancedXML::LoadXmlFile").SetIncludeFile("AdvancedXML/src/AdvancedXMLTools.h");
 
         AddAction("SaveFile",
-                       GD_T("Save an XML file"),
-                       GD_T("Save an XML file."),
+                       _("Save an XML file"),
+                       _("Save an XML file."),
                        GD_T("Save XML file _PARAM1_ into _PARAM0_"),
-                       GD_T("Advanced XML : Documents"),
+                       _("Advanced XML : Documents"),
                        "res/AdvancedXML/AdvancedXMLSave.png",
                        "res/AdvancedXML/AdvancedXMLSave16.png")
 
@@ -74,10 +74,10 @@ public:
             .SetFunctionName("AdvancedXML::SaveXmlFile").SetIncludeFile("AdvancedXML/src/AdvancedXMLTools.h");
 
         AddAction("BrowseTo",
-                       GD_T("Load an element into a reference"),
-                       GD_T("Load an element (relative to another) in a reference.\nNote: References allows to access to an element using the name of the reference pointing to it."),
+                       _("Load an element into a reference"),
+                       _("Load an element (relative to another) in a reference.\nNote: References allows to access to an element using the name of the reference pointing to it."),
                        GD_T("Load path _PARAM2_ (relative to the element _PARAM0_) into reference _PARAM1_"),
-                       GD_T("Advanced XML: General"),
+                       _("Advanced XML: General"),
                        "res/AdvancedXML/AdvancedXMLRef.png",
                        "res/AdvancedXML/AdvancedXMLRef16.png")
 
@@ -88,10 +88,10 @@ public:
             .SetFunctionName("AdvancedXML::BrowseTo").SetIncludeFile("AdvancedXML/src/AdvancedXMLTools.h");
 
         AddAction("NextSibling",
-                       GD_T("Go to next element"),
-                       GD_T("Create a reference on the element following the specified element.\nNote: The reference will be invalid if there is no valid element following the specified one.Conditions are available to check if an element is valid."),
+                       _("Go to next element"),
+                       _("Create a reference on the element following the specified element.\nNote: The reference will be invalid if there is no valid element following the specified one.Conditions are available to check if an element is valid."),
                        GD_T("Load the element called _PARAM2_ following _PARAM1_ into reference _PARAM0_"),
-                       GD_T("Advanced XML: General"),
+                       _("Advanced XML: General"),
                        "res/AdvancedXML/AdvancedXMLRef.png",
                        "res/AdvancedXML/AdvancedXMLRef16.png")
 
@@ -102,10 +102,10 @@ public:
             .SetFunctionName("AdvancedXML::NextSibling").SetIncludeFile("AdvancedXML/src/AdvancedXMLTools.h");
 
         AddCondition("IsRefValid",
-                       GD_T("The reference is valid"),
-                       GD_T("Is valid only when the reference is pointing to an existing and valid element."),
+                       _("The reference is valid"),
+                       _("Is valid only when the reference is pointing to an existing and valid element."),
                        GD_T("_PARAM0_ exists and is valid"),
-                       GD_T("Advanced XML: General"),
+                       _("Advanced XML: General"),
                        "res/AdvancedXML/AdvancedXML.png",
                        "res/AdvancedXML/AdvancedXML16.png")
 
@@ -116,10 +116,10 @@ public:
 
 
         AddCondition("GetElementType",
-                       GD_T("Element type"),
-                       GD_T("Test the type of the element.\n(0-> Tag, 1-> Text, 2-> Comment, 3-> XML Document, -1 -> Unknown )"),
+                       _("Element type"),
+                       _("Test the type of the element.\n(0-> Tag, 1-> Text, 2-> Comment, 3-> XML Document, -1 -> Unknown )"),
                        GD_T("Type of _PARAM0_ _PARAM1__PARAM2_"),
-                       GD_T("Advanced XML: General"),
+                       _("Advanced XML: General"),
                        "res/AdvancedXML/AdvancedXML.png",
                        "res/AdvancedXML/AdvancedXML16.png")
 
@@ -144,10 +144,10 @@ public:
 
 
         AddAction("CreateNewElement",
-                       GD_T("Create a new element"),
-                       GD_T("Create a new element.\nNote: References allows to access to an element using the name of the reference pointing to it."),
+                       _("Create a new element"),
+                       _("Create a new element.\nNote: References allows to access to an element using the name of the reference pointing to it."),
                        GD_T("Create a new element of type _PARAM1_ and attach to it the reference _PARAM0_"),
-                       GD_T("Advanced XML: General"),
+                       _("Advanced XML: General"),
                        "res/AdvancedXML/AdvancedXMLAdd.png",
                        "res/AdvancedXML/AdvancedXMLAdd16.png")
 
@@ -158,10 +158,10 @@ public:
             .SetFunctionName("AdvancedXML::CreateNewElement").SetIncludeFile("AdvancedXML/src/AdvancedXMLTools.h");
 
         AddAction("DeleteAnElement",
-                       GD_T("Delete an element"),
-                       GD_T("Delete an element (The element will be removed from its parent and will be destroyed)."),
+                       _("Delete an element"),
+                       _("Delete an element (The element will be removed from its parent and will be destroyed)."),
                        GD_T("Delete element _PARAM0_"),
-                       GD_T("Advanced XML: General"),
+                       _("Advanced XML: General"),
                        "res/AdvancedXML/AdvancedXMLRemove.png",
                        "res/AdvancedXML/AdvancedXMLRemove16.png")
 
@@ -170,10 +170,10 @@ public:
             .SetFunctionName("AdvancedXML::DeleteAnElement").SetIncludeFile("AdvancedXML/src/AdvancedXMLTools.h");
 
         AddAction("InsertElementIntoAnother",
-                       GD_T("Add an element inside another"),
-                       GD_T("Add an element into another: The element will be a \"child\" of its \"parent\"."),
+                       _("Add an element inside another"),
+                       _("Add an element into another: The element will be a \"child\" of its \"parent\"."),
                        GD_T("Add _PARAM0_ as a child of _PARAM1_ (before _PARAM2_)"),
-                       GD_T("Advanced XML: Tag"),
+                       _("Advanced XML: Tag"),
                        "res/AdvancedXML/AdvancedXML.png",
                        "res/AdvancedXML/AdvancedXML16.png")
 
@@ -184,10 +184,10 @@ public:
             .SetFunctionName("AdvancedXML::InsertElementIntoAnother").SetIncludeFile("AdvancedXML/src/AdvancedXMLTools.h");
 
         AddAction("SetTagName",
-                       GD_T("Change the tag name"),
-                       GD_T("Change the tag name"),
+                       _("Change the tag name"),
+                       _("Change the tag name"),
                        GD_T("Do _PARAM1__PARAM2_ to the name of tag _PARAM0_"),
-                       GD_T("Advanced XML: Tag"),
+                       _("Advanced XML: Tag"),
                        "res/AdvancedXML/AdvancedXML.png",
                        "res/AdvancedXML/AdvancedXML16.png")
 
@@ -210,10 +210,10 @@ public:
 
 
         AddAction("SetContent",
-                       GD_T("Change the content of the element"),
-                       GD_T("Change the content (text) of the element ( For text and comments elements only )."),
+                       _("Change the content of the element"),
+                       _("Change the content (text) of the element ( For text and comments elements only )."),
                        GD_T("Do _PARAM1__PARAM2_ to the content of _PARAM0_"),
-                       GD_T("Advanced XML : Text and comments"),
+                       _("Advanced XML : Text and comments"),
                        "res/AdvancedXML/AdvancedXML.png",
                        "res/AdvancedXML/AdvancedXML16.png")
 
@@ -249,10 +249,10 @@ public:
 
 
         AddAction("SetAttributeNumber",
-                       GD_T("Change the value of an attribute"),
-                       GD_T("Change the value of an attribute of an element ( which must be a Tag element )."),
+                       _("Change the value of an attribute"),
+                       _("Change the value of an attribute of an element ( which must be a Tag element )."),
                        GD_T("Do _PARAM2__PARAM3_ to the attribute _PARAM1_ of element _PARAM0_"),
-                       GD_T("Advanced XML: Tag"),
+                       _("Advanced XML: Tag"),
                        "res/AdvancedXML/AdvancedXML.png",
                        "res/AdvancedXML/AdvancedXML16.png")
 
@@ -277,10 +277,10 @@ public:
 
 
         AddAction("SetAttributeString",
-                       GD_T("Change the text of an attribute"),
-                       GD_T("Change the text of an attribute of an element ( which must be a Tag element )."),
+                       _("Change the text of an attribute"),
+                       _("Change the text of an attribute of an element ( which must be a Tag element )."),
                        GD_T("Do _PARAM2__PARAM3_ to the attribute _PARAM1_ of element _PARAM0_"),
-                       GD_T("Advanced XML: Tag"),
+                       _("Advanced XML: Tag"),
                        "res/AdvancedXML/AdvancedXML.png",
                        "res/AdvancedXML/AdvancedXML16.png")
 
@@ -292,10 +292,10 @@ public:
             .SetFunctionName("AdvancedXML::SetAttributeString").SetIncludeFile("AdvancedXML/src/AdvancedXMLTools.h").SetGetter("AdvancedXML::GetAttributeString").SetManipulatedType("string");
 
         AddAction("RemoveAttribute",
-                       GD_T("Delete an attribute"),
-                       GD_T("Delete an attribute from an element ( which must be a Tag element)."),
+                       _("Delete an attribute"),
+                       _("Delete an attribute from an element ( which must be a Tag element)."),
                        GD_T("Delete attribute _PARAM1_ from the element _PARAM0_"),
-                       GD_T("Advanced XML: Tag"),
+                       _("Advanced XML: Tag"),
                        "res/AdvancedXML/AdvancedXML.png",
                        "res/AdvancedXML/AdvancedXML16.png")
 

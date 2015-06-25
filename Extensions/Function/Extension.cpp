@@ -95,10 +95,10 @@ public:
             gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
 
             AddAction("LaunchFunction",
-                           GD_T("Launch a function"),
-                           GD_T("Launch a function"),
+                           _("Launch a function"),
+                           _("Launch a function"),
                            GD_T("Launch _PARAM0_ (_PARAM1_, _PARAM2_, _PARAM3_, _PARAM4_, _PARAM5_, _PARAM6_, _PARAM7_)"),
-                           GD_T("Functions"),
+                           _("Functions"),
                            "res/actions/function24.png",
                            "res/actions/function.png")
 

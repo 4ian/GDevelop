@@ -48,10 +48,10 @@ ObjectMetadata::ObjectMetadata(const std::string & extensionNamespace_,
 }
 
 gd::InstructionMetadata & ObjectMetadata::AddCondition(const std::string & name,
-                                       const std::string & fullname,
-                                       const std::string & description,
+                                       const gd::String & fullname,
+                                       const gd::String & description,
                                        const std::string & sentence,
-                                       const std::string & group,
+                                       const gd::String & group,
                                        const std::string & icon,
                                        const std::string & smallicon)
 {
@@ -63,10 +63,10 @@ gd::InstructionMetadata & ObjectMetadata::AddCondition(const std::string & name,
 }
 
 gd::InstructionMetadata & ObjectMetadata::AddAction(const std::string & name,
-                                       const std::string & fullname,
-                                       const std::string & description,
+                                       const gd::String & fullname,
+                                       const gd::String & description,
                                        const std::string & sentence,
-                                       const std::string & group,
+                                       const gd::String & group,
                                        const std::string & icon,
                                        const std::string & smallicon)
 {

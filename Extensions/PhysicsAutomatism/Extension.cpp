@@ -48,10 +48,10 @@ public:
             aut.SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddAction("SetStatic",
-                           GD_T("Make the object static"),
-                           GD_T("Make object immovable."),
+                           _("Make the object static"),
+                           _("Make object immovable."),
                            GD_T("Make _PARAM0_ static"),
-                           GD_T("Movement"),
+                           _("Movement"),
                            "res/physics24.png",
                            "res/physics16.png")
                 .AddParameter("object", GD_T("Object"))
@@ -60,10 +60,10 @@ public:
                 .SetFunctionName("SetStatic").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddAction("SetDynamic",
-                           GD_T("Make the object dynamic"),
-                           GD_T("Make object dynamic ( affected by forces and other objects )."),
+                           _("Make the object dynamic"),
+                           _("Make object dynamic ( affected by forces and other objects )."),
                            GD_T("Make _PARAM0_ dynamic"),
-                           GD_T("Movement"),
+                           _("Movement"),
                            "res/physics24.png",
                            "res/physics16.png")
                 .AddParameter("object", GD_T("Object"))
@@ -72,10 +72,10 @@ public:
                 .SetFunctionName("SetDynamic").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddCondition("IsDynamic",
-                           GD_T("The object is dynamic"),
-                           GD_T("Test if an object is dynamic ( affected by forces and the other objects )."),
+                           _("The object is dynamic"),
+                           _("Test if an object is dynamic ( affected by forces and the other objects )."),
                            GD_T("_PARAM0_ is dynamic"),
-                           GD_T("Movement"),
+                           _("Movement"),
                            "res/physics24.png",
                            "res/physics16.png")
 
@@ -84,10 +84,10 @@ public:
                 .SetFunctionName("IsDynamic").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddAction("SetFixedRotation",
-                           GD_T("Fix rotation"),
-                           GD_T("Prevent the object from rotating"),
+                           _("Fix rotation"),
+                           _("Prevent the object from rotating"),
                            GD_T("Fix rotation of _PARAM0_"),
-                           GD_T("Rotation"),
+                           _("Rotation"),
                            "res/physics24.png",
                            "res/physics16.png")
                 .AddParameter("object", GD_T("Object"))
@@ -96,10 +96,10 @@ public:
                 .SetFunctionName("SetFixedRotation").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddAction("AddRevoluteJoint",
-                           GD_T("Add a hinge"),
-                           GD_T("Add a hinge about which the object will rotate.\nDistance between hinge and object will remain identical."),
+                           _("Add a hinge"),
+                           _("Add a hinge about which the object will rotate.\nDistance between hinge and object will remain identical."),
                            GD_T("Add a hinge to _PARAM0_ at _PARAM2_;_PARAM3_"),
-                           GD_T("Joints"),
+                           _("Joints"),
                            "res/physics24.png",
                            "res/physics16.png")
                 .AddParameter("object", GD_T("Object"))
@@ -110,10 +110,10 @@ public:
                 .SetFunctionName("AddRevoluteJoint").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddAction("AddRevoluteJointBetweenObjects",
-                           GD_T("Add a hinge between two objects"),
-                           GD_T("Add a hinge about which the object will rotate."),
+                           _("Add a hinge between two objects"),
+                           _("Add a hinge about which the object will rotate."),
                            GD_T("Add a hinge between _PARAM0_ and _PARAM2_"),
-                           GD_T("Joints"),
+                           _("Joints"),
                            "res/physics24.png",
                            "res/physics16.png")
                 .AddParameter("object", GD_T("Object"))
@@ -125,10 +125,10 @@ public:
                 .SetFunctionName("AddRevoluteJointBetweenObjects").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddAction("ActAddGearJointBetweenObjects",
-                           GD_T("Add a gear between two objects"),
-                           GD_T("Add a virtual gear between two objects."),
+                           _("Add a gear between two objects"),
+                           _("Add a virtual gear between two objects."),
                            GD_T("Add a gear between _PARAM0_ and _PARAM2_"),
-                           GD_T("Joints"),
+                           _("Joints"),
                            "res/physics24.png",
                            "res/physics16.png")
                 .AddParameter("object", GD_T("Object"))
@@ -139,10 +139,10 @@ public:
                 .SetFunctionName("AddGearJointBetweenObjects").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddAction("SetFreeRotation",
-                           GD_T("Make object's rotation free"),
-                           GD_T("Allows object to rotate."),
+                           _("Make object's rotation free"),
+                           _("Allows object to rotate."),
                            GD_T("Allow _PARAM0_ to rotate"),
-                           GD_T("Rotation"),
+                           _("Rotation"),
                            "res/physics24.png",
                            "res/physics16.png")
                 .AddParameter("object", GD_T("Object"))
@@ -151,10 +151,10 @@ public:
                 .SetFunctionName("SetFreeRotation").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddCondition("IsFixedRotation",
-                           GD_T("Fixed rotation"),
-                           GD_T("Test if object is rotation fixed."),
+                           _("Fixed rotation"),
+                           _("Test if object is rotation fixed."),
                            GD_T("_PARAM0_ is rotation fixed."),
-                           GD_T("Rotation"),
+                           _("Rotation"),
                            "res/physics24.png",
                            "res/physics16.png")
                 .AddParameter("object", GD_T("Object"))
@@ -163,10 +163,10 @@ public:
                 .SetFunctionName("IsFixedRotation").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddAction("SetAsBullet",
-                           GD_T("Consider as a bullet."),
-                           GD_T("Consider the object as a bullet, so as to have better collision handling."),
+                           _("Consider as a bullet."),
+                           _("Consider the object as a bullet, so as to have better collision handling."),
                            GD_T("Consider _PARAM0_ as a bullet"),
-                           GD_T("Other"),
+                           _("Other"),
                            "res/physics24.png",
                            "res/physics16.png")
                 .AddParameter("object", GD_T("Object"))
@@ -175,10 +175,10 @@ public:
                 .SetFunctionName("SetAsBullet").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddAction("DontSetAsBullet",
-                           GD_T("Do not consider as a bullet"),
-                           GD_T("Do not consider object as a bullet, so as to use standard collision handling."),
+                           _("Do not consider as a bullet"),
+                           _("Do not consider object as a bullet, so as to use standard collision handling."),
                            GD_T("Do not consider _PARAM0_ as a bullet."),
-                           GD_T("Other"),
+                           _("Other"),
                            "res/physics24.png",
                            "res/physics16.png")
                 .AddParameter("object", GD_T("Object"))
@@ -187,10 +187,10 @@ public:
                 .SetFunctionName("DontSetAsBullet").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddCondition("IsBullet",
-                           GD_T("Object is considered as a bullet"),
-                           GD_T("Test if object is considered as a bullet"),
+                           _("Object is considered as a bullet"),
+                           _("Test if object is considered as a bullet"),
                            GD_T("_PARAM0_ is considered as a bullet"),
-                           GD_T("Other"),
+                           _("Other"),
                            "res/physics24.png",
                            "res/physics16.png")
                 .AddParameter("object", GD_T("Object"))
@@ -199,10 +199,10 @@ public:
                 .SetFunctionName("IsBullet").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddAction("ApplyImpulse",
-                           GD_T("Apply an impulse"),
-                           GD_T("Apply an impulse to the object."),
+                           _("Apply an impulse"),
+                           _("Apply an impulse to the object."),
                            GD_T("Apply to _PARAM0_ impulse _PARAM2_;_PARAM3_"),
-                           GD_T("Displacement"),
+                           _("Displacement"),
                            "res/physics24.png",
                            "res/physics16.png")
                 .AddParameter("object", GD_T("Object"))
@@ -213,10 +213,10 @@ public:
                 .SetFunctionName("ApplyImpulse").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddAction("ApplyImpulseUsingPolarCoordinates",
-                           GD_T("Apply an impulse (angle)"),
-                           GD_T("Apply an impulse to an object, using a angle and a length as coordinates."),
+                           _("Apply an impulse (angle)"),
+                           _("Apply an impulse to an object, using a angle and a length as coordinates."),
                            GD_T("Apply to _PARAM0_ impulse _PARAM3_ with angle: _PARAM2_°"),
-                           GD_T("Displacement"),
+                           _("Displacement"),
                            "res/physics24.png",
                            "res/physics16.png")
                 .AddParameter("object", GD_T("Object"))
@@ -227,10 +227,10 @@ public:
                 .SetFunctionName("ApplyImpulseUsingPolarCoordinates").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddAction("ApplyImpulseTowardPosition",
-                           GD_T("Apply an impulse toward a position"),
-                           GD_T("Apply an impulse, directed toward a position, to the object."),
+                           _("Apply an impulse toward a position"),
+                           _("Apply an impulse, directed toward a position, to the object."),
                            GD_T("Apply to _PARAM0_ impulse _PARAM4_ toward position _PARAM2_;_PARAM3_"),
-                           GD_T("Displacement"),
+                           _("Displacement"),
                            "res/physics24.png",
                            "res/physics16.png")
                 .AddParameter("object", GD_T("Object"))
@@ -242,10 +242,10 @@ public:
                 .SetFunctionName("ApplyImpulseTowardPosition").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddAction("ApplyForce",
-                           GD_T("Add a force"),
-                           GD_T("Add a force to object"),
+                           _("Add a force"),
+                           _("Add a force to object"),
                            GD_T("Apply to _PARAM0_ force _PARAM2_;_PARAM3_"),
-                           GD_T("Displacement"),
+                           _("Displacement"),
                            "res/physics24.png",
                            "res/physics16.png")
                 .AddParameter("object", GD_T("Object"))
@@ -256,10 +256,10 @@ public:
                 .SetFunctionName("ApplyForce").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddAction("ApplyForceUsingPolarCoordinates",
-                           GD_T("Apply a force ( angle )"),
-                           GD_T("Apply a force to an object, using an angle and a length as coordinates."),
+                           _("Apply a force ( angle )"),
+                           _("Apply a force to an object, using an angle and a length as coordinates."),
                            GD_T("Apply to _PARAM0_ force _PARAM3_ at angle _PARAM2_"),
-                           GD_T("Displacement"),
+                           _("Displacement"),
                            "res/physics24.png",
                            "res/physics16.png")
                 .AddParameter("object", GD_T("Object"))
@@ -270,10 +270,10 @@ public:
                 .SetFunctionName("ApplyForceUsingPolarCoordinates").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddAction("ApplyForceTowardPosition",
-                           GD_T("Apply a force toward a position"),
-                           GD_T("Apply a force, directed toward a position, to the object."),
+                           _("Apply a force toward a position"),
+                           _("Apply a force, directed toward a position, to the object."),
                            GD_T("Add to _PARAM0_ force _PARAM4_ toward position _PARAM2_;_PARAM3_"),
-                           GD_T("Displacement"),
+                           _("Displacement"),
                            "res/physics24.png",
                            "res/physics16.png")
                 .AddParameter("object", GD_T("Object"))
@@ -285,10 +285,10 @@ public:
                 .SetFunctionName("ApplyForceTowardPosition").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddAction("ApplyTorque",
-                           GD_T("Add a torque (a rotation)"),
-                           GD_T("Add a torque (a rotation) to object."),
+                           _("Add a torque (a rotation)"),
+                           _("Add a torque (a rotation) to object."),
                            GD_T("Add to _PARAM0_ torque _PARAM2_"),
-                           GD_T("Rotation"),
+                           _("Rotation"),
                            "res/physics24.png",
                            "res/physics16.png")
                 .AddParameter("object", GD_T("Object"))
@@ -298,10 +298,10 @@ public:
                 .SetFunctionName("ApplyTorque").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddAction("SetLinearVelocity",
-                           GD_T("Linear velocity"),
-                           GD_T("Modify velocity of an object."),
+                           _("Linear velocity"),
+                           _("Modify velocity of an object."),
                            GD_T("Set linear velocity of _PARAM0_ to _PARAM2_;_PARAM3_"),
-                           GD_T("Displacement"),
+                           _("Displacement"),
                            "res/physics24.png",
                            "res/physics16.png")
                 .AddParameter("object", GD_T("Object"))
@@ -312,10 +312,10 @@ public:
                 .SetFunctionName("SetLinearVelocity").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddCondition("LinearVelocityX",
-                           GD_T("X component"),
-                           GD_T("Compare the linear velocity on X axis of object."),
+                           _("X component"),
+                           _("Compare the linear velocity on X axis of object."),
                            GD_T("Linear velocity on X axis of _PARAM0_ is _PARAM2__PARAM3_"),
-                           GD_T("Displacement"),
+                           _("Displacement"),
                            "res/physics24.png",
                            "res/physics16.png")
                 .AddParameter("object", GD_T("Object"))
@@ -326,10 +326,10 @@ public:
                 .SetFunctionName("GetLinearVelocityX").SetManipulatedType("number").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddCondition("LinearVelocityY",
-                           GD_T("Y component"),
-                           GD_T("Compare the linear velocity on Y axis of object."),
+                           _("Y component"),
+                           _("Compare the linear velocity on Y axis of object."),
                            GD_T("Linear velocity on Y axis of _PARAM0_ is _PARAM2__PARAM3_"),
-                           GD_T("Displacement"),
+                           _("Displacement"),
                            "res/physics24.png",
                            "res/physics16.png")
                 .AddParameter("object", GD_T("Object"))
@@ -340,10 +340,10 @@ public:
                 .SetFunctionName("GetLinearVelocityY").SetManipulatedType("number").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddCondition("LinearVelocity",
-                           GD_T("Linear speed"),
-                           GD_T("Compare the linear velocity of the object."),
+                           _("Linear speed"),
+                           _("Compare the linear velocity of the object."),
                            GD_T("Linear velocity of _PARAM0_ is _PARAM2__PARAM3_"),
-                           GD_T("Displacement"),
+                           _("Displacement"),
                            "res/physics24.png",
                            "res/physics16.png")
                 .AddParameter("object", GD_T("Object"))
@@ -354,10 +354,10 @@ public:
                 .SetFunctionName("GetLinearVelocity").SetManipulatedType("number").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddAction("SetAngularVelocity",
-                           GD_T("Angular speed"),
-                           GD_T("Modify angular velocity of object."),
+                           _("Angular speed"),
+                           _("Modify angular velocity of object."),
                            GD_T("Set angular speed of _PARAM0_ to _PARAM2_"),
-                           GD_T("Rotation"),
+                           _("Rotation"),
                            "res/physics24.png",
                            "res/physics16.png")
                 .AddParameter("object", GD_T("Object"))
@@ -367,10 +367,10 @@ public:
                 .SetFunctionName("SetAngularVelocity").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddCondition("AngularVelocity",
-                           GD_T("Angular speed"),
-                           GD_T("Compare the angular speed of the object."),
+                           _("Angular speed"),
+                           _("Compare the angular speed of the object."),
                            GD_T("Angular speed of _PARAM0_ is _PARAM2__PARAM3_"),
-                           GD_T("Rotation"),
+                           _("Rotation"),
                            "res/physics24.png",
                            "res/physics16.png")
                 .AddParameter("object", GD_T("Object"))
@@ -381,10 +381,10 @@ public:
                 .SetFunctionName("GetAngularVelocity").SetManipulatedType("number").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddCondition("LinearDamping",
-                           GD_T("Linear damping"),
-                           GD_T("Compare the linear damping of the object."),
+                           _("Linear damping"),
+                           _("Compare the linear damping of the object."),
                            GD_T("Linear damping of _PARAM0_ is _PARAM2__PARAM3_"),
-                           GD_T("Displacement"),
+                           _("Displacement"),
                            "res/physics24.png",
                            "res/physics16.png")
                 .AddParameter("object", GD_T("Object"))
@@ -395,10 +395,10 @@ public:
                 .SetFunctionName("GetLinearDamping").SetManipulatedType("number").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddCondition("CollisionWith",
-                           GD_T("Collision"),
-                           GD_T("Test if two objects are colliding.\nAttention! Only objects specified in the first parameter will be taken in account by the next actions and conditions, if they are colliding with the other objects."),
+                           _("Collision"),
+                           _("Test if two objects are colliding.\nAttention! Only objects specified in the first parameter will be taken in account by the next actions and conditions, if they are colliding with the other objects."),
                            GD_T("_PARAM0_ is in collision with a _PARAM2_"),
-                           "",
+                           _(""),
                            "res/physics24.png",
                            "res/physics16.png")
                 .AddParameter("object", GD_T("Object"))
@@ -408,10 +408,10 @@ public:
                 .SetFunctionName("CollisionWith").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddAction("SetLinearDamping",
-                           GD_T("Linear damping"),
-                           GD_T("Modify linear damping of object."),
+                           _("Linear damping"),
+                           _("Modify linear damping of object."),
                            GD_T("Put linear damping of _PARAM0_ to _PARAM2_"),
-                           GD_T("Displacement"),
+                           _("Displacement"),
                            "res/physics24.png",
                            "res/physics16.png")
                 .AddParameter("object", GD_T("Object"))
@@ -421,10 +421,10 @@ public:
                 .SetFunctionName("SetLinearDamping").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddCondition("AngularDamping",
-                           GD_T("Angular damping"),
-                           GD_T("Test object's angular damping"),
+                           _("Angular damping"),
+                           _("Test object's angular damping"),
                            GD_T("Angular damping of _PARAM0_ is _PARAM2__PARAM3_"),
-                           GD_T("Displacement"),
+                           _("Displacement"),
                            "res/physics24.png",
                            "res/physics16.png")
                 .AddParameter("object", GD_T("Object"))
@@ -435,10 +435,10 @@ public:
                 .SetFunctionName("GetAngularDamping").SetManipulatedType("number").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddAction("SetAngularDamping",
-                           GD_T("Angular damping"),
-                           GD_T("Modify angular damping of object."),
+                           _("Angular damping"),
+                           _("Modify angular damping of object."),
                            GD_T("Set angular damping of _PARAM0_ to _PARAM2_"),
-                           GD_T("Displacement"),
+                           _("Displacement"),
                            "res/physics24.png",
                            "res/physics16.png")
                 .AddParameter("object", GD_T("Object"))
@@ -448,10 +448,10 @@ public:
                 .SetFunctionName("SetAngularDamping").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddAction("SetGravity",
-                           GD_T("Gravity"),
-                           GD_T("Modify the gravity"),
+                           _("Gravity"),
+                           _("Modify the gravity"),
                            GD_T("Set gravity force to _PARAM2_;_PARAM3_"),
-                           GD_T("Global options"),
+                           _("Global options"),
                            "res/physics24.png",
                            "res/physics16.png")
                 .AddParameter("object", GD_T("Object"))
@@ -462,10 +462,10 @@ public:
                 .SetFunctionName("SetGravity").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddAction("SetPolygonScaleX",
-                           GD_T("Change collision polygon X scale"),
-                           GD_T("Change the X scale of the polygon. Use a value greater than 1 to enlarge the polygon, less than 1 to reduce it."),
+                           _("Change collision polygon X scale"),
+                           _("Change the X scale of the polygon. Use a value greater than 1 to enlarge the polygon, less than 1 to reduce it."),
                            GD_T("Change collision polygon of _PARAM0_ X scale to _PARAM2_"),
-                           GD_T("Collision polygon"),
+                           _("Collision polygon"),
                            "res/physics24.png",
                            "res/physics16.png")
                 .AddParameter("object", GD_T("Object"))
@@ -475,10 +475,10 @@ public:
                 .SetFunctionName("SetPolygonScaleX").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddAction("SetPolygonScaleY",
-                           GD_T("Change collision polygon Y scale"),
-                           GD_T("Change the Y scale of the polygon. Use a value greater than 1 to enlarge the polygon, less than 1 to reduce it."),
+                           _("Change collision polygon Y scale"),
+                           _("Change the Y scale of the polygon. Use a value greater than 1 to enlarge the polygon, less than 1 to reduce it."),
                            GD_T("Change collision polygon of _PARAM0_ Y scale to _PARAM2_"),
-                           GD_T("Collision polygon"),
+                           _("Collision polygon"),
                            "res/physics24.png",
                            "res/physics16.png")
                 .AddParameter("object", GD_T("Object"))
@@ -488,10 +488,10 @@ public:
                 .SetFunctionName("SetPolygonScaleY").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddCondition("GetPolygonScaleX",
-                           GD_T("Collision polygon X scale"),
-                           GD_T("Test the value of the collision polygon X scale."),
+                           _("Collision polygon X scale"),
+                           _("Test the value of the collision polygon X scale."),
                            GD_T("Collision polygon of _PARAM0_ X scale is _PARAM2__PARAM3_"),
-                           GD_T("Collision polygon"),
+                           _("Collision polygon"),
                            "res/physics24.png",
                            "res/physics16.png")
                 .AddParameter("object", GD_T("Object"))
@@ -502,10 +502,10 @@ public:
                 .SetFunctionName("GetPolygonScaleX").SetManipulatedType("number").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
             aut.AddCondition("GetPolygonScaleY",
-                           GD_T("Collision polygon Y scale"),
-                           GD_T("Test the value of the collision polygon Y scale."),
+                           _("Collision polygon Y scale"),
+                           _("Test the value of the collision polygon Y scale."),
                            GD_T("Collision polygon of _PARAM0_ Y scale is _PARAM2__PARAM3_"),
-                           GD_T("Collision polygon"),
+                           _("Collision polygon"),
                            "res/physics24.png",
                            "res/physics16.png")
                 .AddParameter("object", GD_T("Object"))

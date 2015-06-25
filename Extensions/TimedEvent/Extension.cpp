@@ -130,10 +130,10 @@ public:
             gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
 
             AddAction("ResetTimedEvent",
-                           GD_T("Reset a timed event"),
-                           GD_T("Reset a timed event"),
+                           _("Reset a timed event"),
+                           _("Reset a timed event"),
                            GD_T("Reset the timed event(s) called _PARAM1_"),
-                           GD_T("Timed events"),
+                           _("Timed events"),
                            "CppPlatform/Extensions/timedevent24.png",
                            "CppPlatform/Extensions/timedevent16.png")
                 .AddCodeOnlyParameter("currentScene", "")
@@ -180,10 +180,10 @@ public:
             gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
 
             AddAction("ResetTimedEventAndSubs",
-                           GD_T("Reset a timed event and sub events"),
-                           GD_T("Reset a timed events, as well as all of its sub events."),
+                           _("Reset a timed event and sub events"),
+                           _("Reset a timed events, as well as all of its sub events."),
                            GD_T("Reset timed events called _PARAM1_ and their sub events"),
-                           GD_T("Timed events"),
+                           _("Timed events"),
                            "CppPlatform/Extensions/timedevent24.png",
                            "CppPlatform/Extensions/timedevent16.png")
 

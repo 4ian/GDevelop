@@ -46,10 +46,10 @@ public:
             aut.SetIncludeFile("PathfindingAutomatism/PathfindingAutomatism.h");
 
             aut.AddAction("SetDestination",
-                           GD_T("Move to a position"),
-                           GD_T("Move the object to a position"),
+                           _("Move to a position"),
+                           _("Move the object to a position"),
                            GD_T("Move _PARAM0_ to _PARAM3_;_PARAM4_"),
-                           "",
+                           _(""),
                            "CppPlatform/Extensions/AStaricon24.png",
                            "CppPlatform/Extensions/AStaricon16.png")
                 .AddParameter("object", GD_T("Object"))
@@ -62,10 +62,10 @@ public:
 
 
             aut.AddCondition("PathFound",
-                           GD_T("Path found"),
-                           GD_T("Return true if a path has been found."),
+                           _("Path found"),
+                           _("Return true if a path has been found."),
                            GD_T("A path has been found for _PARAM0_"),
-                           "",
+                           _(""),
                            "CppPlatform/Extensions/AStaricon24.png",
                            "CppPlatform/Extensions/AStaricon16.png")
 
@@ -75,10 +75,10 @@ public:
 
 
             aut.AddCondition("DestinationReached",
-                           GD_T("Destination reached"),
-                           GD_T("Return true if destination was reached."),
+                           _("Destination reached"),
+                           _("Return true if destination was reached."),
                            GD_T("_PARAM0_ reached its destination"),
-                           "",
+                           _(""),
                            "CppPlatform/Extensions/AStaricon24.png",
                            "CppPlatform/Extensions/AStaricon16.png")
 
@@ -88,10 +88,10 @@ public:
 
 
             aut.AddAction("CellWidth",
-                           GD_T("Width of the cells"),
-                           GD_T("Change the width of the cells of the virtual grid."),
+                           _("Width of the cells"),
+                           _("Change the width of the cells of the virtual grid."),
                            GD_T("Do _PARAM2__PARAM3_ to the width of the virtual cells of _PARAM0_"),
-                           GD_T("Virtual grid"),
+                           _("Virtual grid"),
                            "CppPlatform/Extensions/AStaricon24.png",
                            "CppPlatform/Extensions/AStaricon16.png")
 
@@ -103,10 +103,10 @@ public:
 
 
             aut.AddCondition("CellWidth",
-                           GD_T("Width of the virtual grid"),
-                           GD_T("Compare the width of the cells of the virtual grid."),
+                           _("Width of the virtual grid"),
+                           _("Compare the width of the cells of the virtual grid."),
                            GD_T("Width of the virtual cells of _PARAM0_ is _PARAM2__PARAM3_"),
-                           GD_T("Virtual grid"),
+                           _("Virtual grid"),
                            "CppPlatform/Extensions/AStaricon24.png",
                            "CppPlatform/Extensions/AStaricon16.png")
 
@@ -118,10 +118,10 @@ public:
 
 
             aut.AddAction("CellHeight",
-                           GD_T("Height of the cells"),
-                           GD_T("Change the height of the cells of the virtual grid."),
+                           _("Height of the cells"),
+                           _("Change the height of the cells of the virtual grid."),
                            GD_T("Do _PARAM2__PARAM3_ to the height of the virtual cells of _PARAM0_"),
-                           GD_T("Virtual grid"),
+                           _("Virtual grid"),
                            "CppPlatform/Extensions/AStaricon24.png",
                            "CppPlatform/Extensions/AStaricon16.png")
 
@@ -133,10 +133,10 @@ public:
 
 
             aut.AddCondition("CellHeight",
-                           GD_T("Height of the virtual grid"),
-                           GD_T("Compare the height of the cells of the virtual grid."),
+                           _("Height of the virtual grid"),
+                           _("Compare the height of the cells of the virtual grid."),
                            GD_T("Height of the virtual cells of _PARAM0_ is _PARAM2__PARAM3_"),
-                           GD_T("Virtual grid"),
+                           _("Virtual grid"),
                            "CppPlatform/Extensions/AStaricon24.png",
                            "CppPlatform/Extensions/AStaricon16.png")
 
@@ -148,10 +148,10 @@ public:
 
 
             aut.AddAction("Acceleration",
-                           GD_T("Acceleration"),
-                           GD_T("Change the acceleration when moving the object"),
+                           _("Acceleration"),
+                           _("Change the acceleration when moving the object"),
                            GD_T("Do _PARAM2__PARAM3_ to the acceleration of _PARAM0_ on the path"),
-                           GD_T("Path"),
+                           _("Path"),
                            "CppPlatform/Extensions/AStaricon24.png",
                            "CppPlatform/Extensions/AStaricon16.png")
 
@@ -163,10 +163,10 @@ public:
 
 
             aut.AddCondition("Acceleration",
-                           GD_T("Acceleration"),
-                           GD_T("Compare the acceleration when moving the object"),
+                           _("Acceleration"),
+                           _("Compare the acceleration when moving the object"),
                            GD_T("Acceleration of _PARAM0_ is _PARAM2__PARAM3_"),
-                           GD_T("Path"),
+                           _("Path"),
                            "CppPlatform/Extensions/AStaricon24.png",
                            "CppPlatform/Extensions/AStaricon16.png")
 
@@ -178,10 +178,10 @@ public:
 
 
             aut.AddAction("MaxSpeed",
-                           GD_T("Maximum speed"),
-                           GD_T("Change the maximum speed when moving the object"),
+                           _("Maximum speed"),
+                           _("Change the maximum speed when moving the object"),
                            GD_T("Do _PARAM2__PARAM3_ to the max. speed of _PARAM0_ on the path"),
-                           GD_T("Path"),
+                           _("Path"),
                            "CppPlatform/Extensions/AStaricon24.png",
                            "CppPlatform/Extensions/AStaricon16.png")
 
@@ -193,10 +193,10 @@ public:
 
 
             aut.AddCondition("MaxSpeed",
-                           GD_T("Maximum speed"),
-                           GD_T("Compare the maximum speed when moving the object"),
+                           _("Maximum speed"),
+                           _("Compare the maximum speed when moving the object"),
                            GD_T("Max. speed of _PARAM0_ is _PARAM2__PARAM3_"),
-                           GD_T("Path"),
+                           _("Path"),
                            "CppPlatform/Extensions/AStaricon24.png",
                            "CppPlatform/Extensions/AStaricon16.png")
 
@@ -208,10 +208,10 @@ public:
 
 
             aut.AddAction("Speed",
-                           GD_T("Speed"),
-                           GD_T("Change the speed of the object on the path"),
+                           _("Speed"),
+                           _("Change the speed of the object on the path"),
                            GD_T("Do _PARAM2__PARAM3_ to the speed of _PARAM0_ on the path"),
-                           GD_T("Path"),
+                           _("Path"),
                            "CppPlatform/Extensions/AStaricon24.png",
                            "CppPlatform/Extensions/AStaricon16.png")
 
@@ -223,10 +223,10 @@ public:
 
 
             aut.AddCondition("Speed",
-                           GD_T("Speed"),
-                           GD_T("Compare the speed of the object on the path"),
+                           _("Speed"),
+                           _("Compare the speed of the object on the path"),
                            GD_T("Speed of _PARAM0_ is _PARAM2__PARAM3_"),
-                           GD_T("Path"),
+                           _("Path"),
                            "CppPlatform/Extensions/AStaricon24.png",
                            "CppPlatform/Extensions/AStaricon16.png")
 
@@ -238,10 +238,10 @@ public:
 
 
             aut.AddAction("AngularMaxSpeed",
-                           GD_T("Angular maximum speed"),
-                           GD_T("Change the maximum angular speed when moving the object"),
+                           _("Angular maximum speed"),
+                           _("Change the maximum angular speed when moving the object"),
                            GD_T("Do _PARAM2__PARAM3_ to the max. angular speed of _PARAM0_ on the path"),
-                           GD_T("Path"),
+                           _("Path"),
                            "CppPlatform/Extensions/AStaricon24.png",
                            "CppPlatform/Extensions/AStaricon16.png")
 
@@ -253,10 +253,10 @@ public:
 
 
             aut.AddCondition("AngularMaxSpeed",
-                           GD_T("Angular maximum speed"),
-                           GD_T("Compare the maximum angular speed when moving the object"),
+                           _("Angular maximum speed"),
+                           _("Compare the maximum angular speed when moving the object"),
                            GD_T("Max. angular speed of _PARAM0_ is _PARAM2__PARAM3_"),
-                           GD_T("Path"),
+                           _("Path"),
                            "CppPlatform/Extensions/AStaricon24.png",
                            "CppPlatform/Extensions/AStaricon16.png")
 
@@ -268,10 +268,10 @@ public:
 
 
             aut.AddAction("AngleOffset",
-                           GD_T("Rotation offset"),
-                           GD_T("Change the rotation offset applied when moving the object"),
+                           _("Rotation offset"),
+                           _("Change the rotation offset applied when moving the object"),
                            GD_T("Do _PARAM2__PARAM3_ to the rotation offset of _PARAM0_ on the path"),
-                           GD_T("Path"),
+                           _("Path"),
                            "CppPlatform/Extensions/AStaricon24.png",
                            "CppPlatform/Extensions/AStaricon16.png")
 
@@ -283,10 +283,10 @@ public:
 
 
             aut.AddCondition("AngleOffset",
-                           GD_T("Rotation offset"),
-                           GD_T("Compare the rotation offset when moving the object"),
+                           _("Rotation offset"),
+                           _("Compare the rotation offset when moving the object"),
                            GD_T("Rotation offset of _PARAM0_ is _PARAM2__PARAM3_"),
-                           GD_T("Path"),
+                           _("Path"),
                            "CppPlatform/Extensions/AStaricon24.png",
                            "CppPlatform/Extensions/AStaricon16.png")
 
@@ -298,10 +298,10 @@ public:
 
 
             aut.AddAction("ExtraBorder",
-                           GD_T("Extra border"),
-                           GD_T("Change the size of the extra border applied to the object when planning a path"),
+                           _("Extra border"),
+                           _("Change the size of the extra border applied to the object when planning a path"),
                            GD_T("Do _PARAM2__PARAM3_ to the extra border of _PARAM0_ on the path"),
-                           GD_T("Path"),
+                           _("Path"),
                            "CppPlatform/Extensions/AStaricon24.png",
                            "CppPlatform/Extensions/AStaricon16.png")
 
@@ -313,10 +313,10 @@ public:
 
 
             aut.AddCondition("ExtraBorder",
-                           GD_T("Extra border"),
-                           GD_T("Compare the size of the extra border applied to the object when planning a path"),
+                           _("Extra border"),
+                           _("Compare the size of the extra border applied to the object when planning a path"),
                            GD_T("Size of the extra border applied to _PARAM0_ is _PARAM2__PARAM3_"),
-                           GD_T("Path"),
+                           _("Path"),
                            "CppPlatform/Extensions/AStaricon24.png",
                            "CppPlatform/Extensions/AStaricon16.png")
 
@@ -328,10 +328,10 @@ public:
 
 
             aut.AddAction("AllowDiagonals",
-                           GD_T("Diagonals moves"),
-                           GD_T("Allow or restrict diagonal moves on the path"),
+                           _("Diagonals moves"),
+                           _("Allow or restrict diagonal moves on the path"),
                            GD_T("Allow diagonal moves for _PARAM0_ on the path: _PARAM2_"),
-                           GD_T("Path"),
+                           _("Path"),
                            "CppPlatform/Extensions/AStaricon24.png",
                            "CppPlatform/Extensions/AStaricon16.png")
 
@@ -342,10 +342,10 @@ public:
 
 
             aut.AddCondition("DiagonalsAllowed",
-                           GD_T("Diagonals moves"),
-                           GD_T("Return true if the object is allowed to do diagonal moves on the path"),
+                           _("Diagonals moves"),
+                           _("Return true if the object is allowed to do diagonal moves on the path"),
                            GD_T("Diagonal moves allowed for _PARAM0_"),
-                           GD_T("Path"),
+                           _("Path"),
                            "CppPlatform/Extensions/AStaricon24.png",
                            "CppPlatform/Extensions/AStaricon16.png")
 
@@ -355,10 +355,10 @@ public:
 
 
             aut.AddAction("RotateObject",
-                           GD_T("Rotate the object"),
-                           GD_T("Enable or disable rotation of the object on the path"),
+                           _("Rotate the object"),
+                           _("Enable or disable rotation of the object on the path"),
                            GD_T("Enable rotation of _PARAM0_ on the path: _PARAM2_"),
-                           GD_T("Path"),
+                           _("Path"),
                            "CppPlatform/Extensions/AStaricon24.png",
                            "CppPlatform/Extensions/AStaricon16.png")
 
@@ -369,10 +369,10 @@ public:
 
 
             aut.AddCondition("ObjectRotated",
-                           GD_T("Object rotated"),
-                           GD_T("Return true if the object is rotated when traveling on its path."),
+                           _("Object rotated"),
+                           _("Return true if the object is rotated when traveling on its path."),
                            GD_T("_PARAM0_ is rotated when traveling on its path"),
-                           GD_T("Path"),
+                           _("Path"),
                            "CppPlatform/Extensions/AStaricon24.png",
                            "CppPlatform/Extensions/AStaricon16.png")
 
@@ -490,10 +490,10 @@ public:
             aut.SetIncludeFile("PathfindingAutomatism/PathfindingObstacleAutomatism.h");
 
             aut.AddAction("Cost",
-                           GD_T("Cost"),
-                           GD_T("Change the cost of going through the object."),
+                           _("Cost"),
+                           _("Change the cost of going through the object."),
                            GD_T("Do _PARAM2__PARAM3_ to the cost of _PARAM0_"),
-                           GD_T("Obstacles"),
+                           _("Obstacles"),
                            "CppPlatform/Extensions/pathfindingobstacleicon24.png",
                            "CppPlatform/Extensions/pathfindingobstacleicon16.png")
 
@@ -505,10 +505,10 @@ public:
 
 
             aut.AddCondition("Cost",
-                           GD_T("Cost"),
-                           GD_T("Compare the cost of going through the object"),
+                           _("Cost"),
+                           _("Compare the cost of going through the object"),
                            GD_T("Cost of _PARAM0_ is _PARAM2__PARAM3_"),
-                           GD_T("Obstacles"),
+                           _("Obstacles"),
                            "CppPlatform/Extensions/pathfindingobstacleicon24.png",
                            "CppPlatform/Extensions/pathfindingobstacleicon16.png")
 
@@ -520,10 +520,10 @@ public:
 
 
             aut.AddAction("SetImpassable",
-                           GD_T("Set impassable"),
-                           GD_T("Set the object as being an impassable obstacle or not"),
+                           _("Set impassable"),
+                           _("Set the object as being an impassable obstacle or not"),
                            GD_T("Set _PARAM0_ as an impassable obstacle: _PARAM2_"),
-                           GD_T("Obstacles"),
+                           _("Obstacles"),
                            "CppPlatform/Extensions/pathfindingobstacleicon24.png",
                            "CppPlatform/Extensions/pathfindingobstacleicon16.png")
 
@@ -534,10 +534,10 @@ public:
 
 
             aut.AddCondition("IsImpassable",
-                           GD_T("Is impassable"),
-                           GD_T("Return true if the obstacle is impassable"),
+                           _("Is impassable"),
+                           _("Return true if the obstacle is impassable"),
                            GD_T("_PARAM0_ is impassable"),
-                           GD_T("Obstacles"),
+                           _("Obstacles"),
                            "CppPlatform/Extensions/pathfindingobstacleicon24.png",
                            "CppPlatform/Extensions/pathfindingobstacleicon16.png")
 

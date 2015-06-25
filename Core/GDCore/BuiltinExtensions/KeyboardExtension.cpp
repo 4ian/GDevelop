@@ -20,20 +20,20 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsKeyboardExtension(gd::P
 
     #if defined(GD_IDE_ONLY)
     extension.AddCondition("KeyPressed",
-                   GD_T("A key is pressed"),
-                   GD_T("Test if a key is pressed"),
+                   _("A key is pressed"),
+                   _("Test if a key is pressed"),
                    GD_T("_PARAM1_ key is pressed"),
-                   GD_T("Keyboard"),
+                   _("Keyboard"),
                    "res/conditions/keyboard24.png",
                    "res/conditions/keyboard.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("key", GD_T("Key to test"), "",false);
 
     extension.AddCondition("KeyFromTextPressed",
-                   GD_T("A key is pressed ( text expression )"),
-                   GD_T("Test if a key, retrieved from the result of the expression, is pressed"),
+                   _("A key is pressed ( text expression )"),
+                   _("Test if a key, retrieved from the result of the expression, is pressed"),
                    GD_T("_PARAM1_ key is pressed"),
-                   GD_T("Keyboard"),
+                   _("Keyboard"),
                    "res/conditions/keyboard24.png",
                    "res/conditions/keyboard.png")
         .AddCodeOnlyParameter("currentScene", "")
@@ -41,10 +41,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsKeyboardExtension(gd::P
         .MarkAsAdvanced();
 
     extension.AddCondition("AnyKeyPressed",
+                   _("Any key is pressed"),
+                   _("Test if any key is pressed"),
                    GD_T("Any key is pressed"),
-                   GD_T("Test if any key is pressed"),
-                   GD_T("Any key is pressed"),
-                   GD_T("Keyboard"),
+                   _("Keyboard"),
                    "res/conditions/keyboard24.png",
                    "res/conditions/keyboard.png")
         .AddCodeOnlyParameter("currentScene", "");

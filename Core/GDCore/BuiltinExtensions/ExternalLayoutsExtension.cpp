@@ -20,10 +20,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsExternalLayoutsExtensio
 
     #if defined(GD_IDE_ONLY)
     extension.AddAction("CreateObjectsFromExternalLayout",
-                   GD_T("Create objects from an external layout"),
-                   GD_T("Create objects from an external layout."),
+                   _("Create objects from an external layout"),
+                   _("Create objects from an external layout."),
                    GD_T("Create objects from the external layout _PARAM1_"),
-                   GD_T("External layouts"),
+                   _("External layouts"),
                    "res/conditions/fichier24.png",
                    "res/conditions/fichier.png")
         .AddCodeOnlyParameter("currentScene", "")

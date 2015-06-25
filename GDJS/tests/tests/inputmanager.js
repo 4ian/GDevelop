@@ -54,9 +54,15 @@ describe('gdjs.InputManager', function() {
 
 		inputManager.onFrameEnded();
 		inputManager.onTouchEnd(10);
+		expect(inputManager.getAllTouchIdentifiers()).to.have.length(2);
 		expect(inputManager.getStartedTouchIdentifiers()).to.have.length(0);
 		expect(inputManager.popStartedTouch()).to.be(undefined);
 		expect(inputManager.popEndedTouch()).to.be(10);
+		expect(inputManager.getTouchX(10)).to.be(510);
+		expect(inputManager.getTouchY(10)).to.be(610);
+
+		inputManager.onFrameEnded();
+		expect(inputManager.getAllTouchIdentifiers()).to.have.length(1);
 	});
 	it('should simulate (or not) mouse events', function(){
 		inputManager.touchSimulateMouse();
@@ -106,9 +112,16 @@ describe('gdjs.RuntimeObject.cursorOnObject', function() {
 
 		runtimeGame.getInputManager().onTouchStart(0, 100, 100);
 		expect(object.cursorOnObject(runtimeScene)).to.be(false);
+		runtimeGame.getInputManager().onFrameEnded();
+
 		runtimeGame.getInputManager().onTouchStart(1, 450, 500);
 		expect(object.cursorOnObject(runtimeScene)).to.be(true);
+		runtimeGame.getInputManager().onFrameEnded();
+
 		runtimeGame.getInputManager().onTouchEnd(1);
+		expect(object.cursorOnObject(runtimeScene)).to.be(true);
+		runtimeGame.getInputManager().onFrameEnded();
+
 		expect(object.cursorOnObject(runtimeScene)).to.be(false);
 	});
 });

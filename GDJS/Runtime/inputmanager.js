@@ -237,7 +237,9 @@ gdjs.InputManager.prototype.onTouchMove = function(identifier, x, y) {
 
 gdjs.InputManager.prototype.onTouchEnd = function(identifier) {
     this._endedTouches.push(identifier);
-    this._touches.remove(identifier);
+    if (this._touches.containsKey(identifier)) { //Postpone deletion at the end of the frame
+        this._touches.get(identifier).justEnded = true;
+    }
 
     if (this._touchSimulateMouse) {
         this.onMouseButtonReleased(0);
@@ -278,6 +280,15 @@ gdjs.InputManager.prototype.touchSimulateMouse = function(enable) {
  * @method onFrameEnded
  */
 gdjs.InputManager.prototype.onFrameEnded = function() {
+    //Only clear the ended touches at the end of the frame.
+    var identifiers = this._touches.keys();
+    for(var i = 0;i<identifiers.length;++i) {
+        var touch = this._touches.get(identifiers[i]);
+        if(touch.justEnded) {
+            this._touches.remove(identifiers[i]);
+        }
+    }
+
     this._startedTouches.length = 0;
     this._endedTouches.length = 0;
     this._releasedMouseButtons.length = 0;

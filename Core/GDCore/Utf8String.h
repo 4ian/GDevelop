@@ -118,6 +118,18 @@ public:
     String();
 
     /**
+     * Constructs a string from an array of char **representing a string encoded in UTF8**.
+     *
+     * Usefull to implicitly create a String object from a string literal.
+     *
+     * **Usage :**
+     * \code
+     * gd::String str(u8"A little sentence.");
+     * \endcode
+     */
+    String(const char *characters);
+
+    /**
      * Constructs a String from a std::u32string.
      *
      * **Usage :**
@@ -150,6 +162,17 @@ public:
  * \name Assignment (implicit conversions)
  * \{
  */
+    /**
+     * Assign the String using a string literal (it assumes that the **string literal is encoded
+     * in UTF8**).
+     *
+     * Usage :
+     * \code
+     * gd::String str;
+     * str = u8"This is a test string.";
+     * \endcode
+     */
+    String& operator=(const char *characters);
 
     String& operator=(const sf::String &string);
 
@@ -345,7 +368,7 @@ public:
      * You should avoid to use it in a loop and use the iterators provided by this
      * class instead.
      */
-    value_type operator[](const size_type position) const;
+    value_type operator[]( const size_type position ) const;
 
     /**
      * Get the raw UTF8-encoded std::string
@@ -367,6 +390,8 @@ public:
  */
 
     String& operator+=(const String &other);
+
+    String& operator+=(const char *other);
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
@@ -393,7 +418,7 @@ public:
      * **Usage :**
      *
      * \code
-     * gd::utf8::String str = GD_U8("10;20;30;40");
+     * gd::utf8::String str = u8"10;20;30;40";
      * std::vector<gd::utf8::String> splittedStr = str.Split(U';'); //the U prefix is mandatory to get a char32_t from the literal
      * //Now the vector contains "10", "20", "30" and "40" as gd::String objects
      * \endcode
@@ -419,13 +444,21 @@ public:
      * Compares the current string with another.
      * \todo Implement it !
      */
-    int compare( const String &other );
+    int compare( const String &other ) const;
+
+    /**
+     * Test equality of two strings.
+     */
+    bool operator==( const String &other ) const;
+
+    /**
+     * Test equality of two strings.
+     */
+    bool operator==( const char *character ) const;
 
 /**
  * \}
  */
-
-    bool operator==(const String &other) const;
 
 private:
     std::string m_string; ///< Internal container
@@ -442,6 +475,20 @@ private:
  * \return a String containing the concatenation of lhs and rhs.
  */
 String GD_CORE_API operator+(String lhs, const String &rhs);
+
+/**
+ * \relates String
+ * \return a String containing the concatenation of lhs and rhs (rhs is converted
+ * to gd::utf8::String assuming it's encoded in UTF8).
+ */
+String GD_CORE_API operator+(String lhs, const char *rhs);
+
+/**
+ * \relates String
+ * \return a String containing the concatenation of lhs and rhs (lhs is converted
+ * to gd::utf8::String assuming it's encoded in UTF8).
+ */
+String GD_CORE_API operator+(const char *lhs, const String &rhs);
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
@@ -517,7 +564,7 @@ typedef utf8::String String;
  * \section Performance Performance
  * The UTF8 encoding has the advantage to reduce the RAM consumption compared to UTF16 or UTF32 for strings using a lot 
  * of latin characters. But the characters variable length brings some performance issues compared to fixed size encoding.
- * That's why the complexity of each methods is written in their documentation. As instance, the size() method is linear 
+ * That's why the complexity of each methods is written in their documentation. For instance, the size() method is linear 
  * on the string size and so is the operator[]().
  *
  * \section Conversion Conversions from/to other string types
@@ -526,8 +573,9 @@ typedef utf8::String String;
  *
  * **However, this is not the case with std::string** as this conversion is not often lossless (mostly on Windows). 
  * You need to explicitly call gd::String::FromLocale or gd::String::FromUTF8
- * to convert a std::string to a String. If you want to get a String object from a string literal, you can also use
- * the macro GD_U8() (or GD_LOC() if you literal needs to be in the current locale).
+ * to convert a std::string to a String. However, if you want to get a String object from a string literal, you can 
+ * directly use the operator=() or the constructor as they are supporting const char* as argument (it assumes the string
+ * literal is encoded in UTF8, so you'll need to put the u8 prefix).
  *
  * \subsection Conversions1 Implicit conversion from/to wxString and sf::String 
  * \code
@@ -553,9 +601,9 @@ typedef utf8::String String;
  * gd::utf8::String str = gd::utf8::String::FromLocale(ansiStr);
  * 
  * //Create a String using a string literal encoded in UTF8
- * gd::utf8::String anotherStr = GD_U8("This is an UTF8 string");
+ * gd::utf8::String anotherStr = u8"This is an UTF8 string";
  * //The same as gd::utf8::String anotherStr = gd::utf8::FromUTF8(u8"This is an UTF8 string");
- * //When using GD_U8(), you don't need to put the u8 prefix.
+ * //But it works only with string literals.
  *
  * gd::utf8::String finalStr = str + anotherStr; //Concatenates the two Strings
  * std::cout << finalStr.ToLocale() << std::endl //Shows "Some beautiful localized characters. This is an UTF8 string"

@@ -166,7 +166,7 @@ void CppLayoutPreviewer::OnUpdate()
             else if ( retourEvent != -1 )
             {
                 if (retourEvent > 0 && static_cast<unsigned>(retourEvent) < editor.GetProject().GetLayoutsCount())
-                    mainFrameWrapper.GetInfoBar()->ShowMessage(_( "In the compiled game, the scene will change for " ) + GD_U8("\"") + gd::String::FromUTF8(editor.GetProject().GetLayout(retourEvent).GetName()) + GD_U8("\""));
+                    mainFrameWrapper.GetInfoBar()->ShowMessage(_( "In the compiled game, the scene will change for " ) + "\"" + gd::String::FromUTF8(editor.GetProject().GetLayout(retourEvent).GetName()) + "\"");
             }
         }
         else if ( !previewScene.running ) //Paused

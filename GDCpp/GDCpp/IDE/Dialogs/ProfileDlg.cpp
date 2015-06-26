@@ -203,16 +203,16 @@ void ProfileDlg::OnratioGraphicsPaint(wxPaintEvent& event)
 
     if ( !profilingActivated || totalTimeData.empty() )
     {
-        scaleMaxTxt->SetLabel(gd::String::FromDouble(50)+_("ms\n(")+gd::String::FromDouble(1.0f/50*1000.0f)+GD_U8(" ")+_("fps")+GD_U8(")"));
-        scaleMidTxt->SetLabel(gd::String::FromDouble(50/2.0f)+_("ms\n(")+gd::String::FromDouble(1.0f/(50/2.0f)*1000.0f)+GD_U8(" ")+_("fps")+GD_U8(")"));
+        scaleMaxTxt->SetLabel(gd::String::FromDouble(50)+_("ms\n(")+gd::String::FromDouble(1.0f/50*1000.0f)+GD_U8(" ")+_("fps")+")");
+        scaleMidTxt->SetLabel(gd::String::FromDouble(50/2.0f)+_("ms\n(")+gd::String::FromDouble(1.0f/(50/2.0f)*1000.0f)+GD_U8(" ")+_("fps")+")");
 
         return;
     }
 
     unsigned int maximumTime = 50;
 
-    scaleMaxTxt->SetLabel(gd::String::FromDouble(maximumTime)+_("ms\n(")+gd::String::FromDouble(1.0f/maximumTime*1000.0f)+GD_U8(" ")+_("fps")+GD_U8(")"));
-    scaleMidTxt->SetLabel(gd::String::FromDouble(maximumTime/2.0f)+_("ms\n(")+gd::String::FromDouble(1.0f/(maximumTime/2.0f)*1000.0f)+GD_U8(" ")+_("fps")+GD_U8(")"));
+    scaleMaxTxt->SetLabel(gd::String::FromDouble(maximumTime)+_("ms\n(")+gd::String::FromDouble(1.0f/maximumTime*1000.0f)+GD_U8(" ")+_("fps")+")");
+    scaleMidTxt->SetLabel(gd::String::FromDouble(maximumTime/2.0f)+_("ms\n(")+gd::String::FromDouble(1.0f/(maximumTime/2.0f)*1000.0f)+GD_U8(" ")+_("fps")+")");
 
     //FPS curve
     if ( totalTimeCheck->IsChecked() )

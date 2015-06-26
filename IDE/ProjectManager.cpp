@@ -459,7 +459,7 @@ void ProjectManager::Refresh()
     projectsTree->AddRoot(_("Projects"));
     for (unsigned int i = 0;i<mainEditor.games.size();++i)
     {
-        wxString name = mainEditor.games[i]->GetName() == GD_U8("") ?
+        wxString name = mainEditor.games[i]->GetName() == gd::String() ?
                         _("(No name)") :
                         gd::String::FromUTF8(mainEditor.games[i]->GetName());
 

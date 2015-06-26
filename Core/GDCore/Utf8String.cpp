@@ -26,6 +26,11 @@ String::String() : m_string()
 
 }
 
+String::String(const char *characters) : m_string(characters)
+{
+
+}
+
 String::String(const sf::String &string) : m_string()
 {
     m_string = gd::utf8::FromSfString(string);
@@ -47,6 +52,11 @@ String::String(const wxString &string) : m_string()
 }
 
 #endif
+
+String& String::operator=(const char *characters)
+{
+    m_string = std::string(characters);
+}
 
 String& String::operator=(const sf::String &string)
 {
@@ -210,12 +220,17 @@ String::size_type String::rfind( const String &search, String::size_type pos ) c
     return gd::utf8::RFind(m_string, search.m_string, pos);
 }
 
-bool String::operator==(const String &other) const
+bool String::operator==( const String &other ) const
 {
     return (m_string == other.m_string);
 }
 
-String::value_type String::operator[](const String::size_type position) const
+bool String::operator==( const char *character ) const
+{
+    return (m_string == std::string(character));
+}
+
+String::value_type String::operator[]( const String::size_type position ) const
 {
     const_iterator it = begin();
     std::advance(it, position);
@@ -225,6 +240,12 @@ String::value_type String::operator[](const String::size_type position) const
 String& String::operator+=(const String &other)
 {
     m_string += other.m_string;
+    return *this;
+}
+
+String& String::operator+=(const char *other)
+{
+    *this += gd::String(other);
     return *this;
 }
 
@@ -247,6 +268,19 @@ String GD_CORE_API operator+(String lhs, const String &rhs)
 {
     lhs += rhs;
     return lhs;
+}
+
+String GD_CORE_API operator+(String lhs, const char *rhs)
+{
+    lhs += rhs;
+    return lhs;
+}
+
+String GD_CORE_API operator+(const char *lhs, const String &rhs)
+{
+    String str(lhs);
+    str += rhs;
+    return str;
 }
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)

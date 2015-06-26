@@ -584,7 +584,7 @@ void LayoutEditorCanvas::UpdateContextMenu()
         gd::String name = gd::String::FromUTF8(layout.GetLayer(lowestLayer+1).GetName());
         if ( name == "" ) name = _("Base layer");
         contextMenu.FindItem(ID_LAYERUPMENU)->Enable(true);
-        contextMenu.FindItem(ID_LAYERUPMENU)->SetItemLabel(_("Put the object(s) on the layer \"") + name + GD_U8("\""));
+        contextMenu.FindItem(ID_LAYERUPMENU)->SetItemLabel(_("Put the object(s) on the layer \"") + name + "\"");
     }
 
     //Can we send the objects on a lower layer ?
@@ -602,7 +602,7 @@ void LayoutEditorCanvas::UpdateContextMenu()
         if ( name == "" ) name = _("Base layer");
 
         contextMenu.FindItem(ID_LAYERDOWNMENU)->Enable(true);
-        contextMenu.FindItem(ID_LAYERDOWNMENU)->SetItemLabel(_("Put the object(s) on the layer \"") + name + GD_U8("\""));
+        contextMenu.FindItem(ID_LAYERDOWNMENU)->SetItemLabel(_("Put the object(s) on the layer \"") + name + "\"");
     }
 }
 

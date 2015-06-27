@@ -415,6 +415,7 @@ public:
 
     /**
      * Remove the last character of the String.
+     *
      * **Iterators : ** All iterators may be invalidated (in particular if the 
      * string is reallocated).
      */
@@ -475,15 +476,38 @@ public:
      * its arguments.
      * \param match the characters that will be looked for in the String
      * \param startPos where to start the search
-     * \return the position of the first find
+     * \return the position of the first found character
      */
     size_type find_first_of( const String &match, size_type startPos = 0 ) const;
 
-    size_type find_first_not_of( const String &match, size_type startPos = 0 ) const;
+    /**
+     * Searches the string for the first character that doesn't match any of the characters 
+     * specified in its arguments.
+     * \param not_match the characters that will be looked for in the String
+     * \param startPos where to start the search
+     * \return the position of the first found character
+     */
+    size_type find_first_not_of( const String &not_match, size_type startPos = 0 ) const;
 
+    /**
+     * Searches the string for the last character that matches any of the characters specified in 
+     * its arguments.
+     * \param match the characters that will be looked for in the String
+     * \param endPos where to end the search (this is the last character considered in the
+     * search)
+     * \return the position of the last found character
+     */
     size_type find_last_of( const String &match, size_type endPos = npos ) const;
 
-    size_type find_last_not_of( const String &match, size_type endPos = npos ) const;
+    /**
+     * Searches the string for the last character that doesn't match any of the characters 
+     * specified in its arguments.
+     * \param not_match the characters that will be looked for in the String
+     * \param endPos where to end the search (this is the last character considered in the
+     * search)
+     * \return the position of the last found character
+     */
+    size_type find_last_not_of( const String &not_match, size_type endPos = npos ) const;
 
     /**
      * Compares the current string with another.

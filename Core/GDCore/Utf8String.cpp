@@ -38,6 +38,12 @@ String::String(const sf::String &string) : m_string()
 
 String::String(const std::u32string &string) : m_string()
 {
+    //In theory, an UTF8 character can be up to 6 bytes (even if the current Unicode standard, 
+    //the last character is 4 bytes long).
+    //So, reverse the maximum possible size to avoid reallocations.
+    m_string.reserve(6 * string.size()); 
+
+    //Push_back all characters inside the string.
     for( std::u32string::const_iterator it = string.begin(); it != string.end(); it++ )
     {
         push_back(*it);
@@ -134,9 +140,7 @@ std::string String::ToLocale() const
 
 String String::FromSfString( const sf::String &sfString )
 {
-    String str;
-    str.m_string = gd::utf8::FromSfString(sfString);
-    return str;
+    return String(sfString);
 }
 
 sf::String String::ToSfString() const
@@ -153,9 +157,7 @@ String::operator sf::String() const
 
 String String::FromWxString( const wxString &wxStr)
 {
-    String str;
-    str.m_string = gd::utf8::FromWxString(wxStr);
-    return str;
+    return String(wxStr);
 }
 
 wxString String::ToWxString() const
@@ -172,15 +174,42 @@ String::operator wxString() const
 
 String String::FromUTF8( const std::string &utf8Str )
 {
-    String str;
-    str.m_string = utf8Str;
-    return str;
+    return String(utf8Str.c_str());
 }
 
 std::string String::ToUTF8() const
 {
     return m_string;
 }
+
+String::value_type String::operator[]( const String::size_type position ) const
+{
+    const_iterator it = begin();
+    std::advance(it, position);
+    return *it;
+}
+
+String& String::operator+=(const String &other)
+{
+    m_string += other.m_string;
+    return *this;
+}
+
+String& String::operator+=(const char *other)
+{
+    *this += gd::String(other);
+    return *this;
+}
+
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+
+String& String::operator+=(const wxString &other)
+{
+    *this += FromWxString(other);
+    return *this;
+}
+
+#endif
 
 void String::push_back(String::value_type character)
 {
@@ -310,35 +339,6 @@ bool String::operator==( const char *character ) const
 {
     return (m_string == std::string(character));
 }
-
-String::value_type String::operator[]( const String::size_type position ) const
-{
-    const_iterator it = begin();
-    std::advance(it, position);
-    return *it;
-}
-
-String& String::operator+=(const String &other)
-{
-    m_string += other.m_string;
-    return *this;
-}
-
-String& String::operator+=(const char *other)
-{
-    *this += gd::String(other);
-    return *this;
-}
-
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-
-String& String::operator+=(const wxString &other)
-{
-    *this += FromWxString(other);
-    return *this;
-}
-
-#endif
 
 
 String GD_CORE_API operator+(String lhs, const String &rhs)

@@ -182,6 +182,25 @@ std::string String::ToUTF8() const
     return m_string;
 }
 
+void String::push_back(String::value_type character)
+{
+    ::utf8::unchecked::append(character, std::back_inserter(m_string));
+}
+
+void String::pop_back()
+{
+    m_string.erase((--end()).base(), end().base());
+}
+
+String& String::replace(iterator &i1, iterator &i2, const String &str)
+{
+    std::string strConverted = str.ToUTF8();
+
+    m_string.replace(i1.base(), i2.base(), strConverted);
+
+    return *this;
+}
+
 std::vector<String> String::Split(char32_t delimiter) const
 {
     std::vector<String> splittedStrings(1);
@@ -218,6 +237,68 @@ String::size_type String::find( const String &search, String::size_type pos ) co
 String::size_type String::rfind( const String &search, String::size_type pos ) const
 {
     return gd::utf8::RFind(m_string, search.m_string, pos);
+}
+
+namespace priv
+{
+    String::size_type find_first_of( const String &str, const String &match, 
+        String::size_type startPos, bool not_of)
+    {
+        String::const_iterator it = str.begin();
+        std::advance(it, startPos);
+
+        for( ; it != str.end(); ++it )
+        {
+            //Search the current char in the match string
+            if( ( std::find( match.begin(), match.end(), (*it) ) != match.end() ) != not_of ) 
+                return std::distance(str.begin(), it);
+        }
+
+        return String::npos;
+    }
+}
+
+String::size_type String::find_first_of( const String &match, size_type startPos ) const
+{
+    return priv::find_first_of(*this, match, startPos, false);
+}
+
+String::size_type String::find_first_not_of( const String &match, size_type startPos ) const
+{
+    return priv::find_first_of(*this, match, startPos, true);
+}
+
+namespace priv
+{
+    String::size_type find_last_of( const String &str, const String &match, 
+        String::size_type endPos, bool not_of)
+    {
+        String::size_type strSize = str.size(); //Temporary store the size to avoid a double call to size()
+
+        String::const_iterator it = str.end();
+        if(strSize > endPos)
+            std::advance(it, strSize - endPos);
+
+        while( it != str.begin() )
+        {
+            --it;
+
+            if( ( std::find( match.begin(), match.end(), (*it) ) != match.end() ) != not_of )
+                return std::distance(str.begin(), it);
+        }
+
+        return String::npos;
+    }
+}
+
+String::size_type String::find_last_of( const String &match, size_type endPos ) const
+{
+    return priv::find_last_of(*this, match, endPos, false);
+}
+
+String::size_type String::find_last_not_of( const String &match, size_type endPos ) const
+{
+    return priv::find_last_of(*this, match, endPos, true);
 }
 
 bool String::operator==( const String &other ) const
@@ -259,10 +340,6 @@ String& String::operator+=(const wxString &other)
 
 #endif
 
-void String::push_back(String::value_type character)
-{
-    ::utf8::unchecked::append(character, std::back_inserter(m_string));
-}
 
 String GD_CORE_API operator+(String lhs, const String &rhs)
 {

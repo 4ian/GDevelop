@@ -59,7 +59,7 @@ class String;
  * \brief String represents an UTF8 encoded string.
  * This class represents an UTF8 encoded string. It provides almost the same features as the STL std::string class
  * but is UTF8 aware (size() returns the number of characters, not the number of bytes for example).
- */
+ */ 
 class GD_CORE_API String
 {
 
@@ -96,6 +96,8 @@ public:
         bool operator==(const StringIterator<T> &other) { return (strIt == other.strIt); }
         bool operator!=(const StringIterator<T> &other) { return !operator==(other); }
 
+        T base() const {return strIt;}
+
     private:
         StringIterator(T strIt) : strIt(strIt) {};
         T strIt;
@@ -118,7 +120,8 @@ public:
     String();
 
     /**
-     * Constructs a string from an array of char **representing a string encoded in UTF8**.
+     * Constructs a string from an array of char **representing a string encoded
+     * in UTF8**.
      *
      * Usefull to implicitly create a String object from a string literal.
      *
@@ -163,8 +166,8 @@ public:
  * \{
  */
     /**
-     * Assign the String using a string literal (it assumes that the **string literal is encoded
-     * in UTF8**).
+     * Assign the String using a string literal (it assumes that the **string 
+     * literal is encoded in UTF8**).
      *
      * Usage :
      * \code
@@ -203,6 +206,8 @@ public:
 
     /**
      * Clear the string
+     *
+     * **Iterators :** Obviously, all iterators are invalidated.
      */
     void clear() { m_string.clear(); }
 
@@ -269,7 +274,8 @@ public:
  */
 
     /**
-     * Returns a String created from a std::string encoded in the current locale.
+     * Returns a String created from a std::string encoded in the current 
+     * locale.
      *
      * See \ref Conversions2 for more information.
      */
@@ -364,9 +370,9 @@ public:
 
     /**
      * Returns the code point at the specified position
-     * \warning This operator has a linear complexity on the character's position. 
-     * You should avoid to use it in a loop and use the iterators provided by this
-     * class instead.
+     * \warning This operator has a linear complexity on the character's
+     * position. You should avoid to use it in a loop and use the iterators
+     * provided by this class instead.
      */
     value_type operator[]( const size_type position ) const;
 
@@ -399,7 +405,29 @@ public:
 
 #endif
 
+    /**
+     * Add a character (from its codepoint) at the end of the String.
+     *
+     * **Iterators : ** All iterators may be invalidated (in particular if the 
+     * string is reallocated).
+     */
     void push_back(value_type character);
+
+    /**
+     * Remove the last character of the String.
+     * **Iterators : ** All iterators may be invalidated (in particular if the 
+     * string is reallocated).
+     */
+    void pop_back();
+
+    /**
+     * Replace the portion of the String between i1 and i2 (i2 not 
+     * included) by the String str.
+     * \return *this
+     *
+     * **Iterators :** All iterators may be invalidated.
+     */
+    String& replace(iterator &i1, iterator &i2, const String &str);
 
 /**
  * \}
@@ -419,7 +447,8 @@ public:
      *
      * \code
      * gd::utf8::String str = u8"10;20;30;40";
-     * std::vector<gd::utf8::String> splittedStr = str.Split(U';'); //the U prefix is mandatory to get a char32_t from the literal
+     * std::vector<gd::utf8::String> splittedStr = str.Split(U';'); 
+     * //the U prefix is mandatory to get a char32_t from the literal
      * //Now the vector contains "10", "20", "30" and "40" as gd::String objects
      * \endcode
      */
@@ -431,7 +460,8 @@ public:
     String substr( size_type start = 0, size_type length = npos ) const;
 
     /**
-     * Returns the position of the first occurence of "search" starting from "pos".
+     * Returns the position of the first occurence of "search" starting from 
+     * "pos".
      */
     size_type find( const String &search, size_type pos = 0 ) const;
 
@@ -439,6 +469,21 @@ public:
      * Returns the position of the last occurence starting before "pos".
      */
     size_type rfind( const String &search, size_type pos = npos ) const;
+
+    /**
+     * Searches the string for the first character that matches any of the characters specified in 
+     * its arguments.
+     * \param match the characters that will be looked for in the String
+     * \param startPos where to start the search
+     * \return the position of the first find
+     */
+    size_type find_first_of( const String &match, size_type startPos = 0 ) const;
+
+    size_type find_first_not_of( const String &match, size_type startPos = 0 ) const;
+
+    size_type find_last_of( const String &match, size_type endPos = npos ) const;
+
+    size_type find_last_not_of( const String &match, size_type endPos = npos ) const;
 
     /**
      * Compares the current string with another.
@@ -478,15 +523,15 @@ String GD_CORE_API operator+(String lhs, const String &rhs);
 
 /**
  * \relates String
- * \return a String containing the concatenation of lhs and rhs (rhs is converted
- * to gd::utf8::String assuming it's encoded in UTF8).
+ * \return a String containing the concatenation of lhs and rhs (rhs is
+ * converted to gd::utf8::String assuming it's encoded in UTF8).
  */
 String GD_CORE_API operator+(String lhs, const char *rhs);
 
 /**
  * \relates String
- * \return a String containing the concatenation of lhs and rhs (lhs is converted
- * to gd::utf8::String assuming it's encoded in UTF8).
+ * \return a String containing the concatenation of lhs and rhs (lhs is 
+ * converted to gd::utf8::String assuming it's encoded in UTF8).
  */
 String GD_CORE_API operator+(const char *lhs, const String &rhs);
 
@@ -494,15 +539,15 @@ String GD_CORE_API operator+(const char *lhs, const String &rhs);
 
 /**
  * \relates String
- * \return a String containing the concatenation of lhs and rhs (rhs is converted
- * to String).
+ * \return a String containing the concatenation of lhs and rhs (rhs is
+ * converted to String).
  */
 String GD_CORE_API operator+(String lhs, const wxString &rhs);
 
 /**
  * \relates String
- * \return a String containing the concatenation of lhs and rhs (rhs is converted
- * to String).
+ * \return a String containing the concatenation of lhs and rhs (rhs is 
+ * converted to String).
  */
 String GD_CORE_API operator+(const wxString &lhs, const String &rhs);
 

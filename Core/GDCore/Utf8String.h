@@ -205,7 +205,7 @@ public:
     size_type size() const;
 
     /**
-     * Clear the string
+     * Clear the string.
      *
      * **Iterators :** Obviously, all iterators are invalidated.
      */
@@ -395,13 +395,13 @@ public:
  * \{
  */
 
-    String& operator+=(const String &other);
+    String& operator+=( const String &other );
 
-    String& operator+=(const char *other);
+    String& operator+=( const char *other );
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
-    String& operator+=(const wxString &other);
+    String& operator+=( const wxString &other );
 
 #endif
 
@@ -411,7 +411,7 @@ public:
      * **Iterators : ** All iterators may be invalidated (in particular if the 
      * string is reallocated).
      */
-    void push_back(value_type character);
+    void push_back( value_type character );
 
     /**
      * Remove the last character of the String.
@@ -428,7 +428,15 @@ public:
      *
      * **Iterators :** All iterators may be invalidated.
      */
-    String& replace(iterator &i1, iterator &i2, const String &str);
+    String& replace( iterator &i1, iterator &i2, const String &str );
+
+    /**
+     * Erase the characters between first and last (last not included).
+     * \param first an iterator to the first character to remove
+     * \param last an iterator to the character next to the last one to remove
+     * \return an iterator at the old position of the first deleted character
+     */
+    iterator erase( iterator &first, iterator &last );
 
 /**
  * \}
@@ -453,7 +461,7 @@ public:
      * //Now the vector contains "10", "20", "30" and "40" as gd::String objects
      * \endcode
      */
-    std::vector<String> Split(char32_t delimiter) const;
+    std::vector<String> Split( value_type delimiter ) const;
 
     /**
      * Returns a sub-string starting from "start" and with length "length".

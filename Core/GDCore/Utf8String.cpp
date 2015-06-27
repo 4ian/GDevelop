@@ -189,13 +189,13 @@ String::value_type String::operator[]( const String::size_type position ) const
     return *it;
 }
 
-String& String::operator+=(const String &other)
+String& String::operator+=( const String &other )
 {
     m_string += other.m_string;
     return *this;
 }
 
-String& String::operator+=(const char *other)
+String& String::operator+=( const char *other )
 {
     *this += gd::String(other);
     return *this;
@@ -203,7 +203,7 @@ String& String::operator+=(const char *other)
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
-String& String::operator+=(const wxString &other)
+String& String::operator+=( const wxString &other )
 {
     *this += FromWxString(other);
     return *this;
@@ -211,7 +211,7 @@ String& String::operator+=(const wxString &other)
 
 #endif
 
-void String::push_back(String::value_type character)
+void String::push_back( String::value_type character )
 {
     ::utf8::unchecked::append(character, std::back_inserter(m_string));
 }
@@ -221,7 +221,7 @@ void String::pop_back()
     m_string.erase((--end()).base(), end().base());
 }
 
-String& String::replace(iterator &i1, iterator &i2, const String &str)
+String& String::replace( iterator &i1, iterator &i2, const String &str )
 {
     std::string strConverted = str.ToUTF8();
 
@@ -230,14 +230,19 @@ String& String::replace(iterator &i1, iterator &i2, const String &str)
     return *this;
 }
 
-std::vector<String> String::Split(char32_t delimiter) const
+String::iterator String::erase( String::iterator &first, String::iterator &last )
+{
+    return iterator( m_string.erase( first.base(), last.base() ) );
+}
+
+std::vector<String> String::Split( String::value_type delimiter ) const
 {
     std::vector<String> splittedStrings(1);
     String::const_iterator it = begin();
 
     for(; it != end(); ++it)
     {
-        char32_t codepoint = *it;
+        String::value_type codepoint = *it;
         if(codepoint == delimiter) //It's the delimiter, insert a new String in the vector
         {
             splittedStrings.emplace_back();
@@ -271,16 +276,16 @@ String::size_type String::rfind( const String &search, String::size_type pos ) c
 namespace priv
 {
     String::size_type find_first_of( const String &str, const String &match, 
-        String::size_type startPos, bool not_of)
+        String::size_type startPos, bool not_of )
     {
         String::const_iterator it = str.begin();
-        std::advance(it, startPos);
+        std::advance( it, startPos );
 
         for( ; it != str.end(); ++it )
         {
             //Search the current char in the match string
             if( ( std::find( match.begin(), match.end(), (*it) ) != match.end() ) != not_of ) 
-                return std::distance(str.begin(), it);
+                return std::distance( str.begin(), it );
         }
 
         return String::npos;
@@ -300,20 +305,20 @@ String::size_type String::find_first_not_of( const String &match, size_type star
 namespace priv
 {
     String::size_type find_last_of( const String &str, const String &match, 
-        String::size_type endPos, bool not_of)
+        String::size_type endPos, bool not_of )
     {
         String::size_type strSize = str.size(); //Temporary store the size to avoid a double call to size()
 
         String::const_iterator it = str.end();
-        if(strSize > endPos)
-            std::advance(it, strSize - endPos);
+        if( strSize > endPos )
+            std::advance( it, strSize - endPos );
 
         while( it != str.begin() )
         {
             --it;
 
             if( ( std::find( match.begin(), match.end(), (*it) ) != match.end() ) != not_of )
-                return std::distance(str.begin(), it);
+                return std::distance( str.begin(), it );
         }
 
         return String::npos;
@@ -322,12 +327,17 @@ namespace priv
 
 String::size_type String::find_last_of( const String &match, size_type endPos ) const
 {
-    return priv::find_last_of(*this, match, endPos, false);
+    return priv::find_last_of( *this, match, endPos, false );
 }
 
 String::size_type String::find_last_not_of( const String &match, size_type endPos ) const
 {
-    return priv::find_last_of(*this, match, endPos, true);
+    return priv::find_last_of( *this, match, endPos, true );
+}
+
+int String::compare( const String &other ) const
+{
+    return m_string.compare( other.m_string );
 }
 
 bool String::operator==( const String &other ) const

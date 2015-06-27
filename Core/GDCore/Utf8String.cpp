@@ -33,28 +33,19 @@ String::String(const char *characters) : m_string(characters)
 
 String::String(const sf::String &string) : m_string()
 {
-    m_string = gd::utf8::FromSfString(string);
+    *this = string;
 }
 
 String::String(const std::u32string &string) : m_string()
 {
-    //In theory, an UTF8 character can be up to 6 bytes (even if the current Unicode standard, 
-    //the last character is 4 bytes long).
-    //So, reverse the maximum possible size to avoid reallocations.
-    m_string.reserve(6 * string.size()); 
-
-    //Push_back all characters inside the string.
-    for( std::u32string::const_iterator it = string.begin(); it != string.end(); it++ )
-    {
-        push_back(*it);
-    }
+    *this = string;
 }
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
 String::String(const wxString &string) : m_string()
 {
-    m_string = gd::utf8::FromWxString(string);
+    *this = string;
 }
 
 #endif
@@ -67,6 +58,24 @@ String& String::operator=(const char *characters)
 String& String::operator=(const sf::String &string)
 {
     m_string = gd::utf8::FromSfString(string);
+    return *this;
+}
+
+String& String::operator=(const std::u32string &string)
+{
+    //In theory, an UTF8 character can be up to 6 bytes (even if the current Unicode standard, 
+    //the last character is 4 bytes long).
+    //So, reverse the maximum possible size to avoid reallocations.
+    m_string.reserve( string.size() * 6 );
+
+    //Push_back all characters inside the string.
+    for( std::u32string::const_iterator it = string.begin(); it != string.end(); ++it )
+    {
+        push_back( *it );
+    }
+
+    m_string.shrink_to_fit();
+
     return *this;
 }
 
@@ -136,6 +145,25 @@ String String::FromLocale( const std::string &localizedString )
 std::string String::ToLocale() const
 {
     return gd::utf8::ToLocaleString(m_string);
+}
+
+String String::FromUTF32( const std::u32string &string )
+{
+    String str;
+    str = string; //operator=(const std::u32string&)
+
+    return str;
+}
+
+std::u32string String::ToUTF32() const
+{
+    std::u32string u32str;
+    for( const_iterator it = begin(); it != end(); ++it )
+    {
+        u32str.push_back( *it );
+    }
+
+    return u32str;
 }
 
 String String::FromSfString( const sf::String &sfString )
@@ -265,7 +293,40 @@ String String::substr( String::size_type start, String::size_type length ) const
 
 String::size_type String::find( const String &search, String::size_type pos ) const
 {
-    return gd::utf8::Find(m_string, search.m_string, pos);
+    const_iterator it = begin();
+
+    //Move to pos
+    if(pos < size())
+        std::advance( it, pos );
+    else
+        return npos;
+
+    //Use the standard std::string to find a string (using their internal std::strings).
+    //Use the raw std::string iterator to get the offset as a **byte** count for the starting 
+    //position.
+    std::string::size_type findPos = 
+        m_string.find( search.m_string, std::distance( m_string.begin(), it.base() ) );
+
+    if( findPos != std::string::npos )
+    {
+        //Create a String::iterator from the std::string::iterator pointing to the find result.
+        const_iterator findPosIt( m_string.begin() + findPos );
+        
+        //Return the distance in **characters** count (that's why we need a String::iterator).
+        return std::distance( begin(), findPosIt );
+    }
+    else
+        return npos;
+}
+
+String::size_type String::find( const char *search, String::size_type pos ) const
+{
+    return find( String( search) , pos );
+}
+
+String::size_type String::find( const String::value_type search, String::size_type pos ) const
+{
+    return find( String( std::u32string( 1, search ) ), pos );
 }
 
 String::size_type String::rfind( const String &search, String::size_type pos ) const

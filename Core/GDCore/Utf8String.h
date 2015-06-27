@@ -35,7 +35,7 @@
  * \note You should consider using GD_U8 to generate a gd::utf8::String from an UTF8
  * literal.
  */
-#define GD_LOC(x) gd::utf8::String::FromLocale( (x) ) 
+#define GD_LOC(x) gd::utf8::String::FromLocale( (x) )
 
 /**
  * \}
@@ -59,7 +59,7 @@ class String;
  * \brief String represents an UTF8 encoded string.
  * This class represents an UTF8 encoded string. It provides almost the same features as the STL std::string class
  * but is UTF8 aware (size() returns the number of characters, not the number of bytes for example).
- */ 
+ */
 class GD_CORE_API String
 {
 
@@ -92,7 +92,7 @@ public:
         StringIterator<T> operator++(int) { StringIterator<T> tmp(*this); operator++(); return tmp; }
         StringIterator<T>& operator--() { ::utf8::unchecked::prior(strIt); return *this; }
         StringIterator<T> operator--(int) { StringIterator<T> tmp(*this); operator--(); return tmp; }
-        
+
         bool operator==(const StringIterator<T> &other) { return (strIt == other.strIt); }
         bool operator!=(const StringIterator<T> &other) { return !operator==(other); }
 
@@ -166,7 +166,7 @@ public:
  * \{
  */
     /**
-     * Assign the String using a string literal (it assumes that the **string 
+     * Assign the String using a string literal (it assumes that the **string
      * literal is encoded in UTF8**).
      *
      * Usage :
@@ -178,6 +178,8 @@ public:
     String& operator=(const char *characters);
 
     String& operator=(const sf::String &string);
+
+    String& operator=(const std::u32string &string);
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
@@ -274,12 +276,17 @@ public:
  */
 
     /**
-     * Returns a String created from a std::string encoded in the current 
+     * Returns a String created from a std::string encoded in the current
      * locale.
      *
      * See \ref Conversions2 for more information.
      */
     static String FromLocale( const std::string &localizedString );
+
+    /**
+     * \return a String created from a std::u32string.
+     */
+    static String FromUTF32( const std::u32string &string );
 
     /**
      * Returns a String created from a sf::String (UTF32).
@@ -314,16 +321,19 @@ public:
  */
 
     /**
-     * Returns a localized std::string from the current string.
+     * \return a localized std::string from the current string.
      *
      * See \ref Conversions2 for more information.
      */
     std::string ToLocale() const;
 
-
+    /**
+     * \return a std::u32string.
+     */
+    std::u32string ToUTF32() const;
 
     /**
-     * Returns a sf::String from the current string.
+     * \return a sf::String from the current string.
      *
      * See \ref Conversions1 for more information.
      */
@@ -337,14 +347,14 @@ public:
     operator sf::String() const;
 
     /**
-     * Returns a UTF8 encoded std::string from the current string.
+     * \return a UTF8 encoded std::string from the current string.
      */
     std::string ToUTF8() const;
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
     /**
-     * Returns a wxString from the current string.
+     * \return a wxString from the current string.
      *
      * See \ref Conversions1 for more information.
      */
@@ -408,7 +418,7 @@ public:
     /**
      * Add a character (from its codepoint) at the end of the String.
      *
-     * **Iterators : ** All iterators may be invalidated (in particular if the 
+     * **Iterators : ** All iterators may be invalidated (in particular if the
      * string is reallocated).
      */
     void push_back( value_type character );
@@ -416,13 +426,13 @@ public:
     /**
      * Remove the last character of the String.
      *
-     * **Iterators : ** All iterators may be invalidated (in particular if the 
+     * **Iterators : ** All iterators may be invalidated (in particular if the
      * string is reallocated).
      */
     void pop_back();
 
     /**
-     * Replace the portion of the String between i1 and i2 (i2 not 
+     * Replace the portion of the String between i1 and i2 (i2 not
      * included) by the String str.
      * \return *this
      *
@@ -456,7 +466,7 @@ public:
      *
      * \code
      * gd::utf8::String str = u8"10;20;30;40";
-     * std::vector<gd::utf8::String> splittedStr = str.Split(U';'); 
+     * std::vector<gd::utf8::String> splittedStr = str.Split(U';');
      * //the U prefix is mandatory to get a char32_t from the literal
      * //Now the vector contains "10", "20", "30" and "40" as gd::String objects
      * \endcode
@@ -464,23 +474,32 @@ public:
     std::vector<String> Split( value_type delimiter ) const;
 
     /**
-     * Returns a sub-string starting from "start" and with length "length".
+     * Returns a sub-string starting from **start** and with length **length**.
      */
     String substr( size_type start = 0, size_type length = npos ) const;
 
     /**
-     * Returns the position of the first occurence of "search" starting from 
-     * "pos".
+     * \return the position of the first occurence of **search** starting from **pos**.
      */
     size_type find( const String &search, size_type pos = 0 ) const;
 
     /**
-     * Returns the position of the last occurence starting before "pos".
+     * \return the position of the first occurence of **search** starting from **pos**.
+     */
+    size_type find( const char *search, size_type pos = 0 ) const;
+
+    /**
+     * \return the position of the first occurence of **search** starting from **pos**.
+     */
+    size_type find( const value_type search, size_type pos = 0 ) const;
+
+    /**
+     * \return the position of the last occurence of **search** starting before **pos**.
      */
     size_type rfind( const String &search, size_type pos = npos ) const;
 
     /**
-     * Searches the string for the first character that matches any of the characters specified in 
+     * Searches the string for the first character that matches any of the characters specified in
      * its arguments.
      * \param match the characters that will be looked for in the String
      * \param startPos where to start the search
@@ -489,7 +508,7 @@ public:
     size_type find_first_of( const String &match, size_type startPos = 0 ) const;
 
     /**
-     * Searches the string for the first character that doesn't match any of the characters 
+     * Searches the string for the first character that doesn't match any of the characters
      * specified in its arguments.
      * \param not_match the characters that will be looked for in the String
      * \param startPos where to start the search
@@ -498,7 +517,7 @@ public:
     size_type find_first_not_of( const String &not_match, size_type startPos = 0 ) const;
 
     /**
-     * Searches the string for the last character that matches any of the characters specified in 
+     * Searches the string for the last character that matches any of the characters specified in
      * its arguments.
      * \param match the characters that will be looked for in the String
      * \param endPos where to end the search (this is the last character considered in the
@@ -508,7 +527,7 @@ public:
     size_type find_last_of( const String &match, size_type endPos = npos ) const;
 
     /**
-     * Searches the string for the last character that doesn't match any of the characters 
+     * Searches the string for the last character that doesn't match any of the characters
      * specified in its arguments.
      * \param not_match the characters that will be looked for in the String
      * \param endPos where to end the search (this is the last character considered in the
@@ -519,7 +538,6 @@ public:
 
     /**
      * Compares the current string with another.
-     * \todo Implement it !
      */
     int compare( const String &other ) const;
 
@@ -562,7 +580,7 @@ String GD_CORE_API operator+(String lhs, const char *rhs);
 
 /**
  * \relates String
- * \return a String containing the concatenation of lhs and rhs (lhs is 
+ * \return a String containing the concatenation of lhs and rhs (lhs is
  * converted to gd::utf8::String assuming it's encoded in UTF8).
  */
 String GD_CORE_API operator+(const char *lhs, const String &rhs);
@@ -578,7 +596,7 @@ String GD_CORE_API operator+(String lhs, const wxString &rhs);
 
 /**
  * \relates String
- * \return a String containing the concatenation of lhs and rhs (rhs is 
+ * \return a String containing the concatenation of lhs and rhs (rhs is
  * converted to String).
  */
 String GD_CORE_API operator+(const wxString &lhs, const String &rhs);
@@ -620,18 +638,18 @@ typedef utf8::String String;
  * \section WhatIsUTF8 What is UTF8 and Unicode ?
  * (from https://en.wikipedia.org/wiki/Unicode and https://en.wikipedia.org/wiki/UTF-8)
 
- * Unicode is a computing industry standard for the consistent encoding, representation, and handling of text 
- * expressed in most of the world's writing systems. 
- * Unicode can be implemented by different character encodings. The most commonly used encodings are UTF-8, UTF-16 
- * and the now-obsolete UCS-2. 
+ * Unicode is a computing industry standard for the consistent encoding, representation, and handling of text
+ * expressed in most of the world's writing systems.
+ * Unicode can be implemented by different character encodings. The most commonly used encodings are UTF-8, UTF-16
+ * and the now-obsolete UCS-2.
  *
  * UTF-8 is a character encoding capable of encoding all possible characters, or code points, in Unicode.
- * The encoding is variable-length (not every character is 1 byte long) and uses 8-bit code units. It was designed 
+ * The encoding is variable-length (not every character is 1 byte long) and uses 8-bit code units. It was designed
  * for backward compatibility with ASCII.
- * UTF-8 encodes each of the 1,112,064 valid code points in the Unicode code space using one to four 8-bit bytes 
- * (a group of 8 bits is known as an octet in the Unicode Standard). Code points with lower numerical values 
- * (i.e., earlier code positions in the Unicode character set, which tend to occur more frequently) are encoded using 
- * fewer bytes. The first 128 characters of Unicode, which correspond one-to-one with ASCII, are encoded using a 
+ * UTF-8 encodes each of the 1,112,064 valid code points in the Unicode code space using one to four 8-bit bytes
+ * (a group of 8 bits is known as an octet in the Unicode Standard). Code points with lower numerical values
+ * (i.e., earlier code positions in the Unicode character set, which tend to occur more frequently) are encoded using
+ * fewer bytes. The first 128 characters of Unicode, which correspond one-to-one with ASCII, are encoded using a
  * single octet with the same binary value as ASCII, making valid ASCII text valid UTF-8-encoded Unicode as well.
  *
  * \section Limitations Limitations
@@ -639,34 +657,34 @@ typedef utf8::String String;
  * impossible to edit a single character with operator[]() nor at because the new character length might not be the same.
  *
  * \section Performance Performance
- * The UTF8 encoding has the advantage to reduce the RAM consumption compared to UTF16 or UTF32 for strings using a lot 
+ * The UTF8 encoding has the advantage to reduce the RAM consumption compared to UTF16 or UTF32 for strings using a lot
  * of latin characters. But the characters variable length brings some performance issues compared to fixed size encoding.
- * That's why the complexity of each methods is written in their documentation. For instance, the size() method is linear 
+ * That's why the complexity of each methods is written in their documentation. For instance, the size() method is linear
  * on the string size and so is the operator[]().
  *
  * \section Conversion Conversions from/to other string types
- * The String handles implicit conversion with sf::String and wxString (implicit constructor and implicit conversion 
- * operator). 
+ * The String handles implicit conversion with sf::String and wxString (implicit constructor and implicit conversion
+ * operator).
  *
- * **However, this is not the case with std::string** as this conversion is not often lossless (mostly on Windows). 
+ * **However, this is not the case with std::string** as this conversion is not often lossless (mostly on Windows).
  * You need to explicitly call gd::String::FromLocale or gd::String::FromUTF8
- * to convert a std::string to a String. However, if you want to get a String object from a string literal, you can 
+ * to convert a std::string to a String. However, if you want to get a String object from a string literal, you can
  * directly use the operator=() or the constructor as they are supporting const char* as argument (it assumes the string
  * literal is encoded in UTF8, so you'll need to put the u8 prefix).
  *
- * \subsection Conversions1 Implicit conversion from/to wxString and sf::String 
+ * \subsection Conversions1 Implicit conversion from/to wxString and sf::String
  * \code
  * //Get a String from sf::String
  * sf::String sfmlStr("This is a test ! ");
  * gd::utf8::String str1(sfmlStr); //Now contains "This is a test ! " encoded in UTF8
- * 
+ *
  * //Get a String from wxString
  * wxString wxStr("Another test ! ");
  * str = wxStr; //Now contains "Another test ! " encoded in UTF8
  *
  * //Get a wxString from String
  * wxString anotherWxStr = str; //anotherWxStr contains "Another test ! " correctly encoded
- * 
+ *
  * //Get a sf::String from String
  * sf::String anotherSfmlString = str; //anotherSfmlString now contains "Another test ! "
  * \endcode
@@ -676,7 +694,7 @@ typedef utf8::String String;
  * //Get a String from a std::string encoded in the current locale
  * std::string ansiStr = "Some beautiful localized characters. "; //Encoded in ANSI on Windows, UTF8 on Linux
  * gd::utf8::String str = gd::utf8::String::FromLocale(ansiStr);
- * 
+ *
  * //Create a String using a string literal encoded in UTF8
  * gd::utf8::String anotherStr = u8"This is an UTF8 string";
  * //The same as gd::utf8::String anotherStr = gd::utf8::FromUTF8(u8"This is an UTF8 string");

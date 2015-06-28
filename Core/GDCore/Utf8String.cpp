@@ -63,7 +63,7 @@ String& String::operator=(const sf::String &string)
 
 String& String::operator=(const std::u32string &string)
 {
-    //In theory, an UTF8 character can be up to 6 bytes (even if the current Unicode standard, 
+    //In theory, an UTF8 character can be up to 6 bytes (even if the current Unicode standard,
     //the last character is 4 bytes long).
     //So, reverse the maximum possible size to avoid reallocations.
     m_string.reserve( string.size() * 6 );
@@ -233,7 +233,7 @@ String& String::operator+=( const char *other )
 
 String& String::operator+=( const wxString &other )
 {
-    *this += FromWxString(other);
+    *this += gd::String(other);
     return *this;
 }
 
@@ -302,16 +302,16 @@ String::size_type String::find( const String &search, String::size_type pos ) co
         return npos;
 
     //Use the standard std::string to find a string (using their internal std::strings).
-    //Use the raw std::string iterator to get the offset as a **byte** count for the starting 
+    //Use the raw std::string iterator to get the offset as a **byte** count for the starting
     //position.
-    std::string::size_type findPos = 
+    std::string::size_type findPos =
         m_string.find( search.m_string, std::distance( m_string.begin(), it.base() ) );
 
     if( findPos != std::string::npos )
     {
         //Create a String::iterator from the std::string::iterator pointing to the find result.
         const_iterator findPosIt( m_string.begin() + findPos );
-        
+
         //Return the distance in **characters** count (that's why we need a String::iterator).
         return std::distance( begin(), findPosIt );
     }
@@ -336,7 +336,7 @@ String::size_type String::rfind( const String &search, String::size_type pos ) c
 
 namespace priv
 {
-    String::size_type find_first_of( const String &str, const String &match, 
+    String::size_type find_first_of( const String &str, const String &match,
         String::size_type startPos, bool not_of )
     {
         String::const_iterator it = str.begin();
@@ -345,7 +345,7 @@ namespace priv
         for( ; it != str.end(); ++it )
         {
             //Search the current char in the match string
-            if( ( std::find( match.begin(), match.end(), (*it) ) != match.end() ) != not_of ) 
+            if( ( std::find( match.begin(), match.end(), (*it) ) != match.end() ) != not_of )
                 return std::distance( str.begin(), it );
         }
 
@@ -365,7 +365,7 @@ String::size_type String::find_first_not_of( const String &match, size_type star
 
 namespace priv
 {
-    String::size_type find_last_of( const String &str, const String &match, 
+    String::size_type find_last_of( const String &str, const String &match,
         String::size_type endPos, bool not_of )
     {
         String::size_type strSize = str.size(); //Temporary store the size to avoid a double call to size()

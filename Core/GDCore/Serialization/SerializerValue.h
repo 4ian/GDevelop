@@ -7,6 +7,7 @@
 #ifndef GDCORE_SERIALIZERVALUE_H
 #define GDCORE_SERIALIZERVALUE_H
 #include <string>
+#include "GDCore/Utf8String.h"
 
 namespace gd {
 
@@ -22,6 +23,7 @@ public:
 	SerializerValue();
 	SerializerValue(bool val);
 	SerializerValue(std::string val);
+	SerializerValue(const gd::String &val);
 	SerializerValue(int val);
 	SerializerValue(double val);
 	virtual ~SerializerValue() {};
@@ -35,6 +37,11 @@ public:
 	 * Set the value, its type being a std::string.
 	 */
 	void SetString(const std::string & val);
+
+	/**
+	 * Set the value, its type being a gd::String.
+	 */
+	void SetUtf8String(const gd::String & val);
 
 	/**
 	 * Set the value, its type being an integer.
@@ -62,6 +69,11 @@ public:
 	std::string GetString() const;
 
 	/**
+	 * Get the value, its type being a gd::String.
+	 */
+	gd::String GetUtf8String() const;
+
+	/**
 	 * Get the value, its type being an int.
 	 */
 	int GetInt() const;
@@ -74,29 +86,35 @@ public:
 	/**
 	 * \brief Return true if the value is a boolean.
 	 */
-	bool IsBoolean() const { return isBoolean; };
+	bool IsBoolean() const { return isBoolean; }
 	/**
 	 * \brief Return true if the value is a string.
 	 */
-	bool IsString() const { return isString; };
+	bool IsString() const { return isString; }
+	/**
+	 * \brief Return true if the value is a gd::String.
+	 */
+	bool IsUtf8String() const { return isUtf8String; }
 	/**
 	 * \brief Return true if the value is an int.
 	 */
-	bool IsInt() const { return isInt; };
+	bool IsInt() const { return isInt; }
 	/**
 	 * \brief Return true if the value is a double.
 	 */
-	bool IsDouble() const { return isDouble; };
+	bool IsDouble() const { return isDouble; }
 
 private:
 	bool isUnknown; ///< If true, the type is unknown but the value is stored as a string in stringValue member.
 	bool isBoolean;
 	bool isString;
+	bool isUtf8String;
 	bool isInt;
 	bool isDouble;
 
 	bool booleanValue;
 	std::string stringValue;
+	gd::String utf8StringValue;
 	int intValue;
 	double doubleValue;
 };

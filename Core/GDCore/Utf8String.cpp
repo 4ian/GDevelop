@@ -419,7 +419,10 @@ namespace priv
         String::size_type startPos, bool not_of )
     {
         String::const_iterator it = str.begin();
-        std::advance( it, startPos );
+        if(startPos < str.size())
+            std::advance( it, startPos );
+        else
+            return String::npos;
 
         for( ; it != str.end(); ++it )
         {
@@ -450,8 +453,8 @@ namespace priv
         String::size_type strSize = str.size(); //Temporary store the size to avoid a double call to size()
 
         String::const_iterator it = str.end();
-        if( strSize > endPos )
-            std::advance( it, strSize - endPos );
+        if( endPos < strSize )
+            std::advance( it, endPos - strSize + 1 );
 
         while( it != str.begin() )
         {

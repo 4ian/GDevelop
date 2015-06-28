@@ -16,7 +16,7 @@
 #include <SFML/System/String.hpp>
 
 TEST_CASE( "Utf8 String", "[common][utf8]") {
-	SECTION("Conversion") {
+	SECTION("ctor & conversions") {
 		gd::String str = u8"UTF8 a été testé !";
 
 		sf::String sfStr = str;
@@ -26,13 +26,13 @@ TEST_CASE( "Utf8 String", "[common][utf8]") {
 		REQUIRE( str == gd::String::FromUTF32(u32str) );
 	}
 
-	SECTION("Length") {
+	SECTION("size") {
 		gd::String str = u8"UTF8 a été testé !";
 
 		REQUIRE( str.size() == 18 );
 	}
 
-	SECTION("Substring") {
+	SECTION("substr") {
 		gd::String str = u8"UTF8 a été testé !";
 
 		REQUIRE( str.substr(5, 7) == u8"a été t" );
@@ -41,7 +41,7 @@ TEST_CASE( "Utf8 String", "[common][utf8]") {
 		REQUIRE_THROWS_AS( str.substr(50, 5), std::out_of_range );
 	}
 
-	SECTION("Replace") {
+	SECTION("replace") {
 		//Testing the interval version of replace
 		gd::String str = u8"UTF8 a été testé !";
 
@@ -69,7 +69,7 @@ TEST_CASE( "Utf8 String", "[common][utf8]") {
 			== u8"UTF8 a été vraiment très testé !" );
 	}
 
-	SECTION("Find") {
+	SECTION("find") {
 		gd::String str = u8"UTF8 a été testé !";
 
 		REQUIRE( str.find( u8"té", 0) == 8);
@@ -79,7 +79,7 @@ TEST_CASE( "Utf8 String", "[common][utf8]") {
 		REQUIRE( str.find( u8"té", 15) == gd::String::npos);
 	}
 
-	SECTION("RFind") {
+	SECTION("rfind") {
 		gd::String str = u8"UTF8 a été testé !";
 		REQUIRE( str.rfind(u8"té !", gd::String::npos) == 14 );
 		REQUIRE( str.rfind(u8"té", gd::String::npos) == 14 );
@@ -87,5 +87,35 @@ TEST_CASE( "Utf8 String", "[common][utf8]") {
 		REQUIRE( str.rfind(u8"té", 13) == 8 );
 		REQUIRE( str.rfind(u8"té", 8) == 8 );
 		REQUIRE( str.rfind(u8"té", 7) == std::string::npos );
+	}
+
+	SECTION("find_first/last(_not)_of") {
+		gd::String str = u8"Arriveras-tu à trouver un caractère sans accent ?";
+
+		REQUIRE( str.find_first_of(u8"àéèù") == 13 );
+		REQUIRE( str.find_first_of(u8"àéèù", 13) == 13 );
+		REQUIRE( str.find_first_of(u8"àéèù", 14) == 32 );
+		REQUIRE( str.find_first_of(u8"àéèù", 32) == 32 );
+		REQUIRE( str.find_first_of(u8"àéèù", 33) == gd::String::npos );
+		REQUIRE( str.find_first_of(u8"àéèù", gd::String::npos) == gd::String::npos );
+
+		REQUIRE( str.find_last_of(u8"àéèù") == 32 );
+		REQUIRE( str.find_last_of(u8"àéèù", 32) == 32 );
+		REQUIRE( str.find_last_of(u8"àéèù", 31) == 13 );
+		REQUIRE( str.find_last_of(u8"àéèù", 13) == 13 );
+		REQUIRE( str.find_last_of(u8"àéèù", 12) == gd::String::npos );
+		REQUIRE( str.find_last_of(u8"àéèù", 0) == gd::String::npos );
+
+		REQUIRE( str.find_first_not_of(u8"Aabcdefghijklmnopqrstuvwxyz- ?") == 13 );
+		REQUIRE( str.find_first_not_of(u8"Aabcdefghijklmnopqrstuvwxyz- ?", 13) == 13 );
+		REQUIRE( str.find_first_not_of(u8"Aabcdefghijklmnopqrstuvwxyz- ?", 14) == 32 );
+		REQUIRE( str.find_first_not_of(u8"Aabcdefghijklmnopqrstuvwxyz- ?", 32) == 32 );
+		REQUIRE( str.find_first_not_of(u8"Aabcdefghijklmnopqrstuvwxyz- ?", 33) == gd::String::npos );
+
+		REQUIRE( str.find_last_not_of(u8"Aabcdefghijklmnopqrstuvwxyz- ?") == 32 );
+		REQUIRE( str.find_last_not_of(u8"Aabcdefghijklmnopqrstuvwxyz- ?", 32) == 32 );
+		REQUIRE( str.find_last_not_of(u8"Aabcdefghijklmnopqrstuvwxyz- ?", 31) == 13 );
+		REQUIRE( str.find_last_not_of(u8"Aabcdefghijklmnopqrstuvwxyz- ?", 13) == 13 );
+		REQUIRE( str.find_last_not_of(u8"Aabcdefghijklmnopqrstuvwxyz- ?", 12) == gd::String::npos );
 	}
 }

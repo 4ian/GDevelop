@@ -267,7 +267,11 @@ String& String::replace( String::size_type pos, String::size_type len, const Str
     std::advance( i1, pos );
 
     iterator i2 = i1;
-    std::advance( i2, len );
+    while(i2 != end() && len > 0) //Increment "len" times and stop if end() is reached
+    {
+        ++i2;
+        --len;
+    }
 
     return replace( i1, i2, str );
 }
@@ -275,6 +279,29 @@ String& String::replace( String::size_type pos, String::size_type len, const Str
 String::iterator String::erase( String::iterator first, String::iterator last )
 {
     return iterator( m_string.erase( first.base(), last.base() ) );
+}
+
+String::iterator String::erase( String::iterator p )
+{
+    return erase( p, ++p );
+}
+
+void String::erase( String::size_type pos, String::size_type len )
+{
+    if(pos > size())
+        throw std::out_of_range("[gd::String::erase] starting pos greater than size");
+
+    iterator i1 = begin();
+    std::advance(i1, pos);
+
+    iterator i2 = i1;
+    while(i2 != end() && len != 0) //Increment "len" times and stop if end() is reached
+    {
+        ++i2;
+        len--;
+    }
+
+    erase( i1, i2 );
 }
 
 std::vector<String> String::Split( String::value_type delimiter ) const

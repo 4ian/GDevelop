@@ -59,9 +59,12 @@ TEST_CASE( "Utf8 String", "[common][utf8]") {
 		gd::String::iterator i2 = i1;
 		std::advance(i2, 5);
 
-		REQUIRE( str.replace(i1, i2, u8"vérifié") == u8"UTF8 a été vérifié !" );
+		REQUIRE( str2.replace(i1, i2, u8"vérifié") == u8"UTF8 a été vérifié !" );
 
-		REQUIRE( str.replace(i1, str2.end(), u8"vraiment très testé !")
+		gd::String::iterator i3 = str2.begin();
+		std::advance(i3, 11);
+
+		REQUIRE( str2.replace(i3, str2.end(), u8"vraiment très testé !")
 			== u8"UTF8 a été vraiment très testé !" );
 	}
 

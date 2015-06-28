@@ -450,12 +450,27 @@ public:
     String& replace( size_type pos, size_type len, const String &str );
 
     /**
-     * Erase the characters between first and last (last not included).
+     * Erase the characters between **first** and **last** (**last** not included).
      * \param first an iterator to the first character to remove
      * \param last an iterator to the character next to the last one to remove
-     * \return an iterator at the old position of the first deleted character
+     * \return an iterator pointing at the old position of the first deleted character
      */
     iterator erase( iterator first, iterator last );
+
+    /**
+     * Erase the character pointed by **p**.
+     * \param p an iterator pointing to the character to be erased
+     * \return an interator pointing at the old position of the deleted character
+     */
+    iterator erase( iterator p );
+
+    /**
+     * Erase the characters between the positions **pos** and **pos** + **len**
+     * (**pos** + **len** not included).
+     * \param pos the position of the first character to remove
+     * \param len the number of characters to remove from **pos**
+     */
+    void erase( size_type pos = 0, size_type len = npos );
 
 /**
  * \}

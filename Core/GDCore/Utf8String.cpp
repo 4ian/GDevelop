@@ -251,16 +251,28 @@ void String::pop_back()
     m_string.erase((--end()).base(), end().base());
 }
 
-String& String::replace( iterator &i1, iterator &i2, const String &str )
+String& String::replace( iterator i1, iterator i2, const String &str )
 {
-    std::string strConverted = str.ToUTF8();
-
-    m_string.replace(i1.base(), i2.base(), strConverted);
+    m_string.replace(i1.base(), i2.base(), str.m_string);
 
     return *this;
 }
 
-String::iterator String::erase( String::iterator &first, String::iterator &last )
+String& String::replace( String::size_type pos, String::size_type len, const String &str )
+{
+    if(pos > size())
+        throw std::out_of_range("[gd::String::replace] starting pos greater than size");
+
+    iterator i1 = begin();
+    std::advance( i1, pos );
+
+    iterator i2 = i1;
+    std::advance( i2, len );
+
+    return replace( i1, i2, str );
+}
+
+String::iterator String::erase( String::iterator first, String::iterator last )
 {
     return iterator( m_string.erase( first.base(), last.base() ) );
 }

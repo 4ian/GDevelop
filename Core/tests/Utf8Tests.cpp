@@ -40,6 +40,31 @@ TEST_CASE( "Utf8 String", "[common][utf8]") {
 		REQUIRE_THROWS_AS( str.substr(50, 5), std::out_of_range );
 	}
 
+	SECTION("Replace") {
+		//Testing the interval version of replace
+		gd::String str = u8"UTF8 a été testé !";
+
+		REQUIRE( str.replace(11, 5, u8"vérifié") == u8"UTF8 a été vérifié !" );
+		REQUIRE( str.replace(11, gd::String::npos, u8"vraiment très testé !")
+			== u8"UTF8 a été vraiment très testé !" );
+
+		REQUIRE_THROWS_AS( str.replace(50, 5, u8"Cela va planter."),
+			std::out_of_range );
+
+		//Testing the iterator version of replace
+		gd::String str2 = u8"UTF8 a été testé !";
+
+		gd::String::iterator i1 = str2.begin();
+		std::advance(i1, 11);
+		gd::String::iterator i2 = i1;
+		std::advance(i2, 5);
+
+		REQUIRE( str.replace(i1, i2, u8"vérifié") == u8"UTF8 a été vérifié !" );
+
+		REQUIRE( str.replace(i1, str2.end(), u8"vraiment très testé !")
+			== u8"UTF8 a été vraiment très testé !" );
+	}
+
 	SECTION("Find") {
 		gd::String str = u8"UTF8 a été testé !";
 

@@ -432,13 +432,22 @@ public:
     void pop_back();
 
     /**
-     * Replace the portion of the String between i1 and i2 (i2 not
-     * included) by the String str.
+     * Replace the portion of the String between **i1** and **i2** (**i2** not
+     * included) by the String **str**.
      * \return *this
      *
      * **Iterators :** All iterators may be invalidated.
      */
-    String& replace( iterator &i1, iterator &i2, const String &str );
+    String& replace( iterator i1, iterator i2, const String &str );
+
+    /**
+     * Replace the portion of the String between **pos** and **pos** + **len**
+     * (the character at **pos** + **len** is not included)
+     * \return *this
+     *
+     * **Iterators :** All iterators may be invalidated.
+     */
+    String& replace( size_type pos, size_type len, const String &str );
 
     /**
      * Erase the characters between first and last (last not included).
@@ -446,7 +455,7 @@ public:
      * \param last an iterator to the character next to the last one to remove
      * \return an iterator at the old position of the first deleted character
      */
-    iterator erase( iterator &first, iterator &last );
+    iterator erase( iterator first, iterator last );
 
 /**
  * \}

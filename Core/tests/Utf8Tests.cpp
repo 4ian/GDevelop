@@ -8,6 +8,7 @@
  */
 
 #include <exception>
+#include <iostream>
 #include <string>
 #include "catch.hpp"
 #include "GDCore/Utf8String.h"
@@ -80,7 +81,7 @@ TEST_CASE( "Utf8 String", "[common][utf8]") {
 
 	SECTION("RFind") {
 		gd::String str = u8"UTF8 a été testé !";
-
+		REQUIRE( str.rfind(u8"té !", gd::String::npos) == 14 );
 		REQUIRE( str.rfind(u8"té", gd::String::npos) == 14 );
 		REQUIRE( str.rfind(u8"té", 14) == 14 );
 		REQUIRE( str.rfind(u8"té", 13) == 8 );

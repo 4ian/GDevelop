@@ -375,23 +375,18 @@ String::size_type String::rfind( const String &search, String::size_type pos ) c
     //Move to pos + 1 (we will then get the last byte of the character at pos)
     const_iterator it = begin();
     std::string::const_iterator baseIt;
-    if( pos != npos && pos < size() ) //little optimization by testing npos directly (avoid calculating size())
+    if( pos < size() ) //little optimization by testing npos directly (avoid calculating size())
     {
         std::advance( it, pos + 1 );
         baseIt = it.base();
         --baseIt; //Decrement the std::string::iterator by one because we need
         //it to point to the last byte of the character at pos
     }
-    else
-    {
-        it = end();
-        baseIt = it.base();
-    }
 
     //The last character is included, so we need to put the position
     //of the last byte of the character at the position "pos"
     std::string::size_type findPos = m_string.rfind( search.m_string,
-        std::distance( m_string.begin(), baseIt )
+        pos < size() ? std::distance( m_string.begin(), baseIt ) : std::string::npos
         );
 
     if( findPos != std::string::npos )

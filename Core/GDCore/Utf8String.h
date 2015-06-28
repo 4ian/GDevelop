@@ -499,6 +499,16 @@ public:
     size_type rfind( const String &search, size_type pos = npos ) const;
 
     /**
+     * \return the position of the last occurence of **search** starting before **pos**.
+     */
+    size_type rfind( const char *search, size_type pos = npos ) const;
+
+    /**
+     * \return the position of the last occurence of **search** starting before **pos**.
+     */
+    size_type rfind( const value_type &search, size_type pos = npos ) const;
+
+    /**
      * Searches the string for the first character that matches any of the characters specified in
      * its arguments.
      * \param match the characters that will be looked for in the String

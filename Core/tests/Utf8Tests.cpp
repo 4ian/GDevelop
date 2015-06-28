@@ -53,7 +53,7 @@ TEST_CASE( "Utf8 String", "[common][utf8]") {
 	SECTION("RFind") {
 		gd::String str = u8"UTF8 a été testé !";
 
-		REQUIRE( str.rfind(u8"té", std::string::npos) == 14 );
+		REQUIRE( str.rfind(u8"té", gd::String::npos) == 14 );
 		REQUIRE( str.rfind(u8"té", 14) == 14 );
 		REQUIRE( str.rfind(u8"té", 13) == 8 );
 		REQUIRE( str.rfind(u8"té", 8) == 8 );

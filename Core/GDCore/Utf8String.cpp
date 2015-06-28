@@ -323,7 +323,7 @@ String::size_type String::find( const String &search, String::size_type pos ) co
 
 String::size_type String::find( const char *search, String::size_type pos ) const
 {
-    return find( String( search) , pos );
+    return find( String( search ), pos );
 }
 
 String::size_type String::find( const String::value_type search, String::size_type pos ) const
@@ -333,7 +333,50 @@ String::size_type String::find( const String::value_type search, String::size_ty
 
 String::size_type String::rfind( const String &search, String::size_type pos ) const
 {
-    return gd::utf8::RFind(m_string, search.m_string, pos);
+    //Move to pos + 1 (we will then get the last byte of the character at pos)
+    const_iterator it = begin();
+    std::string::const_iterator baseIt;
+    if( pos != npos && pos < size() ) //little optimization by testing npos directly (avoid calculating size())
+    {
+        std::advance( it, pos + 1 );
+        baseIt = it.base();
+        --baseIt; //Decrement the std::string::iterator by one because we need
+        //it to point to the last byte of the character at pos
+    }
+    else
+    {
+        it = end();
+        baseIt = it.base();
+    }
+
+    //The last character is included, so we need to put the position
+    //of the last byte of the character at the position "pos"
+    std::string::size_type findPos = m_string.rfind( search.m_string,
+        std::distance( m_string.begin(), baseIt )
+        );
+
+    if( findPos != std::string::npos )
+    {
+        //Create a String::iterator to the find position to be able to get the real
+        //distance as characters count (it would be a distance as bytes count
+        //with a std::string::iterator)
+        const_iterator findPosIt( m_string.begin() + findPos );
+
+        //Return the distance (which is a distance as characters count)
+        return std::distance( begin(), findPosIt );
+    }
+    else
+        return npos;
+}
+
+String::size_type String::rfind( const char *search, String::size_type pos ) const
+{
+    return rfind( String( search ), pos );
+}
+
+String::size_type String::rfind( const value_type &search, String::size_type pos ) const
+{
+    return rfind( String( std::u32string( 1, search ) ), pos );
 }
 
 namespace priv

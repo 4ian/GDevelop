@@ -21,6 +21,8 @@ namespace gd
 namespace utf8
 {
 
+const String::size_type GD_CORE_API String::npos;
+
 String::String() : m_string()
 {
 

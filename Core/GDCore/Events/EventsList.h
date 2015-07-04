@@ -8,6 +8,7 @@
 #define GDCORE_EVENTSLIST_H
 #include <vector>
 #include <memory>
+#include <GDCore/Utf8String.h>
 namespace gd { class Project; }
 namespace gd { class BaseEvent; }
 namespace gd { class SerializerElement; }
@@ -56,7 +57,7 @@ public:
      * \param eventType The type of the event
      * \param position Insertion position. If the position is invalid, the object is inserted at the end of the objects list.
      */
-    gd::BaseEvent & InsertNewEvent(gd::Project & project, const std::string & eventType, size_t position = (size_t)-1);
+    gd::BaseEvent & InsertNewEvent(gd::Project & project, const gd::String & eventType, size_t position = (size_t)-1);
 
     /**
      * \brief Copy events from another list

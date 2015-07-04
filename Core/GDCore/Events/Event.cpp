@@ -29,7 +29,7 @@ bool BaseEvent::HasSubEvents() const
     return !GetSubEvents().IsEmpty();
 }
 
-std::string BaseEvent::GenerateEventCode(gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
+gd::String BaseEvent::GenerateEventCode(gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
 {
     if ( IsDisabled() ) return "";
 
@@ -40,11 +40,11 @@ std::string BaseEvent::GenerateEventCode(gd::EventsCodeGenerator & codeGenerator
         const gd::Platform & platform = codeGenerator.GetPlatform();
 
         //First try to guess the extension used
-        std::string eventNamespace = type.substr(0, type.find("::"));
+        gd::String eventNamespace = type.substr(0, type.find("::"));
         std::shared_ptr<gd::PlatformExtension> guessedExtension = platform.GetExtension(eventNamespace);
         if ( guessedExtension )
         {
-            std::map<std::string, gd::EventMetadata > & allEvents = guessedExtension->GetAllEvents();
+            std::map<gd::String, gd::EventMetadata > & allEvents = guessedExtension->GetAllEvents();
             if ( allEvents.find(type) != allEvents.end() && allEvents[type].codeGeneration )
                 return allEvents[type].codeGeneration->Generate(*this, codeGenerator, context);
         }
@@ -56,7 +56,7 @@ std::string BaseEvent::GenerateEventCode(gd::EventsCodeGenerator & codeGenerator
             std::shared_ptr<gd::PlatformExtension> extension = platform.GetAllPlatformExtensions()[i];
             if ( !extension ) continue;
 
-            std::map<std::string, gd::EventMetadata > & allEvents = extension->GetAllEvents();
+            std::map<gd::String, gd::EventMetadata > & allEvents = extension->GetAllEvents();
             if ( allEvents.find(type) != allEvents.end() && allEvents[type].codeGeneration )
                 return allEvents[type].codeGeneration->Generate(*this, codeGenerator, context);
         }
@@ -80,11 +80,11 @@ void BaseEvent::Preprocess(gd::EventsCodeGenerator & codeGenerator, gd::EventsLi
         const gd::Platform & platform = codeGenerator.GetPlatform();
 
         //First try to guess the extension used
-        std::string eventNamespace = type.substr(0, type.find("::"));
+        gd::String eventNamespace = type.substr(0, type.find("::"));
         std::shared_ptr<gd::PlatformExtension> guessedExtension = platform.GetExtension(eventNamespace);
         if ( guessedExtension )
         {
-            std::map<std::string, gd::EventMetadata > & allEvents = guessedExtension->GetAllEvents();
+            std::map<gd::String, gd::EventMetadata > & allEvents = guessedExtension->GetAllEvents();
             if ( allEvents.find(type) != allEvents.end() && allEvents[type].codeGeneration )
                 return allEvents[type].codeGeneration->Preprocess(*this, codeGenerator, eventList, indexOfTheEventInThisList);
         }
@@ -96,7 +96,7 @@ void BaseEvent::Preprocess(gd::EventsCodeGenerator & codeGenerator, gd::EventsLi
             std::shared_ptr<gd::PlatformExtension> extension = platform.GetAllPlatformExtensions()[i];
             if ( !extension ) continue;
 
-            std::map<std::string, gd::EventMetadata > & allEvents = extension->GetAllEvents();
+            std::map<gd::String, gd::EventMetadata > & allEvents = extension->GetAllEvents();
             if ( allEvents.find(type) != allEvents.end() && allEvents[type].codeGeneration )
                 return allEvents[type].codeGeneration->Preprocess(*this, codeGenerator, eventList, indexOfTheEventInThisList);
         }

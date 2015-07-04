@@ -108,7 +108,7 @@ EditForEachEvent::~EditForEachEvent()
 
 void EditForEachEvent::OnokBtClick(wxCommandEvent& event)
 {
-    eventEdited.SetObjectToPick(ToString(objectEdit->GetValue()));
+    eventEdited.SetObjectToPick(objectEdit->GetValue());
     EndModal(1);
 }
 

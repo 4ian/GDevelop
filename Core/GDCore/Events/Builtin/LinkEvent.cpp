@@ -151,11 +151,11 @@ void LinkEvent::Render(wxDC & dc, int x, int y, unsigned int width, gd::EventsEd
         dc.SetTextForeground( wxColour( 160, 160, 160 ) );
 
     dc.SetFont(renderingHelper->GetNiceFont());
-    dc.DrawText( _("Link to ")+gd::utf8::ToWxString(GetTarget()), x+32, y + 3 );
+    dc.DrawText( _("Link to ")+GetTarget(), x+32, y + 3 );
 
     if ( !IncludeAllEvents() )
     {
-        wxRect textRect = dc.GetTextExtent(_("Link to ")+gd::utf8::ToWxString(GetTarget()));
+        wxRect textRect = dc.GetTextExtent(_("Link to ")+GetTarget());
         dc.DrawText( _("Include only events ")+ToString(GetIncludeStart()+1)+_(" to ")+ToString(GetIncludeEnd()+1), x+textRect.GetWidth()+32+10, y + 5 );
     }
 #endif
@@ -189,5 +189,3 @@ unsigned int LinkEvent::GetRenderedHeight(unsigned int width, const gd::Platform
 }
 
 }
-
-

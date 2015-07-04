@@ -15,6 +15,7 @@ namespace gd { class Project; }
 namespace gd { class Layout; }
 namespace gd { class Layer; }
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
+#include "GDCore/Utf8String.h"
 
 namespace gd
 {
@@ -91,7 +92,7 @@ private:
     gd::LayoutEditorCanvas * m_layoutCanvas;
     gd::MainFrameWrapper & m_mainFrameWrapper;
 
-    std::string m_layerSelected;
+    gd::String m_layerSelected;
 };
 
 }

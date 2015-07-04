@@ -9,7 +9,7 @@
 
 #include <iostream>
 #include <vector>
-#include <string>
+#include <GDCore/Utf8String.h>
 #include <vector>
 #include <memory>
 #include <memory>
@@ -128,7 +128,7 @@ public:
      *
      * \see gd::EventMetadata
      */
-    virtual std::string GenerateEventCode(gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context);
+    virtual gd::String GenerateEventCode(gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context);
 
     /**
      * Called before events are compiled : the platform provided by \a codeGenerator is asked for the EventMetadata associated to the event,
@@ -175,12 +175,12 @@ public:
     /**
      * Return the event type
      */
-    std::string GetType() const { return type; };
+    gd::String GetType() const { return type; };
 
     /**
      * Change the event type
      */
-    void SetType(std::string type_) { type = type_; };
+    void SetType(gd::String type_) { type = type_; };
 
     /**
      * Set if the event if disabled or not
@@ -254,7 +254,7 @@ protected:
 
 private:
     bool                    disabled; ///<True if the event is disabled and must not be executed
-    std::string             type; ///<Type of the event. Must be assigned at the creation. Used for saving the event for instance.
+    gd::String             type; ///<Type of the event. Must be assigned at the creation. Used for saving the event for instance.
 
     static gd::EventsList badSubEvents;
 };

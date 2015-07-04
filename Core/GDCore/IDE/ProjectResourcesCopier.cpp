@@ -26,7 +26,7 @@ namespace gd
 {
 
 bool ProjectResourcesCopier::CopyAllResourcesTo(gd::Project & originalProject, AbstractFileSystem & fs,
-    std::string destinationDirectory, bool updateOriginalProject, wxProgressDialog * optionalProgressDialog,
+    gd::String destinationDirectory, bool updateOriginalProject, wxProgressDialog * optionalProgressDialog,
     bool askAboutAbsoluteFilenames, bool preserveDirectoryStructure)
 {
     //Check if there are some resources with absolute filenames
@@ -62,9 +62,9 @@ bool ProjectResourcesCopier::CopyAllResourcesTo(gd::Project & originalProject, A
     }
 
     //Copy resources
-    map<string, string> & resourcesNewFilename = resourcesMergingHelper.GetAllResourcesOldAndNewFilename();
+    map<gd::String, gd::String> & resourcesNewFilename = resourcesMergingHelper.GetAllResourcesOldAndNewFilename();
     unsigned int i = 0;
-    for(map<string, string>::const_iterator it = resourcesNewFilename.begin(); it != resourcesNewFilename.end(); ++it)
+    for(map<gd::String, gd::String>::const_iterator it = resourcesNewFilename.begin(); it != resourcesNewFilename.end(); ++it)
     {
         if ( !it->first.empty() )
         {
@@ -77,13 +77,13 @@ bool ProjectResourcesCopier::CopyAllResourcesTo(gd::Project & originalProject, A
             #endif
 
             //Create the destination filename
-            std::string destinationFile(destinationDirectory + "/" + it->second);
+            gd::String destinationFile(destinationDirectory + "/" + it->second);
             fs.MakeAbsolute(destinationFile, destinationDirectory);
 
             if ( destinationFile != it->first )
             {
                 //Be sure the directory exists
-                std::string dir = fs.DirNameFrom(destinationFile);
+                gd::String dir = fs.DirNameFrom(destinationFile);
                 if ( !fs.DirExists(dir) ) fs.MkDir(dir);
 
                 //We can now copy the file

@@ -5,7 +5,7 @@
  */
 #ifndef INSTRUCTION_H
 #define INSTRUCTION_H
-#include <string>
+#include <GDCore/Utf8String.h>
 #include <vector>
 #include "GDCore/Events/Expression.h"
 #include "GDCore/Tools/SPtrList.h"
@@ -38,7 +38,7 @@ public:
      * \brief Default constructor
      * \param type The type of the instruction
      */
-    Instruction(std::string type_ = "");
+    Instruction(gd::String type_ = "");
 
     /**
      * \brief Constructor
@@ -46,7 +46,7 @@ public:
      * \param parameters A vector containing the parameters of the instruction
      * \param inverted true to set the instruction as inverted (used for condition instructions).
      */
-    Instruction(std::string type_, const std::vector <gd::Expression> & parameters_, bool inverted = false);
+    Instruction(gd::String type_, const std::vector <gd::Expression> & parameters_, bool inverted = false);
 
     virtual ~Instruction();
 
@@ -54,13 +54,13 @@ public:
      * \brief Return the type of the instruction.
      * \return The type of the instruction
      */
-    std::string GetType() const { return type; }
+    gd::String GetType() const { return type; }
 
     /**
      * \brief Change the instruction type
      * \param val The new type of the instruction
      */
-    void SetType(const std::string & newType) { type = newType; }
+    void SetType(const gd::String & newType) { type = newType; }
 
     /**
      * \brief Return true if the condition is inverted
@@ -141,7 +141,7 @@ public:
 
 private:
 
-    std::string                             type; ///< Instruction type
+    gd::String                             type; ///< Instruction type
     bool                                    inverted; ///< True if the instruction if inverted. Only applicable for instruction used as conditions by events
     mutable std::vector < gd::Expression >  parameters; ///< Vector containing the parameters
     gd::InstructionsList                    subInstructions; ///< Sub instructions, if applicable.

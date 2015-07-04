@@ -7,7 +7,7 @@
 #ifndef GDCORE_ABSTRACTFILESYSTEM
 #define GDCORE_ABSTRACTFILESYSTEM
 #include <vector>
-#include <string>
+#include <GDCore/Utf8String.h>
 
 #undef CopyFile //Remove a Windows macro
 
@@ -38,66 +38,66 @@ public:
      * @param filename The filename to normalize
      * @return The normalized filename.
      */
-    static std::string NormalizeSeparator(std::string filename);
+    static gd::String NormalizeSeparator(gd::String filename);
 
     /**
      * \brief Create the specified directory.
      * \param path The directory to create.
      */
-    virtual void MkDir(const std::string & path) = 0;
+    virtual void MkDir(const gd::String & path) = 0;
 
     /**
      * \brief Return true if the specified directory exists
      */
-    virtual bool DirExists(const std::string & path) = 0;
+    virtual bool DirExists(const gd::String & path) = 0;
 
     /**
      * \brief Return true if the specified file exists
      */
-    virtual bool FileExists(const std::string & path) = 0;
+    virtual bool FileExists(const gd::String & path) = 0;
 
     /**
      * \brief Clear the directory given as parameter, removing all the files.
      */
-    virtual bool ClearDir(const std::string & directory) = 0;
+    virtual bool ClearDir(const gd::String & directory) = 0;
 
     /**
      * \brief Get a directory suitable for temporary files.
      */
-    virtual std::string GetTempDir() = 0;
+    virtual gd::String GetTempDir() = 0;
 
     /**
      * \brief Extract the name of the file (with its extension) from a path.
      */
-    virtual std::string FileNameFrom(const std::string & file) = 0;
+    virtual gd::String FileNameFrom(const gd::String & file) = 0;
 
     /**
      * \brief Extract the path without the filename.
      */
-    virtual std::string DirNameFrom(const std::string & file) = 0;
+    virtual gd::String DirNameFrom(const gd::String & file) = 0;
 
     /**
      * \brief Change the filename so that it is absolute, using the base directory passed as parameter.
      * \return true if the operation succeeded.
      */
-    virtual bool MakeAbsolute(std::string & filename, const std::string & baseDirectory) = 0;
+    virtual bool MakeAbsolute(gd::String & filename, const gd::String & baseDirectory) = 0;
 
     /**
      * \brief Return true if the filename is absolute
      */
-    virtual bool IsAbsolute(const std::string & filename) = 0;
+    virtual bool IsAbsolute(const gd::String & filename) = 0;
 
     /**
      * \brief Change the filename so that it is relative to the base directory passed as parameter.
      * \return true if the operation succeeded.
      */
-    virtual bool MakeRelative(std::string & filename, const std::string & baseDirectory) = 0;
+    virtual bool MakeRelative(gd::String & filename, const gd::String & baseDirectory) = 0;
 
-    virtual bool CopyFile(const std::string & file, const std::string & destination) = 0;
+    virtual bool CopyFile(const gd::String & file, const gd::String & destination) = 0;
 
-    virtual bool WriteToFile(const std::string & file, const std::string & content) = 0;
+    virtual bool WriteToFile(const gd::String & file, const gd::String & content) = 0;
 
-    virtual std::string ReadFile(const std::string & file) = 0;
+    virtual gd::String ReadFile(const gd::String & file) = 0;
 
     /**
      * \brief Return a vector containing the files in the specified path
@@ -106,7 +106,7 @@ public:
      * \param extension If specified, only file finishing with this extension will be returned
      * \return A vector with all the matched files
      */
-    virtual std::vector<std::string> ReadDir(const std::string & path, const std::string & extension = "") = 0;
+    virtual std::vector<gd::String> ReadDir(const gd::String & path, const gd::String & extension = "") = 0;
 
 protected:
     AbstractFileSystem() {};
@@ -127,20 +127,20 @@ public:
      */
     static NativeFileSystem & Get();
 
-	virtual void MkDir(const std::string & path);
-    virtual bool DirExists(const std::string & path);
-    virtual bool FileExists(const std::string & path);
-    virtual std::string FileNameFrom(const std::string & file);
-    virtual std::string DirNameFrom(const std::string & file);
-    virtual bool MakeAbsolute(std::string & filename, const std::string & baseDirectory);
-    virtual bool MakeRelative(std::string & filename, const std::string & baseDirectory);
-    virtual bool IsAbsolute(const std::string & filename);
-    virtual bool CopyFile(const std::string & file, const std::string & destination);
-    virtual bool ClearDir(const std::string & directory);
-    virtual bool WriteToFile(const std::string & file, const std::string & content);
-    virtual std::string ReadFile(const std::string & file);
-    virtual std::string GetTempDir();
-    virtual std::vector<std::string> ReadDir(const std::string & path, const std::string & extension = "");
+	virtual void MkDir(const gd::String & path);
+    virtual bool DirExists(const gd::String & path);
+    virtual bool FileExists(const gd::String & path);
+    virtual gd::String FileNameFrom(const gd::String & file);
+    virtual gd::String DirNameFrom(const gd::String & file);
+    virtual bool MakeAbsolute(gd::String & filename, const gd::String & baseDirectory);
+    virtual bool MakeRelative(gd::String & filename, const gd::String & baseDirectory);
+    virtual bool IsAbsolute(const gd::String & filename);
+    virtual bool CopyFile(const gd::String & file, const gd::String & destination);
+    virtual bool ClearDir(const gd::String & directory);
+    virtual bool WriteToFile(const gd::String & file, const gd::String & content);
+    virtual gd::String ReadFile(const gd::String & file);
+    virtual gd::String GetTempDir();
+    virtual std::vector<gd::String> ReadDir(const gd::String & path, const gd::String & extension = "");
 
     /**
      * \brief Destroy the singleton.

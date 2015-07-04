@@ -6,7 +6,7 @@
 #ifndef GDCORE_RESOURCESMANAGER_H
 #define GDCORE_RESOURCESMANAGER_H
 #include <memory>
-#include <string>
+#include <GDCore/Utf8String.h>
 #include <vector>
 namespace gd { class Project; }
 namespace gd { class ResourceFolder; }
@@ -31,19 +31,19 @@ public:
 
     /** \brief Change the name of the resource with the name passed as parameter.
      */
-    virtual void SetName(const std::string & name_) { name = name_;}
+    virtual void SetName(const gd::String & name_) { name = name_;}
 
     /** \brief Return the name of the resource.
      */
-    virtual const std::string & GetName() const {return name;}
+    virtual const gd::String & GetName() const {return name;}
 
     /** \brief Change the kind of the resource
      */
-    virtual void SetKind(const std::string & newKind) { kind = newKind; }
+    virtual void SetKind(const gd::String & newKind) { kind = newKind; }
 
     /** \brief Return the name of the object.
      */
-    virtual const std::string & GetKind() const {return kind;}
+    virtual const gd::String & GetKind() const {return kind;}
 
     /** \brief Change if the resource is user added or not
      */
@@ -62,13 +62,13 @@ public:
     virtual bool UseFile() { return false; }
 
     /**
-     * \brief Return, if applicable, the string containing the file used by the resource.
+     * \brief Return, if applicable, the String containing the file used by the resource.
      * The file is relative to the project directory.
      *
      * \see gd::Resource::UseFile
      * \see gd::Resource::SetFile
      */
-    virtual const std::string & GetFile() const {return badStr;};
+    virtual const gd::String & GetFile() const {return badStr;};
 
     /**
      * \brief Change, if applicable, the file of the resource.
@@ -76,43 +76,43 @@ public:
      * \see gd::Resource::UseFile
      * \see gd::Resource::GetFile
      */
-    virtual void SetFile(const std::string & newFile) {};
+    virtual void SetFile(const gd::String & newFile) {};
 
     /**
-     * \brief Return, if applicable, a string containing the absolute filename of the resource.
+     * \brief Return, if applicable, a String containing the absolute filename of the resource.
      */
-    std::string GetAbsoluteFile(const gd::Project & game) const;
+    gd::String GetAbsoluteFile(const gd::Project & game) const;
 
     /**
      * \brief Called when a property must be edited (i.e: it was double clicked in a property grid)
      *
      * \return true if the resource was changed
      */
-    virtual bool EditProperty(gd::Project & project, const std::string & property) { return true; };
+    virtual bool EditProperty(gd::Project & project, const gd::String & property) { return true; };
 
     /**
      * \brief Called when a property must be changed (i.e: its value was changed in a property grid)
      *
      * \return true if the resource was changed
      */
-    virtual bool ChangeProperty(gd::Project & project, const std::string & property, const std::string & newValue) { return true; };
+    virtual bool ChangeProperty(gd::Project & project, const gd::String & property, const gd::String & newValue) { return true; };
 
     /**
      * \brief Must return a description of the main property provided by the resource (example : "Image file")
      */
-    virtual void GetPropertyInformation(gd::Project & project, const std::string & property, std::string & userFriendlyName, std::string & description) const { return; };
+    virtual void GetPropertyInformation(gd::Project & project, const gd::String & property, gd::String & userFriendlyName, gd::String & description) const { return; };
 
     /**
      * \brief Called when a property must be changed ( i.e: its value was changed in the property grid )
      *
      * \return the value of the property
      */
-    virtual std::string GetProperty(gd::Project & project, const std::string & property) { return ""; };
+    virtual gd::String GetProperty(gd::Project & project, const gd::String & property) { return ""; };
 
     /**
      * \brief Return a description of the main property provided by the resource ( Example : "Image file" )
      */
-    virtual std::vector<std::string> GetAllProperties(gd::Project & project) const { std::vector<std::string> noProperties; return noProperties; };
+    virtual std::vector<gd::String> GetAllProperties(gd::Project & project) const { std::vector<gd::String> noProperties; return noProperties; };
 
     #if !defined(GD_NO_WX_GUI)
     /**
@@ -132,11 +132,11 @@ public:
     virtual void UnserializeFrom(const SerializerElement & element) {};
 
 private:
-    std::string kind;
-    std::string name;
+    gd::String kind;
+    gd::String name;
     bool userAdded; ///< True if the resource was added by the user, and not automatically by GDevelop.
 
-    static std::string badStr;
+    static gd::String badStr;
 };
 
 /**
@@ -155,12 +155,12 @@ public:
     /**
      * Return the file used by the resource.
      */
-    virtual const std::string & GetFile() const {return file;};
+    virtual const gd::String & GetFile() const {return file;};
 
     /**
      * Change the file of the resource.
      */
-    virtual void SetFile(const std::string & newFile);
+    virtual void SetFile(const gd::String & newFile);
 
     #if defined(GD_IDE_ONLY)
     virtual bool UseFile() { return true; }
@@ -177,31 +177,31 @@ public:
      *
      * \return true if the resource was changed
      */
-    virtual bool EditProperty(gd::Project & project, const std::string & property);
+    virtual bool EditProperty(gd::Project & project, const gd::String & property);
 
     /**
      * Called when a property must be changed ( i.e: its value was changed in the property grid )
      *
      * \return true if the resource was changed
      */
-    virtual bool ChangeProperty(gd::Project & project, const std::string & property, const std::string & newValue);
+    virtual bool ChangeProperty(gd::Project & project, const gd::String & property, const gd::String & newValue);
 
     /**
      * Called when a property must be changed ( i.e: its value was changed in the property grid )
      *
      * \return the value of the property
      */
-    virtual std::string GetProperty(gd::Project & project, const std::string & property);
+    virtual gd::String GetProperty(gd::Project & project, const gd::String & property);
 
     /**
      * Return a description of the main property provided by the resource ( Example : "Image file" )
      */
-    virtual void GetPropertyInformation(gd::Project & project, const std::string & property, std::string & userFriendlyName, std::string & description) const;
+    virtual void GetPropertyInformation(gd::Project & project, const gd::String & property, gd::String & userFriendlyName, gd::String & description) const;
 
     /**
      * Return a vector containing the name of all the properties of the resource
      */
-    virtual std::vector<std::string> GetAllProperties(gd::Project & project) const;
+    virtual std::vector<gd::String> GetAllProperties(gd::Project & project) const;
 
     /**
      * \brief Serialize the object
@@ -217,7 +217,7 @@ public:
     bool smooth; ///< True if smoothing filter is applied
     bool alwaysLoaded; ///< True if the image must always be loaded in memory.
 private:
-    std::string file;
+    gd::String file;
 };
 
 /**
@@ -237,33 +237,33 @@ public:
     /**
      * \brief Return true if a resource exists.
      */
-    bool HasResource(const std::string & name) const;
+    bool HasResource(const gd::String & name) const;
 
     /**
      * \brief Return a reference to a resource.
      */
-    Resource & GetResource(const std::string & name);
+    Resource & GetResource(const gd::String & name);
 
     /**
      * \brief Return a reference to a resource.
      */
-    const Resource & GetResource(const std::string & name) const;
+    const Resource & GetResource(const gd::String & name) const;
 
     /**
      * \brief Create a new resource but does not add it to the list
      */
-    std::shared_ptr<Resource> CreateResource(const std::string & kind);
+    std::shared_ptr<Resource> CreateResource(const gd::String & kind);
 
     /**
      * \brief Get a list containing the name of all of the resources.
      */
-    std::vector<std::string> GetAllResourcesList();
+    std::vector<gd::String> GetAllResourcesList();
 
     #if defined(GD_IDE_ONLY)
     /**
      * \brief Return a (smart) pointer to a resource.
      */
-    std::shared_ptr<gd::Resource> GetResourceSPtr(const std::string & name);
+    std::shared_ptr<gd::Resource> GetResourceSPtr(const gd::String & name);
 
     /**
      * \brief Add an already constructed resource
@@ -273,67 +273,67 @@ public:
     /**
      * \brief Add a resource created from a file.
      */
-    bool AddResource(const std::string & name, const std::string & filename);
+    bool AddResource(const gd::String & name, const gd::String & filename);
 
     /**
      * \brief Remove a resource
      */
-    void RemoveResource(const std::string & name);
+    void RemoveResource(const gd::String & name);
 
     /**
      * \brief Rename a resource
      */
-    void RenameResource(const std::string & oldName, const std::string & newName);
+    void RenameResource(const gd::String & oldName, const gd::String & newName);
 
     /**
      * \brief Move a resource up in the list
      */
-    bool MoveResourceUpInList(const std::string & name);
+    bool MoveResourceUpInList(const gd::String & name);
 
     /**
      * \brief Move a resource down in the list
      */
-    bool MoveResourceDownInList(const std::string & name);
+    bool MoveResourceDownInList(const gd::String & name);
 
     /**
      * \brief Return true if the folder exists.
      */
-    bool HasFolder(const std::string & name) const;
+    bool HasFolder(const gd::String & name) const;
 
     /**
      * \brief Return a reference to a folder
      */
-    const ResourceFolder & GetFolder(const std::string & name) const;
+    const ResourceFolder & GetFolder(const gd::String & name) const;
 
     /**
      * \brief Return a reference to a folder
      */
-    ResourceFolder & GetFolder(const std::string & name);
+    ResourceFolder & GetFolder(const gd::String & name);
 
     /**
      * \brief Remove a folder.
      */
-    void RemoveFolder(const std::string & name);
+    void RemoveFolder(const gd::String & name);
 
     /**
      * \brief Create a new empty folder.
      */
-    void CreateFolder(const std::string & name);
+    void CreateFolder(const gd::String & name);
 
     /**
      * \brief Move a folder up in the list
      */
-    bool MoveFolderUpInList(const std::string & name);
+    bool MoveFolderUpInList(const gd::String & name);
 
     /**
      * \brief Move a folder down in the list
      */
-    bool MoveFolderDownInList(const std::string & name);
+    bool MoveFolderDownInList(const gd::String & name);
 
     /**
      * \brief Get a list containing the name of all of the folders.
      */
-    std::vector<std::string> GetAllFolderList();
+    std::vector<gd::String> GetAllFolderList();
 
 
     /**
@@ -372,51 +372,51 @@ public:
 
     /** Change the name of the folder with the name passed as parameter.
      */
-    virtual void SetName(const std::string & name_) { name = name_;}
+    virtual void SetName(const gd::String & name_) { name = name_;}
 
     /** Return the name of the folder.
      */
-    virtual const std::string & GetName() const {return name;}
+    virtual const gd::String & GetName() const {return name;}
 
     /**
      * Add a resource from an already existing resource.
      */
-    virtual void AddResource(const std::string & name, gd::ResourcesManager & parentManager);
+    virtual void AddResource(const gd::String & name, gd::ResourcesManager & parentManager);
 
     /**
      * Remove a resource
      */
-    virtual void RemoveResource(const std::string & name);
+    virtual void RemoveResource(const gd::String & name);
 
     /**
      * Return true if a resource is in the folder.
      */
-    virtual bool HasResource(const std::string & name) const;
+    virtual bool HasResource(const gd::String & name) const;
 
     /**
      * Return a reference to a resource.
      */
-    virtual Resource & GetResource(const std::string & name);
+    virtual Resource & GetResource(const gd::String & name);
 
     /**
      * Return a reference to a resource.
      */
-    virtual const Resource & GetResource(const std::string & name) const;
+    virtual const Resource & GetResource(const gd::String & name) const;
 
     /**
      * Get a list containing the name of all of the resources.
      */
-    virtual std::vector<std::string> GetAllResourcesList();
+    virtual std::vector<gd::String> GetAllResourcesList();
 
     /**
      * Move a resource up in the list
      */
-    virtual bool MoveResourceUpInList(const std::string & name);
+    virtual bool MoveResourceUpInList(const gd::String & name);
 
     /**
      * Move a resource down in the list
      */
-    virtual bool MoveResourceDownInList(const std::string & name);
+    virtual bool MoveResourceDownInList(const gd::String & name);
 
     /**
      * \brief Serialize the object
@@ -429,7 +429,7 @@ public:
     void UnserializeFrom(const SerializerElement & element, gd::ResourcesManager & parentManager);
 
 private:
-    std::string name;
+    gd::String name;
     std::vector< std::shared_ptr<Resource> > resources;
 
     void Init(const ResourceFolder & other);

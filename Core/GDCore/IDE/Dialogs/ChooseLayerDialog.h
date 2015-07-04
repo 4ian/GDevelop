@@ -15,7 +15,7 @@
 #include <wx/dialog.h>
 //*)
 #include "GDCore/PlatformDefinition/Layout.h"
-#include <string>
+#include <GDCore/Utf8String.h>
 #include <vector>
 
 namespace gd
@@ -39,7 +39,7 @@ public:
     /**
      * \brief Return the selected layer
      */
-    const std::string & GetChosenLayer() const { return chosenLayer; }
+    const gd::String & GetChosenLayer() const { return chosenLayer; }
 
     //(*Declarations(ChooseLayerDialog)
     wxButton* cancelBt;
@@ -67,7 +67,7 @@ private:
     //*)
 
     bool addQuotes;
-    std::string chosenLayer;
+    gd::String chosenLayer;
 
     DECLARE_EVENT_TABLE()
 };

@@ -37,7 +37,7 @@ void Sprite::AddPoint( const Point & point )
         points.push_back(point);
 }
 
-void Sprite::DelPoint( const std::string & name )
+void Sprite::DelPoint( const gd::String & name )
 {
     for (unsigned int i = 0;i<points.size();++i)
     {
@@ -46,7 +46,7 @@ void Sprite::DelPoint( const std::string & name )
     }
 }
 
-bool Sprite::HasPoint( const std::string & name ) const
+bool Sprite::HasPoint( const gd::String & name ) const
 {
     if (name == "Origin") return true;
     if (name == "Centre" || name == "Center") return true;
@@ -60,7 +60,7 @@ bool Sprite::HasPoint( const std::string & name ) const
     return false;
 }
 
-const Point & Sprite::GetPoint( const std::string & name) const
+const Point & Sprite::GetPoint( const gd::String & name) const
 {
     if (name == "Origin") return origine;
     if (name == "Centre" || name == "Center") return centre;
@@ -74,7 +74,7 @@ const Point & Sprite::GetPoint( const std::string & name) const
     return badPoint;
 }
 
-Point & Sprite::GetPoint(const std::string & name)
+Point & Sprite::GetPoint(const gd::String & name)
 {
     if (name == "Origin") return origine;
     if (name == "Centre" || name == "Center") return centre;

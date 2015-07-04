@@ -44,13 +44,13 @@ public:
      * in a search path. ( locale directory for example or xxxPlatform/Extensions/locale ).
      * \param catalogName The name of the translation catalog.
      */
-    void AddCatalog(std::string catalogName);
+    void AddCatalog(gd::String catalogName);
 
     /**
      * \brief Add a path where catalog are searched.
      * \param path The path, relative to the GDevelop directory.
      */
-    void AddPath(std::string path);
+    void AddPath(gd::String path);
 
     static LocaleManager *Get()
     {

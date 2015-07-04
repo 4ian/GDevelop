@@ -358,12 +358,12 @@ void ResourcesEditor::OnAddImageBtClick( wxCommandEvent& event )
 
         wxArrayString files;
         FileDialog.GetPaths( files );
-        std::string imageNonAjoutees;
+        gd::String imageNonAjoutees;
 
         //Add each image to images list and to folder if any
-        std::vector < std::string > filenames;
+        std::vector < gd::String > filenames;
         for ( unsigned int i = 0; i < files.GetCount();++i )
-            filenames.push_back(gd::ToString(files[i]));
+            filenames.push_back(files[i]);
 
         AddResources(filenames);
 
@@ -372,7 +372,7 @@ void ResourcesEditor::OnAddImageBtClick( wxCommandEvent& event )
 
 }
 
-std::vector<std::string> ResourcesEditor::CopyAndAddResources(std::vector<std::string> filenames, const std::string & destinationDirStr)
+std::vector<gd::String> ResourcesEditor::CopyAndAddResources(std::vector<gd::String> filenames, const gd::String & destinationDirStr)
 {
     if ( !project.GetProjectFile().empty() ) //If game is not saved, we keep absolute filenames and do not copy resources.
     {
@@ -386,7 +386,7 @@ std::vector<std::string> ResourcesEditor::CopyAndAddResources(std::vector<std::s
             wxString name = wxFileName::FileName(filenames[i]).GetFullName();
             wxFileName destinationFile = wxFileName::FileName(destinationDir.GetPath()+"/"+name);
 
-            gd::LogStatus( GD_T( "Copy of" ) + " " + gd::utf8::FromWxString(name) );
+            gd::LogStatus( GD_T( "Copy of" ) + " " + name );
 
             //Copy the resource
             wxCopyFile(filenames[i], destinationFile.GetFullPath(), true);
@@ -397,10 +397,10 @@ std::vector<std::string> ResourcesEditor::CopyAndAddResources(std::vector<std::s
     return AddResources(filenames);
 }
 
-std::vector<std::string> ResourcesEditor::AddResources(const std::vector<std::string> & filenames)
+std::vector<gd::String> ResourcesEditor::AddResources(const std::vector<gd::String> & filenames)
 {
-    std::vector<std::string> resourceNames;
-    std::string alreadyExistingResources;
+    std::vector<gd::String> resourceNames;
+    gd::String alreadyExistingResources;
 
     //Find current folder, if any.
     gd::ResourceFolder * currentFolder = NULL;
@@ -421,16 +421,16 @@ std::vector<std::string> ResourcesEditor::AddResources(const std::vector<std::st
         if (!projectDirectory.empty())  //If game is not saved, we keep absolute filenames
             file.MakeRelativeTo(projectDirectory);
 
-        std::string name = gd::ToString(file.GetFullName());
+        gd::String name = file.GetFullName();
         gd::LogStatus( GD_T( "Adding " ) + name );
 
         //Add to all images
-        if ( project.GetResourcesManager().AddResource(name, gd::ToString(file.GetFullPath())) )
+        if ( project.GetResourcesManager().AddResource(name, file.GetFullPath()) )
         {
             for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
                 project.GetUsedPlatforms()[j]->GetChangesNotifier().OnResourceModified(project, name);
 
-            resourcesTree->AppendItem( allImagesItem, gd::utf8::ToWxString(name), -1, -1, new gd::TreeItemStringData("Image", name));
+            resourcesTree->AppendItem( allImagesItem, name, -1, -1, new gd::TreeItemStringData("Image", name));
             resourceNames.push_back(name);
         }
         else
@@ -440,7 +440,7 @@ std::vector<std::string> ResourcesEditor::AddResources(const std::vector<std::st
         if ( currentFolder && !currentFolder->HasResource(name) )
         {
             currentFolder->AddResource(name, project.GetResourcesManager());
-            resourcesTree->AppendItem( currentFolderItem, gd::utf8::ToWxString(name), -1, -1, new gd::TreeItemStringData("Image", name));
+            resourcesTree->AppendItem( currentFolderItem, name, -1, -1, new gd::TreeItemStringData("Image", name));
         }
     }
 
@@ -472,7 +472,7 @@ void ResourcesEditor::OnremoveFolderOnlySelected(wxCommandEvent& event)
 
     if ( itemData && folderItem.IsOk() && itemData->GetString() == "Image" && folderData && folderData->GetString() == "Folder" )
     {
-        std::string folderName = folderData->GetSecondString();
+        gd::String folderName = folderData->GetSecondString();
         if ( !project.GetResourcesManager().HasFolder(folderName) ) return;
 
         project.GetResourcesManager().GetFolder(folderName).RemoveResource(itemData->GetSecondString());
@@ -486,7 +486,7 @@ void ResourcesEditor::OnremoveFolderOnlySelected(wxCommandEvent& event)
 /**
  * Tool function
  */
-void ResourcesEditor::RemoveImageFromTree(wxTreeItemId parent, std::string imageName)
+void ResourcesEditor::RemoveImageFromTree(wxTreeItemId parent, gd::String imageName)
 {
     void * cookie;
     wxTreeItemId item = resourcesTree->GetFirstChild( parent, cookie );
@@ -521,7 +521,7 @@ void ResourcesEditor::OnDelImageBtClick( wxCommandEvent& event )
         gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(resourcesTree->GetItemData(selection[i]));
         if ( data && data->GetString() == "Image")
         {
-            std::string imageName = data->GetSecondString();
+            gd::String imageName = data->GetSecondString();
 
             project.GetResourcesManager().RemoveResource(imageName);
             for ( unsigned int j = 0; j < project.GetUsedPlatforms().size();++j)
@@ -584,8 +584,8 @@ void ResourcesEditor::OnresourcesTreeSelectionChanged( wxTreeEvent& event )
     wxFocusEvent unusedEvent;
     OnSetFocus(unusedEvent);
 
-    std::string name = gd::utf8::FromWxString((resourcesTree->GetItemText( event.GetItem() )));
-    //Changement de l'item sélectionné
+    gd::String name = resourcesTree->GetItemText(event.GetItem());
+    //Changement de l'item sï¿½lectionnï¿½
     m_itemSelected = event.GetItem();
 
     gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(resourcesTree->GetItemData(event.GetItem()));
@@ -606,7 +606,7 @@ void ResourcesEditor::OnresourcesTreeSelectionChanged( wxTreeEvent& event )
 
 void ResourcesEditor::UpdatePropertyGrid()
 {
-    std::vector<std::string> commonProperties; ///< The name of the properties to be displayed
+    std::vector<gd::String> commonProperties; ///< The name of the properties to be displayed
     bool aFolderIsSelected = false;
 
     //First construct the list of common properties
@@ -617,7 +617,7 @@ void ResourcesEditor::UpdatePropertyGrid()
         gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(resourcesTree->GetItemData(selection[i]));
         if ( data && data->GetString() == "Image")
         {
-            std::vector<std::string> properties = project.GetResourcesManager().GetResource(data->GetSecondString()).GetAllProperties(project);
+            std::vector<gd::String> properties = project.GetResourcesManager().GetResource(data->GetSecondString()).GetAllProperties(project);
             if ( i == 0 )
                 commonProperties = properties;
             else
@@ -644,7 +644,7 @@ void ResourcesEditor::UpdatePropertyGrid()
     {
         gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(resourcesTree->GetItemData(selection[0]));
         if ( data )
-            propertyGrid->SetPropertyValue(nameProperty, gd::utf8::ToWxString(data->GetSecondString()));
+            propertyGrid->SetPropertyValue(nameProperty, data->GetSecondString());
     }
     else
     {
@@ -694,7 +694,7 @@ void ResourcesEditor::UpdatePropertyGrid()
         if ( !commonProperties.empty() ) propertyGrid->Append( new wxPropertyCategory(_("Other properties")) );
         for (unsigned int j = 0;j<commonProperties.size();++j)
         {
-            wxPGProperty * property = propertyGrid->Append( new wxStringProperty("", gd::utf8::ToWxString(commonProperties[j]), "") );
+            wxPGProperty * property = propertyGrid->Append( new wxStringProperty("", commonProperties[j], "") );
             wxString commonValue;
 
             for (unsigned int i = 0;i<selection.size();++i)
@@ -704,14 +704,14 @@ void ResourcesEditor::UpdatePropertyGrid()
                 {
                     //It is assumed that the description and the user friendly name
                     //are the same for all the properties with the same name.
-                    std::string propertyUserFriendlyName;
-                    std::string propertyDescription;
+                    gd::String propertyUserFriendlyName;
+                    gd::String propertyDescription;
                     project.GetResourcesManager().GetResource(data->GetSecondString()).GetPropertyInformation(project, commonProperties[j], propertyUserFriendlyName, propertyDescription);
-                    propertyGrid->SetPropertyLabel(property, gd::utf8::ToWxString(propertyUserFriendlyName));
-                    propertyGrid->SetPropertyHelpString(property, gd::utf8::ToWxString(propertyDescription));
+                    propertyGrid->SetPropertyLabel(property, propertyUserFriendlyName);
+                    propertyGrid->SetPropertyHelpString(property, propertyDescription);
 
                     //Values can be different though
-                    std::string propertyValue = project.GetResourcesManager().GetResource(data->GetSecondString()).GetProperty(project, commonProperties[j]);
+                    gd::String propertyValue = project.GetResourcesManager().GetResource(data->GetSecondString()).GetProperty(project, commonProperties[j]);
                     if ( i == 0 ) commonValue = propertyValue;
                     else if ( commonValue != propertyValue ) commonValue = _("(Multiple values)");
                 }
@@ -724,8 +724,8 @@ void ResourcesEditor::UpdatePropertyGrid()
 
 void ResourcesEditor::OnPropertyChanged(wxPropertyGridEvent& event)
 {
-    std::string propertyName = gd::utf8::FromWxString(event.GetPropertyName());
-    std::string propertyNewValue = gd::utf8::FromWxString(event.GetPropertyValue().GetString());
+    gd::String propertyName = event.GetPropertyName();
+    gd::String propertyNewValue = event.GetPropertyValue().GetString();
 
     wxArrayTreeItemIds selection;
     resourcesTree->GetSelections(selection);
@@ -736,7 +736,7 @@ void ResourcesEditor::OnPropertyChanged(wxPropertyGridEvent& event)
         {
             if ( propertyName == "File" )
             {
-                project.GetResourcesManager().GetResource(data->GetSecondString()).SetFile(gd::utf8::ToLocaleString(propertyNewValue)); //Convert it to the current locale (Paths are in the current locale)
+                project.GetResourcesManager().GetResource(data->GetSecondString()).SetFile(propertyNewValue); //Convert it to the current locale (Paths are in the current locale)
                 previewPanel->Refresh();
                 previewPanel->Update();
             }
@@ -770,8 +770,8 @@ void ResourcesEditor::OnPropertyChanged(wxPropertyGridEvent& event)
 
 void ResourcesEditor::OnPropertyChanging(wxPropertyGridEvent& event)
 {
-    std::string propertyName = gd::utf8::FromWxString(event.GetPropertyName());
-    std::string propertyNewValue = gd::utf8::FromWxString(event.GetPropertyValue().GetString());
+    gd::String propertyName = event.GetPropertyName();
+    gd::String propertyNewValue = event.GetPropertyValue().GetString();
 
     wxArrayTreeItemIds selection;
     resourcesTree->GetSelections(selection);
@@ -788,7 +788,7 @@ void ResourcesEditor::OnPropertyChanging(wxPropertyGridEvent& event)
                     event.Veto();
                     return;
                 }
-                renamedItemOldName = gd::utf8::FromWxString(event.GetProperty()->GetValue().GetString());
+                renamedItemOldName = event.GetProperty()->GetValue().GetString();
             }
         }
         else if ( data && data->GetString() == "Folder")
@@ -801,7 +801,7 @@ void ResourcesEditor::OnPropertyChanging(wxPropertyGridEvent& event)
                     event.Veto();
                     return;
                 }
-                renamedItemOldName = gd::utf8::FromWxString(event.GetProperty()->GetValue().GetString());
+                renamedItemOldName = event.GetProperty()->GetValue().GetString();
             }
         }
     }
@@ -810,7 +810,7 @@ void ResourcesEditor::OnPropertyChanging(wxPropertyGridEvent& event)
 /**
  * Tool function
  */
-void ResourcesEditor::RenameInTree(wxTreeItemId parent, std::string oldName, std::string newName, std::string type)
+void ResourcesEditor::RenameInTree(wxTreeItemId parent, gd::String oldName, gd::String newName, gd::String type)
 {
     void * cookie;
     wxTreeItemId item = resourcesTree->GetFirstChild( parent, cookie );
@@ -824,7 +824,7 @@ void ResourcesEditor::RenameInTree(wxTreeItemId parent, std::string oldName, std
         gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(resourcesTree->GetItemData(item));
         if ( data && data->GetSecondString() == oldName && data->GetString() == type)
         {
-            resourcesTree->SetItemText(item, gd::utf8::ToWxString(newName));
+            resourcesTree->SetItemText(item, newName);
             data->SetSecondString(newName);
         }
 
@@ -840,7 +840,7 @@ void ResourcesEditor::OnresourcesTreeEndLabelEdit( wxTreeEvent& event )
     gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(resourcesTree->GetItemData(event.GetItem()));
     if ( !event.IsEditCancelled() && data )
     {
-        std::string newName = gd::utf8::FromWxString(event.GetLabel());
+        gd::String newName = event.GetLabel();
 
         if ( data->GetString() == "Folder" )
         {
@@ -890,7 +890,7 @@ void ResourcesEditor::OnresourcesTreeBeginLabelEdit( wxTreeEvent& event )
         if ( data->GetString() == "BaseFolder" )
             resourcesTree->EndEditLabel( event.GetItem(), true );
         else
-            renamedItemOldName = gd::utf8::FromWxString(resourcesTree->GetItemText( event.GetItem() ));
+            renamedItemOldName = resourcesTree->GetItemText(event.GetItem());
     }
     else
         resourcesTree->EndEditLabel( event.GetItem(), true );
@@ -905,39 +905,40 @@ void ResourcesEditor::Refresh()
     resourcesTree->AddRoot( "ImagesBank" );
 
     //Setup search
-    std::string search = gd::StrUppercase(gd::utf8::FromWxString(searchCtrl->GetValue()));
+    gd::String search = searchCtrl->GetValue();
+    search = search.ToUpperCase();
     bool searching = search.empty() ? false : true;
 
     //Folders
-    std::vector<std::string> folders = project.GetResourcesManager().GetAllFolderList();
+    std::vector<gd::String> folders = project.GetResourcesManager().GetAllFolderList();
     for (unsigned int i = 0;i< folders.size() ;++i)
     {
         gd::ResourceFolder & folder = project.GetResourcesManager().GetFolder(folders[i]);
         wxTreeItemId folderItem = resourcesTree->AppendItem( resourcesTree->GetRootItem(), folders[i], -1, -1, new gd::TreeItemStringData("Folder", folders[i] ));
 
-        std::vector<std::string> resources = folder.GetAllResourcesList();
+        std::vector<gd::String> resources = folder.GetAllResourcesList();
         for (unsigned int j=0;j<resources.size();++j)
         {
             gd::Resource & resource = folder.GetResource(resources[j]);
 
-            if ( searching && gd::StrUppercase(resource.GetName()).find(search) == std::string::npos)
+            if ( searching && resource.GetName().ToUpperCase().find(search) == gd::String::npos)
                 continue;
 
-            resourcesTree->AppendItem( folderItem, gd::utf8::ToWxString(resource.GetName()), -1,-1, new gd::TreeItemStringData("Image", resource.GetName() ));
+            resourcesTree->AppendItem( folderItem, resource.GetName(), -1,-1, new gd::TreeItemStringData("Image", resource.GetName() ));
         }
     }
 
     //All images
     allImagesItem = resourcesTree->AppendItem( resourcesTree->GetRootItem(), _("All images"), -1,-1, new gd::TreeItemStringData("BaseFolder", "" ));
-    std::vector<std::string> resources = project.GetResourcesManager().GetAllResourcesList();
+    std::vector<gd::String> resources = project.GetResourcesManager().GetAllResourcesList();
     for ( unsigned int i = 0;i <resources.size();i++ )
     {
         gd::Resource & resource = project.GetResourcesManager().GetResource(resources[i]);
 
-        if ( searching && gd::StrUppercase(resource.GetName()).find(search) == std::string::npos)
+        if ( searching && resource.GetName().ToUpperCase().find(search) == gd::String::npos)
             continue;
 
-        resourcesTree->AppendItem( allImagesItem, gd::utf8::ToWxString(resource.GetName()), -1, -1, new gd::TreeItemStringData("Image", resource.GetName() ));
+        resourcesTree->AppendItem( allImagesItem, resource.GetName(), -1, -1, new gd::TreeItemStringData("Image", resource.GetName() ));
     }
 
     resourcesTree->Expand( allImagesItem );
@@ -945,7 +946,7 @@ void ResourcesEditor::Refresh()
 
 void ResourcesEditor::OnDeleteUnusedFiles( wxCommandEvent& event )
 {
-    std::vector<std::string> unusedImages =
+    std::vector<gd::String> unusedImages =
         gd::ProjectResourcesAdder::GetAllUselessResources(project);
 
     //Construct corresponding wxArrayString with unused images
@@ -966,7 +967,7 @@ void ResourcesEditor::OnDeleteUnusedFiles( wxCommandEvent& event )
     wxArrayInt selection = dialog.GetSelections();
     for (unsigned int i = 0;i<selection.size();++i)
     {
-        std::string imageName = gd::utf8::FromWxString(imagesNotUsed[selection[i]]);
+        gd::String imageName = imagesNotUsed[selection[i]];
 
         project.GetResourcesManager().RemoveResource(imageName);
         RemoveImageFromTree( resourcesTree->GetRootItem(), imageName );
@@ -1023,8 +1024,8 @@ void ResourcesEditor::OnOpenPaintProgramClick(wxCommandEvent& event)
         wxFileDialog dialog(this, _("Choose the program for editing this kind of resource"), "", "", _("Programs (*.exe)|*.exe"));
         dialog.ShowModal();
 
-        wxConfigBase::Get()->Write( _T( "/EditeursExternes/"+resource.GetKind() ), dialog.GetPath() );
-        wxConfigBase::Get()->Read( _T( "/EditeursExternes/"+resource.GetKind() ), &result );
+        wxConfigBase::Get()->Write( "/EditeursExternes/"+resource.GetKind(), dialog.GetPath() );
+        wxConfigBase::Get()->Read( "/EditeursExternes/"+resource.GetKind(), &result );
     }
 
     if ( !result.empty() )
@@ -1036,7 +1037,7 @@ void ResourcesEditor::OnOpenPaintProgramClick(wxCommandEvent& event)
  */
 void ResourcesEditor::OnpreviewPanelPaint(wxPaintEvent& event)
 {
-    wxPaintDC dc( previewPanel ); //Création obligatoire du wxBufferedPaintDC
+    wxPaintDC dc( previewPanel ); //Crï¿½ation obligatoire du wxBufferedPaintDC
 
     if ( project.GetResourcesManager().HasResource(selectedResource) )
         project.GetResourcesManager().GetResource(selectedResource).RenderPreview(dc, *previewPanel, project);
@@ -1075,7 +1076,7 @@ void ResourcesEditor::ShiftUpElementOfTree()
  */
 void ResourcesEditor::OnMoveUpSelected(wxCommandEvent& event)
 {
-    std::string name = gd::utf8::FromWxString(resourcesTree->GetItemText( m_itemSelected ));
+    gd::String name = resourcesTree->GetItemText(m_itemSelected);
     gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(resourcesTree->GetItemData(m_itemSelected));
     if ( !data ) return;
 
@@ -1130,7 +1131,7 @@ void ResourcesEditor::ShiftDownElementOfTree()
  */
 void ResourcesEditor::OnMoveDownSelected(wxCommandEvent& event)
 {
-    std::string name = gd::utf8::FromWxString(resourcesTree->GetItemText( m_itemSelected ));
+    gd::String name = resourcesTree->GetItemText(m_itemSelected);
     gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(resourcesTree->GetItemData(m_itemSelected));
     if ( !data ) return;
 
@@ -1162,12 +1163,12 @@ void ResourcesEditor::OnMoveDownSelected(wxCommandEvent& event)
     }
 }
 
-void ResourcesEditor::TriggerDrop(wxCoord x, wxCoord y, std::vector<std::string > resources)
+void ResourcesEditor::TriggerDrop(wxCoord x, wxCoord y, std::vector<gd::String > resources)
 {
     m_itemSelected = resourcesTree->HitTest(wxPoint(x,y));
     if ( !m_itemSelected.IsOk() ) return;
 
-    std::string name = gd::utf8::FromWxString(resourcesTree->GetItemText( m_itemSelected ));
+    gd::String name = resourcesTree->GetItemText(m_itemSelected);
     gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(resourcesTree->GetItemData( m_itemSelected ));
     if ( !data ) return;
 
@@ -1225,11 +1226,11 @@ void ResourcesEditor::ForceRefreshRibbonAndConnect()
 
 void ResourcesEditor::OnAddFolderSelected(wxCommandEvent& event)
 {
-    std::string newName = GD_T("New folder");
+    gd::String newName = GD_T("New folder");
     unsigned int i = 1;
     while( project.GetResourcesManager().HasFolder(newName) )
     {
-        newName = GD_T("New folder") + " " + gd::ToString(i);
+        newName = GD_T("New folder") + " " + gd::String::FromInt(i);
         ++i;
     }
 
@@ -1237,7 +1238,7 @@ void ResourcesEditor::OnAddFolderSelected(wxCommandEvent& event)
 
     wxTreeItemId newFolderItem = resourcesTree->InsertItem(resourcesTree->GetRootItem(),
                                                            project.GetResourcesManager().GetAllFolderList().size(),
-                                                           gd::utf8::ToWxString(newName), -1, -1, new gd::TreeItemStringData("Folder", newName));
+                                                           newName, -1, -1, new gd::TreeItemStringData("Folder", newName));
     resourcesTree->EditLabel(newFolderItem);
 }
 

@@ -6,7 +6,7 @@
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
-#include <string>
+#include <GDCore/Utf8String.h>
 #include <vector>
 //(*InternalHeaders(ChooseObjectTypeDialog)
 #include <wx/bitmap.h>
@@ -168,7 +168,7 @@ void ChooseObjectTypeDialog::RefreshList()
                                       project.GetUsedExtensions().end(),
                                       extensions[i]->GetName()) != project.GetUsedExtensions().end();
 
-	    vector<string> objectsTypes = extensions[i]->GetExtensionObjectsTypes();
+	    std::vector<gd::String> objectsTypes = extensions[i]->GetExtensionObjectsTypes();
 	    for(unsigned int j = 0;j<objectsTypes.size();++j)
 	    {
 	        if ( objectsTypes[j] != "" ) //Cannot use directly a base object
@@ -183,8 +183,8 @@ void ChooseObjectTypeDialog::RefreshList()
                 //And add the object to the list
                 long index = extensionEnabled ? 0 : objectsList->GetItemCount();
                 gd::TreeItemStringData * associatedData = new gd::TreeItemStringData(objectsTypes[j]);
-                objectsList->InsertItem(index, gd::utf8::ToWxString(extensions[i]->GetObjectMetadata(objectsTypes[j]).GetFullName()));
-                objectsList->SetItem(index, 1, gd::utf8::ToWxString(extensions[i]->GetObjectMetadata(objectsTypes[j]).GetDescription()));
+                objectsList->InsertItem(index, extensions[i]->GetObjectMetadata(objectsTypes[j]).GetFullName());
+                objectsList->SetItem(index, 1, extensions[i]->GetObjectMetadata(objectsTypes[j]).GetDescription());
                 objectsList->SetItemImage(index, imageList->GetImageCount()-1);
                 objectsList->SetItemPtrData(index, wxPtrToUInt(associatedData));
                 if ( !extensionEnabled ) objectsList->SetItemTextColour(index, wxColor(128,128,128));
@@ -233,7 +233,7 @@ void ChooseObjectTypeDialog::OnokBtClick(wxCommandEvent& event)
 
 	for (unsigned int i = 0;i<extensions.size();++i)
 	{
-	    vector<string> objectsTypes = extensions[i]->GetExtensionObjectsTypes();
+	    std::vector<gd::String> objectsTypes = extensions[i]->GetExtensionObjectsTypes();
 	    if ( find(objectsTypes.begin(), objectsTypes.end(), selectedObjectType) != objectsTypes.end() )
         {
             extension = extensions[i]; break;
@@ -249,10 +249,10 @@ void ChooseObjectTypeDialog::OnokBtClick(wxCommandEvent& event)
         if ( !extensionEnabled )
         {
             if (wxMessageBox(_("This object is provided by the ")+
-                             gd::utf8::ToWxString(extension->GetFullName())+
+                             extension->GetFullName()+
                              _(" extension, but this extension is not activated for the current game.\n\nDo you want to use this extension in your game?"),
-                             _("Activate extension ")+gd::utf8::ToWxString(extension->GetFullName()), 
-                             wxYES_NO|wxICON_QUESTION|wxYES_DEFAULT 
+                             _("Activate extension ")+extension->GetFullName(), 
+                             wxYES_NO|wxICON_QUESTION|wxYES_DEFAULT
                             ) == wxNO)
             {
                 return;

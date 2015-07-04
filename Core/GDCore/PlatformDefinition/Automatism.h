@@ -5,7 +5,7 @@
  */
 #ifndef GDCORE_AUTOMATISM_H
 #define GDCORE_AUTOMATISM_H
-#include <string>
+#include <GDCore/Utf8String.h>
 #include <map>
 #if defined(GD_IDE_ONLY)
 namespace gd { class PropertyDescriptor; }
@@ -36,17 +36,17 @@ public:
     /**
      * \brief Change the name identifying the automatism.
      */
-    virtual void SetName(const std::string & name_) { name = name_; };
+    virtual void SetName(const gd::String & name_) { name = name_; };
 
     /**
      * \brief Return the name identifying the automatism
      */
-    virtual const std::string & GetName() const { return name; }
+    virtual const gd::String & GetName() const { return name; }
 
     /**
      * \brief Return the name identifying the type of the automatism
      */
-    virtual const std::string & GetTypeName() const { return type; }
+    virtual const gd::String & GetTypeName() const { return type; }
 
     /**
      * \brief Change name identifying the type of the automatism.
@@ -54,7 +54,7 @@ public:
      * You should not need to use this method: The type is set by the IDE when the automatism is created
      * or when the automatism is loaded from xml.
      */
-    virtual void SetTypeName(const std::string & type_) { type = type_; };
+    virtual void SetTypeName(const gd::String & type_) { type = type_; };
 
     #if defined(GD_IDE_ONLY)
     /**
@@ -67,7 +67,7 @@ public:
      *
      * Usage example:
      \code
-        std::map<std::string, gd::PropertyDescriptor> properties;
+        std::map<gd::String, gd::PropertyDescriptor> properties;
         properties[ToString(_("Initial speed"))].SetValue("5");
 
         return properties;
@@ -76,7 +76,7 @@ public:
      * \return a std::map with properties names as key.
      * \see gd::PropertyDescriptor
      */
-    virtual std::map<std::string, gd::PropertyDescriptor> GetProperties(gd::Project & project) const;
+    virtual std::map<gd::String, gd::PropertyDescriptor> GetProperties(gd::Project & project) const;
 
     /**
      * \brief Called when the IDE wants to update a custom property of the automatism
@@ -84,7 +84,7 @@ public:
      * \return false if the new value cannot be set
      * \see gd::InitialInstance
      */
-    virtual bool UpdateProperty(const std::string & name, const std::string & value, gd::Project & project) {return false;};
+    virtual bool UpdateProperty(const gd::String & name, const gd::String & value, gd::Project & project) {return false;};
 
     /**
      * \brief Serialize the automatism.
@@ -141,8 +141,8 @@ public:
 
 protected:
 
-    std::string name; ///< Name of the automatism
-    std::string type; ///< The type indicate of which type is the automatism. ( To test if we can do something, like actions, reserved to specific automatism with it )
+    gd::String name; ///< Name of the automatism
+    gd::String type; ///< The type indicate of which type is the automatism. ( To test if we can do something, like actions, reserved to specific automatism with it )
 
     //////
     //TODO : C++ Platform specific code below : To be put in a RuntimeAutomatism class

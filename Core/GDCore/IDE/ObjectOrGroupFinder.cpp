@@ -25,7 +25,7 @@ ObjectOrGroupFinder::ObjectOrGroupFinder(const Project &project, const Layout *l
 
 }
 
-unsigned int ObjectOrGroupFinder::HasObjectOrGroupNamed(const std::string &name, bool allLayouts)
+unsigned int ObjectOrGroupFinder::HasObjectOrGroupNamed(const gd::String &name, bool allLayouts)
 {
     unsigned int flag = HasSameName::No;
     layoutsWithSameObjectName.clear();
@@ -75,12 +75,12 @@ unsigned int ObjectOrGroupFinder::HasObjectOrGroupNamed(const std::string &name,
     return flag;
 }
 
-const std::vector<std::string>& ObjectOrGroupFinder::GetLayoutsWithSameObjectName() const
+const std::vector<gd::String>& ObjectOrGroupFinder::GetLayoutsWithSameObjectName() const
 {
     return layoutsWithSameObjectName;
 }
 
-bool ObjectOrGroupFinder::HasGroupNamed(std::string name, const std::vector<gd::ObjectGroup> & groups) const
+bool ObjectOrGroupFinder::HasGroupNamed(gd::String name, const std::vector<gd::ObjectGroup> & groups) const
 {
     return std::find_if( groups.begin(), groups.end(), std::bind2nd(gd::GroupHasTheSameName(), name))
             != groups.end();

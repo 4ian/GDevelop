@@ -18,6 +18,7 @@
 #include <wx/srchctrl.h>
 #include <wx/aui/aui.h>
 #include <memory>
+#include "GDCore/Utf8String.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 namespace gd { class ResourceLibraryDialog; }
 namespace gd { class Project; }
@@ -43,7 +44,7 @@ public:
      * Ask the resources editor to add the resources contained into \a filenames.
      * \return A vector containing the name of the added resources.
      */
-    std::vector<std::string> AddResources(const std::vector<std::string> & filenames);
+    std::vector<gd::String> AddResources(const std::vector<gd::String> & filenames);
 
     /**
      * Ask the resources editor to add the resources contained into \a filenames.
@@ -51,7 +52,7 @@ public:
      * (which is relative to the project directory) before being added to the project.
      * \return A vector containing the name of the added resources.
      */
-    std::vector<std::string> CopyAndAddResources(std::vector<std::string> filenames, const std::string & destinationDir);
+    std::vector<gd::String> CopyAndAddResources(std::vector<gd::String> filenames, const gd::String & destinationDir);
 
     /**
      * \brief Called by DndTextResourcesEditor when one or more resources from the editor has been dropped
@@ -59,9 +60,9 @@ public:
      *
      * \see DndTextResourcesEditor
      */
-    void TriggerDrop(wxCoord x, wxCoord y, std::vector<std::string > resources);
+    void TriggerDrop(wxCoord x, wxCoord y, std::vector<gd::String > resources);
 
-    //Item sélectionné dans la liste
+    //Item sï¿½lectionnï¿½ dans la liste
     wxTreeItemId m_itemSelected;
 
     //(*Declarations(ResourcesEditor)
@@ -204,8 +205,8 @@ private:
 
 
     void UpdatePropertyGrid();
-    void RemoveImageFromTree(wxTreeItemId parent, std::string imageName);
-    void RenameInTree(wxTreeItemId parent, std::string oldName, std::string newName, std::string type);
+    void RemoveImageFromTree(wxTreeItemId parent, gd::String imageName);
+    void RenameInTree(wxTreeItemId parent, gd::String oldName, gd::String newName, gd::String type);
     wxTreeItemId GetSelectedFolderItem();
     void ShiftUpElementOfTree();
     void ShiftDownElementOfTree();
@@ -216,8 +217,8 @@ private:
     bool useRibbon;
     bool editorJustConstructed;
 
-    std::string selectedResource;
-    std::string renamedItemOldName;
+    gd::String selectedResource;
+    gd::String renamedItemOldName;
 
     gd::ResourceLibraryDialog * resourceLibraryDialog;
 

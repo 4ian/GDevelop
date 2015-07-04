@@ -86,12 +86,12 @@ public:
      * Draw a text in dc at point, without taking more than widthAvailable.
      * \return X position of the last character and total height taken by the text
      */
-    wxPoint DrawTextInArea(std::string text, wxDC & dc, wxRect rect, wxPoint point);
+    wxPoint DrawTextInArea(gd::String text, wxDC & dc, wxRect rect, wxPoint point);
 
     /**
      * \return Height taken by the text
      */
-    unsigned int GetTextHeightInArea(const std::string & text, unsigned int widthAvailable);
+    unsigned int GetTextHeightInArea(const gd::String & text, unsigned int widthAvailable);
 
     /**
      * Draw a specific instruction
@@ -153,7 +153,7 @@ public:
      * Make sure a text will be correctly display by replacing specials characters
      * and inserting tags like <br>.
      */
-    std::string GetHTMLText(std::string text);
+    gd::String GetHTMLText(gd::String text);
 
     wxColor eventGradient1;
     wxColor eventGradient2;

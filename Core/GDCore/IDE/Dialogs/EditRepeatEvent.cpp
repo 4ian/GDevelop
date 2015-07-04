@@ -107,7 +107,7 @@ EditRepeatEvent::~EditRepeatEvent()
 
 void EditRepeatEvent::OnexpressionBtClick(wxCommandEvent& )
 {
-    gd::EditExpressionDialog dialog(this, ToString( expressionEdit->GetValue() ), game, scene);
+    gd::EditExpressionDialog dialog(this, expressionEdit->GetValue(), game, scene);
     if ( dialog.ShowModal() == 1 )
         expressionEdit->ChangeValue(dialog.GetExpression());
 
@@ -116,7 +116,7 @@ void EditRepeatEvent::OnexpressionBtClick(wxCommandEvent& )
 
 void EditRepeatEvent::OnokBtClick(wxCommandEvent&)
 {
-    event.SetRepeatExpression(ToString( expressionEdit->GetValue() ));
+    event.SetRepeatExpression(expressionEdit->GetValue());
     EndModal(1);
 }
 

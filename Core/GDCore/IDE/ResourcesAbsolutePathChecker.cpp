@@ -6,12 +6,12 @@
 
 #include "ResourcesAbsolutePathChecker.h"
 #include "GDCore/IDE/AbstractFileSystem.h"
-#include <string>
+#include <GDCore/Utf8String.h>
 
 namespace gd
 {
 
-void ResourcesAbsolutePathChecker::ExposeFile(std::string & resourceFilename)
+void ResourcesAbsolutePathChecker::ExposeFile(gd::String & resourceFilename)
 {
     if ( fs.IsAbsolute(resourceFilename) )
         hasAbsoluteFilenames = true;

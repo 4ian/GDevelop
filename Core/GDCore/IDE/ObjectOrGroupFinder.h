@@ -4,7 +4,7 @@
  * This project is released under the MIT License.
  */
 
-#include <string>
+#include <GDCore/Utf8String.h>
 #include <vector>
 
 namespace gd
@@ -52,21 +52,21 @@ public:
      * Return a flag (ObjectOrGroupFinder::HasSameName) to tell if an object/group has the search name
      * Note : with allLayouts set to true, it also test the local objects and groups of other layouts.
      */
-    unsigned int HasObjectOrGroupNamed(const std::string &name, bool allLayouts = false);
+    unsigned int HasObjectOrGroupNamed(const gd::String &name, bool allLayouts = false);
 
     /**
-     * \return a string containing the list of the layouts containing an object/group with the searched name (from the previous call to HasObjectOrGroupNamed())
+     * \return a gd::String containing the list of the layouts containing an object/group with the searched name (from the previous call to HasObjectOrGroupNamed())
      */
-    const std::vector<std::string>& GetLayoutsWithSameObjectName() const;
+    const std::vector<gd::String>& GetLayoutsWithSameObjectName() const;
 
 private:
 
-    bool HasGroupNamed(std::string name, const std::vector<gd::ObjectGroup> & groups) const;
+    bool HasGroupNamed(gd::String name, const std::vector<gd::ObjectGroup> & groups) const;
 
     const Project &project;
     const Layout *layout;
 
-    std::vector<std::string> layoutsWithSameObjectName;
+    std::vector<gd::String> layoutsWithSameObjectName;
 };
 
 }

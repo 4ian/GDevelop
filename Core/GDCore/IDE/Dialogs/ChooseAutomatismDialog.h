@@ -20,7 +20,7 @@
 #include <wx/dialog.h>
 //*)
 #include <wx/srchctrl.h>
-#include <string>
+#include <GDCore/Utf8String.h>
 namespace gd { class Project; }
 namespace gd { class Layout; }
 
@@ -45,7 +45,7 @@ public:
      * \param parentObject The object from which an automatism must be chosen
      * \param automatismTypeAllowed If not empty, only automatisms of this type will be shown
      */
-    ChooseAutomatismDialog(wxWindow* parent, Project & project, gd::Layout & layout, std::string parentObject_, std::string automatismTypeAllowed_);
+    ChooseAutomatismDialog(wxWindow* parent, Project & project, gd::Layout & layout, gd::String parentObject_, gd::String automatismTypeAllowed_);
     virtual ~ChooseAutomatismDialog();
 
     /**
@@ -58,7 +58,7 @@ public:
     /**
      * \brief Return the chosen automatism name
      */
-    const std::string & GetChosenAutomatism() const { return automatismChosen; }
+    const gd::String & GetChosenAutomatism() const { return automatismChosen; }
 
 protected:
     //(*Declarations(ChooseAutomatismDialog)
@@ -96,9 +96,9 @@ private:
     void RefreshList();
     Project & project;
     gd::Layout & layout;
-    std::string parentObject;
-    std::string automatismTypeAllowed;
-    std::string automatismChosen;
+    gd::String parentObject;
+    gd::String automatismTypeAllowed;
+    gd::String automatismChosen;
 
     DECLARE_EVENT_TABLE()
 };

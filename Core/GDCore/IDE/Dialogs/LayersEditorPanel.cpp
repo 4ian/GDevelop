@@ -98,7 +98,7 @@ void LayersEditorPanel::Refresh()
 
     for (unsigned int i = 0; i < m_layout.GetLayersCount(); ++i)
     {
-        std::string name = m_layout.GetLayer(i).GetName();
+        gd::String name = m_layout.GetLayer(i).GetName();
         if ( name == "" ) name = GD_T("Base layer");
         m_layersList->InsertItem(0, name);
 
@@ -155,7 +155,7 @@ void LayersEditorPanel::EditSelectedLayer()
     gd::Layer * layer = GetSelectedLayer();
     if ( !layer ) return;
 
-    std::string oldName = layer->GetName();
+    gd::String oldName = layer->GetName();
     layer->EditLayer();
 
     //Be sure to update instances if the layer name has changed.
@@ -240,10 +240,10 @@ void LayersEditorPanel::OnlayersListItemRClick(wxListEvent& event)
 
 void LayersEditorPanel::OnAddLayerClicked(wxCommandEvent& event)
 {
-    wxString name = GD_T("New layer");
+    gd::String name = GD_T("New layer");
 
     bool alreadyExist = false;
-    int nb = 0;
+    unsigned int nb = 0;
     for (unsigned int i = 0;i<m_layout.GetLayersCount();++i)
     {
         if ( m_layout.GetLayer(i).GetName() == name )
@@ -252,7 +252,7 @@ void LayersEditorPanel::OnAddLayerClicked(wxCommandEvent& event)
     while ( alreadyExist )
     {
         ++nb;
-        name = GD_T("New layer ") + ToString(nb);
+        name = GD_T("New layer ") + gd::String::FromUInt(nb);
 
         alreadyExist = false;
         for (unsigned int i = 0;i<m_layout.GetLayersCount();++i)
@@ -262,8 +262,8 @@ void LayersEditorPanel::OnAddLayerClicked(wxCommandEvent& event)
         }
     }
 
-    m_layout.InsertNewLayer(ToString(name), m_layout.GetLayersCount()-1);
-    m_layout.GetLayer(ToString(name)).SetCameraCount(1);
+    m_layout.InsertNewLayer(name, m_layout.GetLayersCount()-1);
+    m_layout.GetLayer(name).SetCameraCount(1);
 
     Refresh();
 }
@@ -274,7 +274,7 @@ void LayersEditorPanel::OnDeleteLayerClicked(wxCommandEvent& event)
     Layer * selectedLayer = GetSelectedLayer();
     if ( !selectedLayer || selectedLayer->GetName().empty() ) return;
 
-    std::string name = selectedLayer->GetName();
+    gd::String name = selectedLayer->GetName();
 
     for (unsigned int i = 0;i<m_layout.GetLayersCount();++i)
     {
@@ -283,7 +283,7 @@ void LayersEditorPanel::OnDeleteLayerClicked(wxCommandEvent& event)
             //Ask the user what he wants to do with the existing instances.
             if ( m_layout.GetInitialInstances().SomeInstancesAreOnLayer(name) )
             {
-                std::vector<std::string> availableLayers;
+                std::vector<gd::String> availableLayers;
                 for (unsigned int j = 0;j<m_layout.GetLayersCount();++j)
                 {
                     if (i!=j) availableLayers.push_back(m_layout.GetLayer(j).GetName());

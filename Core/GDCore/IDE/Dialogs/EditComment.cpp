@@ -126,8 +126,8 @@ void EditComment::OnColorBtClick(wxCommandEvent& event)
 
 void EditComment::OnOkBtClick(wxCommandEvent& event)
 {
-    commentEvent.com1 = Com1Edit->GetValue().mb_str();
-    commentEvent.com2 = Com2Edit->GetValue().mb_str();
+    commentEvent.com1 = Com1Edit->GetValue();
+    commentEvent.com2 = Com2Edit->GetValue();
 
     commentEvent.r = ColorBt->GetBackgroundColour().Red();
     commentEvent.v = ColorBt->GetBackgroundColour().Green();

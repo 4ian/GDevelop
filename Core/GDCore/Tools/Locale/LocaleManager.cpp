@@ -32,13 +32,13 @@ bool LocaleManager::SetLanguage(int languageWxWidgetsId_)
     return true;
 }
 
-void LocaleManager::AddCatalog(std::string catalogName)
+void LocaleManager::AddCatalog(gd::String catalogName)
 {
     if ( locale )
         locale->AddCatalog(catalogName);
 }
 
-void LocaleManager::AddPath(std::string path)
+void LocaleManager::AddPath(gd::String path)
 {
     wxLogNull noLog;
     wxLocale::AddCatalogLookupPathPrefix(path);

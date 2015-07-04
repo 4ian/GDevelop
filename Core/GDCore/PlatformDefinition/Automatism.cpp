@@ -15,9 +15,9 @@ Automatism::~Automatism()
 };
 
 #if defined(GD_IDE_ONLY)
-std::map<std::string, gd::PropertyDescriptor> Automatism::GetProperties(gd::Project & project) const
+std::map<gd::String, gd::PropertyDescriptor> Automatism::GetProperties(gd::Project & project) const
 {
-	std::map<std::string, gd::PropertyDescriptor> nothing;
+	std::map<gd::String, gd::PropertyDescriptor> nothing;
 	return nothing;
 }
 #endif

@@ -13,8 +13,8 @@ namespace gd
 void GD_CORE_API BuiltinExtensionsImplementer::ImplementsExternalLayoutsExtension(gd::PlatformExtension & extension)
 {
     extension.SetExtensionInformation("BuiltinExternalLayouts",
-                          GD_T("External layouts"),
-                          GD_T("Built-in extension providing actions and conditions related to external layouts"),
+                          _("External layouts"),
+                          _("Built-in extension providing actions and conditions related to external layouts"),
                           "Florian Rival",
                           "Open source (MIT License)");
 
@@ -22,14 +22,14 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsExternalLayoutsExtensio
     extension.AddAction("CreateObjectsFromExternalLayout",
                    _("Create objects from an external layout"),
                    _("Create objects from an external layout."),
-                   GD_T("Create objects from the external layout _PARAM1_"),
+                   _("Create objects from the external layout _PARAM1_"),
                    _("External layouts"),
                    "res/conditions/fichier24.png",
                    "res/conditions/fichier.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("string", GD_T("Name of the external layout"), "",false)
-        .AddParameter("expression", GD_T("X position of the origin"), "",true).SetDefaultValue("0")
-        .AddParameter("expression", GD_T("Y position of the origin"), "",true).SetDefaultValue("0")
+        .AddParameter("string", _("Name of the external layout"), "",false)
+        .AddParameter("expression", _("X position of the origin"), "",true).SetDefaultValue("0")
+        .AddParameter("expression", _("Y position of the origin"), "",true).SetDefaultValue("0")
         .MarkAsAdvanced();
     #endif
 }

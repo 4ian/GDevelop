@@ -96,6 +96,11 @@ public:
         bool operator==(const StringIterator<T> &other) { return (strIt == other.strIt); }
         bool operator!=(const StringIterator<T> &other) { return !operator==(other); }
 
+        bool operator<(const StringIterator<T> &other) { return (strIt < other.strIt); }
+        bool operator<=(const StringIterator<T> &other) { return (strIt <= other.strIt); }
+        bool operator>(const StringIterator<T> &other) { return (strIt > other.strIt); }
+        bool operator>=(const StringIterator<T> &other) { return (strIt >= other.strIt); }
+
         T base() const {return strIt;}
 
     private:
@@ -207,6 +212,11 @@ public:
     size_type size() const;
 
     /**
+     * Returns the string's length.
+     */
+    size_type length() const { return size(); };
+
+    /**
      * Clear the string.
      *
      * **Iterators :** Obviously, all iterators are invalidated.
@@ -252,19 +262,44 @@ public:
  */
 
     /**
-     * Returns a String created from an integer.
+     * \return a String created from an integer.
      */
     static String FromInt(int value);
 
     /**
-     * Returns a String created from a float.
+     * \return the string converted to int.
+     */
+    int ToInt() const;
+
+    /**
+     * \return a String created from an unsigned integer.
+     */
+    static String FromUInt(unsigned int value);
+
+    /**
+     * \return the string converted to unsigned int.
+     */
+    unsigned int ToUInt() const;
+
+    /**
+     * \return a String created from a float.
      */
     static String FromFloat(float value);
 
     /**
-     * Returns a String created from a double.
+     * \return the string converted to float.
+     */
+    int ToFloat() const;
+
+    /**
+     * \return a String created from a double.
      */
     static String FromDouble(double value);
+
+    /**
+     * \return the string converted to double.
+     */
+    int ToDouble() const;
 
 /**
  * \}
@@ -396,6 +431,11 @@ public:
      */
     const std::string& Raw() const { return m_string; }
 
+    /**
+     * Get the C-string.
+     */
+    const char* c_str() const { return m_string.c_str(); }
+
 /**
  * \}
  */
@@ -408,6 +448,8 @@ public:
     String& operator+=( const String &other );
 
     String& operator+=( const char *other );
+
+    String& operator+=( char32_t character );
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
@@ -430,6 +472,15 @@ public:
      * string is reallocated).
      */
     void pop_back();
+
+    /**
+     * Inserts characters right before the character at **pos**.
+     *
+     * \return *this
+     *
+     * **Iterators :** All iterators may be invalidated.
+     */
+    String& insert( size_type pos, const String &str );
 
     /**
      * Replace the portion of the String between **i1** and **i2** (**i2** not
@@ -496,6 +547,12 @@ public:
      * \endcode
      */
     std::vector<String> Split( value_type delimiter ) const;
+
+    /**
+     * \return a String with uppercase letters only
+     * TODO: Implement it
+     */
+    String ToUpperCase() const { return *this; }
 
     /**
      * Returns a sub-string starting from **start** and with length **length**.
@@ -584,6 +641,21 @@ public:
      * Test equality of two strings.
      */
     bool operator==( const char *character ) const;
+
+    /**
+     * Test inequality of two strings.
+     */
+    bool operator!=( const String &other ) const;
+
+    /**
+     * Test inequality of two strings.
+     */
+    bool operator!=( const char *characters ) const;
+
+    /**
+     * Compare two strings.
+     */
+    bool operator<( const String &other ) const;
 
 /**
  * \}

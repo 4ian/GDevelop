@@ -6,7 +6,7 @@
 
 #ifndef SPRITE_H
 #define SPRITE_H
-#include <string>
+#include <GDCore/Utf8String.h>
 #include <memory>
 #include <SFML/Graphics/Sprite.hpp>
 #include "GDCore/BuiltinExtensions/SpriteExtension/Point.h"
@@ -35,17 +35,17 @@ public:
     /**
      * Change the name of the Sprite's image
      */
-    inline void SetImageName(const std::string & image_) { image = image_; }
+    inline void SetImageName(const gd::String & image_) { image = image_; }
 
     /**
      * Get the name of the Sprite's image
      */
-    inline const std::string & GetImageName() const { return image; }
+    inline const gd::String & GetImageName() const { return image; }
 
     /**
      * Get a reference to the name of the image
      */
-    inline std::string & GetImageName() { return image; }
+    inline gd::String & GetImageName() { return image; }
 
     /**
      * Get the collision mask ( custom or automatically generated owing to IsCollisionMaskAutomatic() )
@@ -89,22 +89,22 @@ public:
     /**
      * Delete point with the specified name
      */
-    void DelPoint( const std::string & name );
+    void DelPoint( const gd::String & name );
 
     /**
      * Return point with name passed in argument
      */
-    const Point & GetPoint( const std::string & name) const;
+    const Point & GetPoint( const gd::String & name) const;
 
     /**
      * Return point with name passed in argument
      */
-    Point & GetPoint(const std::string & name);
+    Point & GetPoint(const gd::String & name);
 
     /**
      * Return true if the point exists.
      */
-    bool HasPoint( const std::string & name ) const;
+    bool HasPoint( const gd::String & name ) const;
 
     /**
      * Return Origin point.
@@ -187,7 +187,7 @@ private:
     std::shared_ptr<SFMLTextureWrapper> sfmlImage; ///< Pointer to the image displayed by the sprite.
     bool hasItsOwnImage; ///< True if sfmlImage is only owned by this Sprite.
     #endif
-    std::string image; ///< Name of the image to be loaded in Image Manager.
+    gd::String image; ///< Name of the image to be loaded in Image Manager.
 
     bool automaticCollisionMask; ///< True to use the custom collision mask. Otherwise, a basic bounding box is returned by GetCollisionMask()
     std::vector<Polygon2d> customCollisionMask; ///< Custom collision mask

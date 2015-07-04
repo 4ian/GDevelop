@@ -40,8 +40,8 @@ public:
     const gd::InstructionsList & GetActions() const { return actions; };
     gd::InstructionsList & GetActions() { return actions; };
 
-    const std::string & GetRepeatExpression() const { return repeatNumberExpression.GetPlainString(); };
-    void SetRepeatExpression(std::string repeatNumberExpression_) { repeatNumberExpression = gd::Expression(repeatNumberExpression_); };
+    const gd::String & GetRepeatExpression() const { return repeatNumberExpression.GetPlainString(); };
+    void SetRepeatExpression(gd::String repeatNumberExpression_) { repeatNumberExpression = gd::Expression(repeatNumberExpression_); };
 
     virtual std::vector < gd::InstructionsList* > GetAllConditionsVectors();
     virtual std::vector < gd::InstructionsList* > GetAllActionsVectors();

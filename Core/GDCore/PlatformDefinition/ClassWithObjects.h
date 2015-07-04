@@ -5,7 +5,7 @@
  */
 #ifndef GDCORE_CLASSWITHOBJECTS_H
 #define GDCORE_CLASSWITHOBJECTS_H
-#include <string>
+#include <GDCore/Utf8String.h>
 #include <vector>
 #include <memory>
 namespace gd { class Object; }
@@ -45,17 +45,17 @@ public:
     /**
      * \brief Return true if object called \a name exists.
      */
-    bool HasObjectNamed(const std::string & name) const;
+    bool HasObjectNamed(const gd::String & name) const;
 
     /**
      * \brief Return a reference to the object called \a name.
      */
-    Object & GetObject(const std::string & name);
+    Object & GetObject(const gd::String & name);
 
     /**
      * \brief Return a reference to the object called \a name.
      */
-    const gd::Object & GetObject(const std::string & name) const;
+    const gd::Object & GetObject(const gd::String & name) const;
 
     /**
      * \brief Return a reference to the object at position \a index in the objects list
@@ -73,7 +73,7 @@ public:
      * \warning This has nothing to do with an object position on a layout. Objects put on layouts
      * are represented thanks to the gd::InitialInstance class.
      */
-    unsigned int GetObjectPosition(const std::string & name) const;
+    unsigned int GetObjectPosition(const gd::String & name) const;
 
     /**
      * \brief Return the number of object.
@@ -87,7 +87,7 @@ public:
      * \note The object is created using the project's current platform.
      * \return A reference to the object in the list.
      */
-    gd::Object & InsertNewObject(gd::Project & project, const std::string & objectType, const std::string & name, unsigned int position);
+    gd::Object & InsertNewObject(gd::Project & project, const gd::String & objectType, const gd::String & name, unsigned int position);
 #endif
 
     /**
@@ -103,7 +103,7 @@ public:
      * \brief Delete an object.
      * \param name The name of the object to be deleted.
      */
-    void RemoveObject(const std::string & name);
+    void RemoveObject(const gd::String & name);
 
     /**
      * \brief Swap the position of the specified objects.

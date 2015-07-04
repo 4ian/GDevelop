@@ -149,7 +149,7 @@ void EventsListSerialization::UpdateInstructionsFromGD2x(gd::Project & project, 
                 else
                 {
                     //Exchange parameters
-                    std::string op = parameters[j+1].GetPlainString();
+                    gd::String op = parameters[j+1].GetPlainString();
                     instr.SetParameter(j+1, parameters[j] );
                     instr.SetParameter(j, gd::Expression(op));
                 }
@@ -166,7 +166,7 @@ void EventsListSerialization::UnserializeEventsFrom(gd::Project & project, Event
     for(unsigned int i = 0; i<events.GetChildrenCount(); ++i)
     {
         SerializerElement & eventElem = events.GetChild(i);
-        std::string type = eventElem.GetChild("type", 0, "Type").GetValue().GetString();
+        gd::String type = eventElem.GetChild("type", 0, "Type").GetValue().GetString();
         gd::BaseEventSPtr event = project.CreateEvent(type);
         if ( event != std::shared_ptr<gd::BaseEvent>())
             event->UnserializeFrom(project, eventElem);

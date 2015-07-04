@@ -36,7 +36,7 @@ public:
      * \brief Get a pointer to the platform called \a platformName.
      * \note The PlatformManager is the owner of the platform, so the pointer should not be freed or deleted.
      */
-    gd::Platform* GetPlatform(const std::string & platformName) const;
+    gd::Platform* GetPlatform(const gd::String & platformName) const;
 
     /**
      * \brief Get a list of all platforms available.

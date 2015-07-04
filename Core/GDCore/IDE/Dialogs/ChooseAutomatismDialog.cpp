@@ -43,7 +43,7 @@ BEGIN_EVENT_TABLE(ChooseAutomatismDialog,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-ChooseAutomatismDialog::ChooseAutomatismDialog(wxWindow* parent, Project & project_, gd::Layout & layout_, std::string parentObject_, std::string automatismTypeAllowed_) :
+ChooseAutomatismDialog::ChooseAutomatismDialog(wxWindow* parent, Project & project_, gd::Layout & layout_, gd::String parentObject_, gd::String automatismTypeAllowed_) :
 project(project_),
 layout(layout_),
 parentObject(parentObject_),
@@ -122,9 +122,9 @@ bool ChooseAutomatismDialog::DeduceAutomatism()
 			gd::LogMessage(GD_T("This object doesn't have the appropriate automatism attached to it.\nCheck that you selected the right object or add the automatism in the object properties."));
 		else
 		{
-			gd::LogMessage(gd::utf8::FromWxString(
+			gd::LogMessage(
 				wxString::Format(wxString(_("This object doesn't have automatism \"%s\" attached to it.\nCheck that you selected the right object or add this automatism in the object properties.")),
-            	metadata.GetFullName().c_str())));
+            	metadata.GetFullName().c_str()));
 		}
 
 		return true;
@@ -135,18 +135,18 @@ bool ChooseAutomatismDialog::DeduceAutomatism()
 
 void ChooseAutomatismDialog::RefreshList()
 {
-    std::string search = ToString(searchCtrl->GetValue());
+    gd::String search = searchCtrl->GetValue();
     bool searching = search.empty() ? false : true;
 
-	std::vector <std::string> automatisms = gd::GetAutomatismsOfObject(project, layout, parentObject);
+	std::vector <gd::String> automatisms = gd::GetAutomatismsOfObject(project, layout, parentObject);
 
 	automatismsList->Clear();
 	for (unsigned int i = 0;i<automatisms.size();++i)
 	{
-	    std::string automatismName = automatisms[i];
+	    gd::String automatismName = automatisms[i];
 
 		if ( (automatismTypeAllowed.empty() || automatismTypeAllowed == gd::GetTypeOfAutomatism(project, layout, automatismName)) &&
-             (!searching || (searching && gd::StrUppercase(automatismName).find(gd::StrUppercase(search)) != std::string::npos) ))
+             (!searching || (searching && automatismName.ToUpperCase().find(search.ToUpperCase()) != gd::String::npos) ))
             automatismsList->Append(automatismName);
 	}
 

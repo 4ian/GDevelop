@@ -5,7 +5,7 @@
  */
 #include "ExpressionMetadata.h"
 #include "GDCore/CommonTools.h"
-#include <string>
+#include <GDCore/Utf8String.h>
 #if !defined(GD_NO_WX_GUI)
 #include <wx/file.h>
 #include <wx/bitmap.h>
@@ -14,12 +14,12 @@
 namespace gd
 {
 
-ExpressionMetadata::ExpressionMetadata(const std::string & extensionNamespace_,
-                        const std::string & name_,
-                        const std::string & fullname_,
-                        const std::string & description_,
-                        const std::string & group_,
-                        const std::string & smallicon_) :
+ExpressionMetadata::ExpressionMetadata(const gd::String & extensionNamespace_,
+                        const gd::String & name_,
+                        const gd::String & fullname_,
+                        const gd::String & description_,
+                        const gd::String & group_,
+                        const gd::String & smallicon_) :
 fullname(fullname_),
 description(description_),
 group(group_),
@@ -42,11 +42,11 @@ ExpressionMetadata & ExpressionMetadata::SetHidden()
     return *this;
 }
 
-gd::ExpressionMetadata & ExpressionMetadata::AddParameter(const std::string & type, const std::string & description, const std::string & optionalObjectType, bool parameterIsOptional)
+gd::ExpressionMetadata & ExpressionMetadata::AddParameter(const gd::String & type, const gd::String & description, const gd::String & optionalObjectType, bool parameterIsOptional)
 {
     gd::ParameterMetadata info;
     info.type = type;
-    info.description = gd::ToString(description);
+    info.description = description;
     info.codeOnly = false;
     info.optional = parameterIsOptional;
     info.supplementaryInformation = optionalObjectType.empty() ? "" : extensionNamespace+optionalObjectType;
@@ -55,7 +55,7 @@ gd::ExpressionMetadata & ExpressionMetadata::AddParameter(const std::string & ty
     return *this;
 }
 
-gd::ExpressionMetadata & ExpressionMetadata::AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation)
+gd::ExpressionMetadata & ExpressionMetadata::AddCodeOnlyParameter(const gd::String & type, const gd::String & supplementaryInformation)
 {
     gd::ParameterMetadata info;
     info.type = type;

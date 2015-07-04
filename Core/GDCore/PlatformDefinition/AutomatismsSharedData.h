@@ -8,7 +8,7 @@
 #define AUTOMATISMSSHAREDDATA_H
 
 #include <memory>
-#include <string>
+#include <GDCore/Utf8String.h>
 class AutomatismsRuntimeSharedData;
 namespace gd { class SerializerElement; }
 
@@ -34,22 +34,22 @@ public:
     /**
      * \brief Change the name identifying the automatism.
      */
-    void SetName(std::string name_) { name = name_; };
+    void SetName(gd::String name_) { name = name_; };
 
     /**
      * \brief Return the name identifying the automatism
      */
-    std::string GetName() { return name; }
+    gd::String GetName() { return name; }
 
     /**
      * \brief Return the name identifying the type of the automatism
      */
-    std::string GetTypeName() { return type; }
+    gd::String GetTypeName() { return type; }
 
     /**
      * \brief Change name identifying the type of the automatism.
      */
-    virtual void SetTypeName(const std::string & type_) { type = type_; };
+    virtual void SetTypeName(const gd::String & type_) { type = type_; };
 
     #if defined(GD_IDE_ONLY)
     /**
@@ -75,8 +75,8 @@ public:
     }
 
 private:
-    std::string name; ///< A layout can have some automatisms with the same type, but with different names.
-    std::string type; ///< The type indicate of which type is the automatism.
+    gd::String name; ///< A layout can have some automatisms with the same type, but with different names.
+    gd::String type; ///< The type indicate of which type is the automatism.
 };
 
 }

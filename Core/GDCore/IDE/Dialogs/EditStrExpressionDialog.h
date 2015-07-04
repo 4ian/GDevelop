@@ -18,7 +18,7 @@
 #include <wx/dialog.h>
 #include <wx/stc/stc.h>
 //*)
-#include <string>
+#include <GDCore/Utf8String.h>
 #include <vector>
 #include "GDCore/Events/ExpressionMetadata.h"
 namespace gd { class Project; }
@@ -29,7 +29,7 @@ namespace gd
 {
 
 /**
- * \brief Dialog used to edit a string expression
+ * \brief Dialog used to edit a gd::String expression
  *
  * \ingroup IDEDialogs
  */
@@ -44,13 +44,13 @@ public:
      * \param project Project
      * \param layout Layout
      */
-    EditStrExpressionDialog(wxWindow* parent, std::string expression, gd::Project & project_, gd::Layout & layout_);
+    EditStrExpressionDialog(wxWindow* parent, gd::String expression, gd::Project & project_, gd::Layout & layout_);
     virtual ~EditStrExpressionDialog();
 
     /**
      * Return the expression
      */
-    const std::string & GetExpression() const {return returnedExpression;}
+    const gd::String & GetExpression() const {return returnedExpression;}
 
     //(*Declarations(EditStrExpressionDialog)
     wxPanel* objectsFunctionsPanel;
@@ -107,9 +107,9 @@ private:
     void TextModified(wxStyledTextEvent& event);
     void UpdateTextCtrl(wxStyledTextEvent& event);
 
-    std::string ShowParameterDialog(const gd::ParameterMetadata & ParameterMetadata, bool & userCancelled, std::string object = "");
+    gd::String ShowParameterDialog(const gd::ParameterMetadata & ParameterMetadata, bool & userCancelled, gd::String object = "");
 
-    std::string returnedExpression;
+    gd::String returnedExpression;
 
     //Items selected
     wxTreeItemId itemObj;
@@ -119,7 +119,7 @@ private:
     wxImageList * imageListVal;
 
     //Utile pour selectionner un objet
-    //( quand on souhaite accéder aux propriétés d'un objet )
+    //( quand on souhaite accï¿½der aux propriï¿½tï¿½s d'un objet )
     gd::Project & project;
     gd::Layout & layout;
 

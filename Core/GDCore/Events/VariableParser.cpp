@@ -3,7 +3,7 @@
  * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the MIT License.
  */
-#include <string>
+#include <GDCore/Utf8String.h>
 #include <vector>
 #include "GDCore/Events/VariableParser.h"
 namespace gd { class Layout; }
@@ -66,7 +66,7 @@ void VariableParser::ReadToken()
 		}
 
 		currentTokenType = TS_VARNAME; //We're parsing a variable name.
-		currentToken += expression[currentPosition];
+		currentToken.push_back(expression[currentPosition]);
 		currentPosition++;
 	}
 
@@ -104,7 +104,7 @@ void VariableParser::X()
 	    S();
 	else if (currentTokenType == TS_OPENING_BRACKET)
 	{
-		std::string strExpr = SkipStringExpression();
+		gd::String strExpr = SkipStringExpression();
 
 		ReadToken();
 		if (currentTokenType != TS_CLOSING_BRACKET)
@@ -119,9 +119,9 @@ void VariableParser::X()
 
 }
 
-std::string VariableParser::SkipStringExpression()
+gd::String VariableParser::SkipStringExpression()
 {
-	std::string stringExpression;
+	gd::String stringExpression;
 	bool insideStringLiteral = false;
 	bool lastCharacterWasBackslash = false;
 	unsigned int nestedBracket = 0;
@@ -140,8 +140,8 @@ std::string VariableParser::SkipStringExpression()
 			nestedBracket--;
 		}
 
-		lastCharacterWasBackslash = expression[currentPosition] == '\\';
-		stringExpression += expression[currentPosition];
+		lastCharacterWasBackslash = expression[currentPosition] == U'\\';
+		stringExpression.push_back(expression[currentPosition]);
 		currentPosition++;
 	}
 

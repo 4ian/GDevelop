@@ -19,7 +19,7 @@
 namespace gd
 {
 
-const std::string EventStoreDialog::host = "http://gdevapp.com";
+const gd::String EventStoreDialog::host = "http://gdevapp.com";
 const int EventStoreDialog::port = 80;
 gd::SerializerElement * EventStoreDialog::templates = NULL;
 
@@ -43,7 +43,7 @@ EventStoreDialog::~EventStoreDialog()
 {
 }
 
-void EventStoreDialog::RefreshWith(std::string templateId, const std::vector<std::string> & parameters)
+void EventStoreDialog::RefreshWith(gd::String templateId, const std::vector<gd::String> & parameters)
 {
     FetchTemplate(templateId);
     RefreshTemplate();
@@ -57,7 +57,7 @@ sf::Http::Response::Status EventStoreDialog::FetchTemplates(bool forceFetch)
     if (templates && !forceFetch) return sf::Http::Response::Ok;
 
     // Create request
-    sf::Http Http(host, port);
+    sf::Http Http(host.ToLocale(), port);
     sf::Http::Request request;
     request.setMethod(sf::Http::Request::Get);
     request.setUri("/events/");
@@ -74,7 +74,7 @@ sf::Http::Response::Status EventStoreDialog::FetchTemplates(bool forceFetch)
     return response.getStatus();
 }
 
-sf::Http::Response::Status EventStoreDialog::FetchTemplate(std::string id)
+sf::Http::Response::Status EventStoreDialog::FetchTemplate(gd::String id)
 {
     nameTxt->SetLabel("Loading the template...");
     descriptionEdit->SetValue("");
@@ -82,10 +82,10 @@ sf::Http::Response::Status EventStoreDialog::FetchTemplate(std::string id)
     gd::SafeYield::Do();
 
     // Create request
-    sf::Http Http(host, port);
+    sf::Http Http(host.ToLocale(), port);
     sf::Http::Request request;
     request.setMethod(sf::Http::Request::Get);
-    request.setUri("/events/"+id);
+    request.setUri("/events/"+id.ToLocale());
 
     // Send the request
     sf::Http::Response response = Http.sendRequest(request, sf::seconds(2));
@@ -99,23 +99,24 @@ sf::Http::Response::Status EventStoreDialog::FetchTemplate(std::string id)
 void EventStoreDialog::RefreshList()
 {
     templatesList->Clear();
-    std::string searchText = gd::ToString(searchCtrl->GetValue());
-    searchText = gd::StrUppercase(searchText);
+    gd::String searchText = searchCtrl->GetValue();
+    searchText = searchText.ToUpperCase();
     bool searching = searchText.empty() ? false : true;
 
     if (!templates) return;
 	templates->ConsiderAsArrayOf("Template");
 	for (unsigned int i = 0;i<templates->GetChildrenCount();++i) {
 		const SerializerElement & eventTemplate = templates->GetChild(i);
-        std::string name = eventTemplate.GetChild("name").GetValue().GetString();
-        std::string desc = eventTemplate.GetChild("description").GetValue().GetString();
+        gd::String name = eventTemplate.GetChild("name").GetValue().GetString();
+        gd::String desc = eventTemplate.GetChild("description").GetValue().GetString();
 
-        if (!searching || gd::StrUppercase(name).find(searchText) != std::string::npos
-            || gd::StrUppercase(desc).find(searchText) != std::string::npos)
+        if (!searching || name.ToUpperCase().find(searchText) != gd::String::npos
+            || desc.ToUpperCase().find(searchText) != gd::String::npos)
         {
     		wxString id = eventTemplate.GetChild("_id").GetValue().GetString();
             if (desc.size() > 50) {
-                desc.resize(50);
+                while(desc.size() > 50)
+                    desc.pop_back();
                 desc += "...";
             }
 
@@ -178,7 +179,7 @@ void EventStoreDialog::InstantiateTemplate()
     for (unsigned int i = 0;i<parameters.GetChildrenCount() && i < paramEdits.size();++i)
     {
         const SerializerElement & parameter = parameters.GetChild(i);
-        std::string newValue = gd::ToString(paramEdits[i]->GetValue());
+        gd::String newValue = paramEdits[i]->GetValue();
 
         groupEvent.GetCreationParameters().push_back(newValue);
 
@@ -211,7 +212,7 @@ void EventStoreDialog::OnSelectionChanged(wxCommandEvent& event)
     if (!data)
         return;
 
-    sf::Http::Response::Status status = FetchTemplate(gd::ToString(data->GetData()));
+    sf::Http::Response::Status status = FetchTemplate(data->GetData());
     if (status == sf::Http::Response::Ok)
         RefreshTemplate();
     else

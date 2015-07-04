@@ -67,7 +67,7 @@ TEST_CASE( "Variable", "[common]" ) {
         REQUIRE( variable.GetString() == "MyString" );
         REQUIRE( variable.IsNumber() == false );
 
-        variable = std::string("MyRealStdString");
+        variable = "MyRealStdString";
         REQUIRE( variable.GetString() == "MyRealStdString" );
         REQUIRE( variable.IsNumber() == false );
     }

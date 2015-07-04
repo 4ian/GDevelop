@@ -5,7 +5,7 @@
  */
 #ifndef AUTOMATISMMETADATA_H
 #define AUTOMATISMMETADATA_H
-#include <string>
+#include <GDCore/Utf8String.h>
 #include <map>
 #include "GDCore/Events/InstructionMetadata.h"
 #include "GDCore/Events/ExpressionMetadata.h"
@@ -32,14 +32,14 @@ namespace gd
 class GD_CORE_API AutomatismMetadata
 {
 public:
-    AutomatismMetadata(const std::string & extensionNamespace,
-                       const std::string & name_,
-                       const std::string & fullname_,
-                       const std::string & defaultName_,
-                       const std::string & description_,
-                       const std::string & group_,
-                       const std::string & icon24x24_,
-                       const std::string & className_,
+    AutomatismMetadata(const gd::String & extensionNamespace,
+                       const gd::String & name_,
+                       const gd::String & fullname_,
+                       const gd::String & defaultName_,
+                       const gd::String & description_,
+                       const gd::String & group_,
+                       const gd::String & icon24x24_,
+                       const gd::String & className_,
                        std::shared_ptr<gd::Automatism> instance,
                        std::shared_ptr<gd::AutomatismsSharedData> sharedDatasInstance);
     AutomatismMetadata() {};
@@ -48,46 +48,46 @@ public:
     /**
      * Declare a new condition as being part of the extension.
      */
-    gd::InstructionMetadata & AddCondition(const std::string & name_,
+    gd::InstructionMetadata & AddCondition(const gd::String & name_,
                                            const gd::String & fullname_,
                                            const gd::String & description_,
-                                           const std::string & sentence_,
+                                           const gd::String & sentence_,
                                            const gd::String & group_,
-                                           const std::string & icon_,
-                                           const std::string & smallicon_);
+                                           const gd::String & icon_,
+                                           const gd::String & smallicon_);
 
     /**
      * Declare a new action as being part of the extension.
      */
-    gd::InstructionMetadata & AddAction(const std::string & name_,
+    gd::InstructionMetadata & AddAction(const gd::String & name_,
                                            const gd::String & fullname_,
                                            const gd::String & description_,
-                                           const std::string & sentence_,
+                                           const gd::String & sentence_,
                                            const gd::String & group_,
-                                           const std::string & icon_,
-                                           const std::string & smallicon_);
+                                           const gd::String & icon_,
+                                           const gd::String & smallicon_);
     /**
      * Declare a new action as being part of the extension.
      */
-    gd::ExpressionMetadata & AddExpression(const std::string & name_,
-                                           const std::string & fullname_,
-                                           const std::string & description_,
-                                           const std::string & group_,
-                                           const std::string & smallicon_);
+    gd::ExpressionMetadata & AddExpression(const gd::String & name_,
+                                           const gd::String & fullname_,
+                                           const gd::String & description_,
+                                           const gd::String & group_,
+                                           const gd::String & smallicon_);
 
     /**
      * Declare a new string expression as being part of the extension.
      */
-    gd::ExpressionMetadata & AddStrExpression(const std::string & name_,
-                                           const std::string & fullname_,
-                                           const std::string & description_,
-                                           const std::string & group_,
-                                           const std::string & smallicon_);
+    gd::ExpressionMetadata & AddStrExpression(const gd::String & name_,
+                                           const gd::String & fullname_,
+                                           const gd::String & description_,
+                                           const gd::String & group_,
+                                           const gd::String & smallicon_);
 
-    AutomatismMetadata & SetFullName(const std::string & fullname_);
-    AutomatismMetadata & SetDefaultName(const std::string & defaultName_);
-    AutomatismMetadata & SetDescription(const std::string & description_);
-    AutomatismMetadata & SetGroup(const std::string & group_);
+    AutomatismMetadata & SetFullName(const gd::String & fullname_);
+    AutomatismMetadata & SetDefaultName(const gd::String & defaultName_);
+    AutomatismMetadata & SetDescription(const gd::String & description_);
+    AutomatismMetadata & SetGroup(const gd::String & group_);
     AutomatismMetadata & SetBitmapIcon(const wxBitmap & bitmap_);
 
     /**
@@ -95,19 +95,19 @@ public:
      * \note The requirement may vary depending on the platform: Most of the time, the include
      * file contains the declaration of the automatism.
      */
-    AutomatismMetadata & SetIncludeFile(const std::string & includeFile);
+    AutomatismMetadata & SetIncludeFile(const gd::String & includeFile);
 
     /**
      * \brief Add a file to the already existing include files.
      */
-    AutomatismMetadata & AddIncludeFile(const std::string & includeFile);
+    AutomatismMetadata & AddIncludeFile(const gd::String & includeFile);
 
 #if defined(GD_IDE_ONLY)
-    const std::string & GetFullName() const { return fullname; }
-    const std::string & GetDefaultName() const { return defaultName; }
-    const std::string & GetDescription() const  { return description; }
-    const std::string & GetGroup() const  { return group; }
-    const std::string & GetIconFilename() const { return iconFilename; }
+    const gd::String & GetFullName() const { return fullname; }
+    const gd::String & GetDefaultName() const { return defaultName; }
+    const gd::String & GetDescription() const  { return description; }
+    const gd::String & GetGroup() const  { return group; }
+    const gd::String & GetIconFilename() const { return iconFilename; }
 #if !defined(GD_NO_WX_GUI)
     const wxBitmap & GetBitmapIcon() const { return icon; }
 #endif
@@ -116,22 +116,22 @@ public:
     std::shared_ptr<gd::AutomatismsSharedData> GetSharedDataInstance() const { return sharedDatasInstance; }
 
 #if defined(GD_IDE_ONLY)
-    std::map<std::string, gd::InstructionMetadata > conditionsInfos;
-    std::map<std::string, gd::InstructionMetadata > actionsInfos;
-    std::map<std::string, gd::ExpressionMetadata > expressionsInfos;
-    std::map<std::string, gd::ExpressionMetadata > strExpressionsInfos;
+    std::map<gd::String, gd::InstructionMetadata > conditionsInfos;
+    std::map<gd::String, gd::InstructionMetadata > actionsInfos;
+    std::map<gd::String, gd::ExpressionMetadata > expressionsInfos;
+    std::map<gd::String, gd::ExpressionMetadata > strExpressionsInfos;
 
-    std::vector<std::string> includeFiles;
-    std::string className;
+    std::vector<gd::String> includeFiles;
+    gd::String className;
 #endif
 private:
-    std::string extensionNamespace;
+    gd::String extensionNamespace;
 #if defined(GD_IDE_ONLY)
-    std::string fullname;
-    std::string defaultName;
-    std::string description;
-    std::string group;
-    std::string iconFilename;
+    gd::String fullname;
+    gd::String defaultName;
+    gd::String description;
+    gd::String group;
+    gd::String iconFilename;
 #if !defined(GD_NO_WX_GUI)
     wxBitmap icon;
 #endif

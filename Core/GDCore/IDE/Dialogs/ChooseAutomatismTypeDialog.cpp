@@ -167,7 +167,7 @@ void ChooseAutomatismTypeDialog::RefreshList()
                                       project.GetUsedExtensions().end(),
                                       extensions[i]->GetName()) != project.GetUsedExtensions().end();
 
-	    vector<string> automatismsTypes = extensions[i]->GetAutomatismsTypes();
+	    std::vector<gd::String> automatismsTypes = extensions[i]->GetAutomatismsTypes();
 	    for(unsigned int j = 0;j<automatismsTypes.size();++j)
 	    {
 	        if ( !automatismsTypes[j].empty() )
@@ -221,7 +221,7 @@ void ChooseAutomatismTypeDialog::OnokBtClick(wxCommandEvent& event)
 
 	for (unsigned int i = 0;i<extensions.size();++i)
 	{
-	    vector<string> automatismsTypes = extensions[i]->GetAutomatismsTypes();
+	    std::vector<gd::String> automatismsTypes = extensions[i]->GetAutomatismsTypes();
 	    if ( find(automatismsTypes.begin(), automatismsTypes.end(), selectedAutomatismType) != automatismsTypes.end() )
         {
             extension = extensions[i]; break;
@@ -294,14 +294,14 @@ bool ChooseAutomatismTypeDialog::ChooseAndAddAutomatismToObject(wxWindow * paren
         std::vector < std::shared_ptr<gd::PlatformExtension> > extensions = project.GetCurrentPlatform().GetAllPlatformExtensions();
         for (unsigned int i = 0;i<extensions.size();++i)
         {
-            std::vector<std::string> automatismsTypes = extensions[i]->GetAutomatismsTypes();
+            std::vector<gd::String> automatismsTypes = extensions[i]->GetAutomatismsTypes();
             if ( find(automatismsTypes.begin(), automatismsTypes.end(), dialog.GetSelectedAutomatismType()) != automatismsTypes.end() )
                 extension = extensions[i];
         }
         gd::AutomatismMetadata metadata = extension->GetAutomatismMetadata(dialog.GetSelectedAutomatismType());
 
         //Add automatism to object
-        std::string autoName = metadata.GetDefaultName();
+        gd::String autoName = metadata.GetDefaultName();
         for (unsigned int j = 2;object->HasAutomatismNamed(autoName);++j)
             autoName = metadata.GetDefaultName()+gd::ToString(j);
 

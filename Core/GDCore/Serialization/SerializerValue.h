@@ -41,7 +41,7 @@ public:
 	/**
 	 * Set the value, its type being a gd::String.
 	 */
-	void SetUtf8String(const gd::String & val);
+	void SetString(const gd::String & val);
 
 	/**
 	 * Set the value, its type being an integer.
@@ -64,14 +64,9 @@ public:
 	bool GetBool() const;
 
 	/**
-	 * Get the value, its type being a string.
-	 */
-	std::string GetString() const;
-
-	/**
 	 * Get the value, its type being a gd::String.
 	 */
-	gd::String GetUtf8String() const;
+	gd::String GetString() const;
 
 	/**
 	 * Get the value, its type being an int.
@@ -92,10 +87,6 @@ public:
 	 */
 	bool IsString() const { return isString; }
 	/**
-	 * \brief Return true if the value is a gd::String.
-	 */
-	bool IsUtf8String() const { return isUtf8String; }
-	/**
 	 * \brief Return true if the value is an int.
 	 */
 	bool IsInt() const { return isInt; }
@@ -108,13 +99,11 @@ private:
 	bool isUnknown; ///< If true, the type is unknown but the value is stored as a string in stringValue member.
 	bool isBoolean;
 	bool isString;
-	bool isUtf8String;
 	bool isInt;
 	bool isDouble;
 
 	bool booleanValue;
-	std::string stringValue;
-	gd::String utf8StringValue;
+	gd::String stringValue;
 	int intValue;
 	double doubleValue;
 };

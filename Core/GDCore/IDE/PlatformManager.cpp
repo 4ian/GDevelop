@@ -31,7 +31,7 @@ bool PlatformManager::AddPlatform(std::shared_ptr<gd::Platform> newPlatform)
     return true;
 }
 
-gd::Platform* PlatformManager::GetPlatform(const std::string & platformName) const
+gd::Platform* PlatformManager::GetPlatform(const gd::String & platformName) const
 {
     for (unsigned int i = 0;i<platformsLoaded.size();++i)
     {

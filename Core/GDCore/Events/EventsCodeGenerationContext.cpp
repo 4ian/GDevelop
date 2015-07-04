@@ -20,9 +20,9 @@ void EventsCodeGenerationContext::InheritsFrom(const EventsCodeGenerationContext
 
     //Objects lists declared by parent became "already declared" in the child context.
     alreadyDeclaredObjectsLists = parent_.alreadyDeclaredObjectsLists;
-    for ( set<string>::iterator it = parent_.objectsListsToBeDeclared.begin() ; it != parent_.objectsListsToBeDeclared.end(); ++it )
+    for ( std::set<gd::String>::iterator it = parent_.objectsListsToBeDeclared.begin() ; it != parent_.objectsListsToBeDeclared.end(); ++it )
         alreadyDeclaredObjectsLists.insert(*it);
-    for ( set<string>::iterator it = parent_.emptyObjectsListsToBeDeclared.begin() ; it != parent_.emptyObjectsListsToBeDeclared.end(); ++it )
+    for ( std::set<gd::String>::iterator it = parent_.emptyObjectsListsToBeDeclared.begin() ; it != parent_.emptyObjectsListsToBeDeclared.end(); ++it )
         alreadyDeclaredObjectsLists.insert(*it);
 
     depthOfLastUse = parent_.depthOfLastUse;
@@ -35,14 +35,14 @@ void EventsCodeGenerationContext::InheritsFrom(const EventsCodeGenerationContext
     }
 }
 
-void EventsCodeGenerationContext::ObjectsListNeeded(const std::string & objectName)
+void EventsCodeGenerationContext::ObjectsListNeeded(const gd::String & objectName)
 {
     if ( emptyObjectsListsToBeDeclared.find(objectName) == emptyObjectsListsToBeDeclared.end() )
         objectsListsToBeDeclared.insert(objectName);
 
     depthOfLastUse[objectName] = GetContextDepth();
 }
-void EventsCodeGenerationContext::EmptyObjectsListNeeded(const std::string & objectName)
+void EventsCodeGenerationContext::EmptyObjectsListNeeded(const gd::String & objectName)
 {
     if ( objectsListsToBeDeclared.find(objectName) == objectsListsToBeDeclared.end() )
         emptyObjectsListsToBeDeclared.insert(objectName);
@@ -50,15 +50,15 @@ void EventsCodeGenerationContext::EmptyObjectsListNeeded(const std::string & obj
     depthOfLastUse[objectName] = GetContextDepth();
 }
 
-std::set<std::string> EventsCodeGenerationContext::GetAllObjectsToBeDeclared() const
+std::set<gd::String> EventsCodeGenerationContext::GetAllObjectsToBeDeclared() const
 {
-    std::set <std::string> allObjectListsToBeDeclared(objectsListsToBeDeclared.begin(), objectsListsToBeDeclared.end());
+    std::set <gd::String> allObjectListsToBeDeclared(objectsListsToBeDeclared.begin(), objectsListsToBeDeclared.end());
     allObjectListsToBeDeclared.insert(emptyObjectsListsToBeDeclared.begin(), emptyObjectsListsToBeDeclared.end());
 
     return allObjectListsToBeDeclared;
 }
 
-unsigned int EventsCodeGenerationContext::GetLastDepthObjectListWasNeeded(const std::string & name) const
+unsigned int EventsCodeGenerationContext::GetLastDepthObjectListWasNeeded(const gd::String & name) const
 {
     if ( depthOfLastUse.count(name) != 0 )
         return depthOfLastUse.find(name)->second;

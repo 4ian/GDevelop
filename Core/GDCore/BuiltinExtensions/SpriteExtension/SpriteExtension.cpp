@@ -15,14 +15,14 @@ namespace gd
 void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::PlatformExtension & extension)
 {
     extension.SetExtensionInformation("Sprite",
-                          GD_T("Sprite"),
-                          GD_T("Extension for adding animated objects in the scene, which can contain animations with directions within each."),
+                          _("Sprite"),
+                          _("Extension for adding animated objects in the scene, which can contain animations with directions within each."),
                           "Florian Rival",
                           "Open source (MIT License)");
 
     gd::ObjectMetadata & obj = extension.AddObject("Sprite",
-               GD_T("Sprite"),
-               GD_T("Animated object which can be used for most elements of a game"),
+               _("Sprite"),
+               _("Animated object which can be used for most elements of a game"),
                "CppPlatform/Extensions/spriteicon.png",
                &CreateSpriteObject);
 
@@ -30,42 +30,42 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
     obj.AddAction("Opacity",
                    _("Change object's opacity"),
                    _("Change the opacity of an object."),
-                   GD_T("Do _PARAM1__PARAM2_ to the opacity of _PARAM0_"),
+                   _("Do _PARAM1__PARAM2_ to the opacity of _PARAM0_"),
                    _("Visibility"),
                    "res/actions/opacity24.png",
                    "res/actions/opacity.png")
 
-        .AddParameter("object", GD_T("Object"), "Sprite", false)
-        .AddParameter("operator", GD_T("Modification's sign"), "",false)
-        .AddParameter("expression", GD_T("Value"), "",false)
+        .AddParameter("object", _("Object"), "Sprite", false)
+        .AddParameter("operator", _("Modification's sign"), "",false)
+        .AddParameter("expression", _("Value"), "",false)
         .MarkAsSimple()
         .SetManipulatedType("number");
 
     obj.AddAction("ChangeAnimation",
                    _("Change the animation"),
                    _("Modify the current animation of the object."),
-                   GD_T("Do _PARAM1__PARAM2_ to the number of current animation of _PARAM0_"),
+                   _("Do _PARAM1__PARAM2_ to the number of current animation of _PARAM0_"),
                    _("Animations and images"),
                    "res/actions/animation24.png",
                    "res/actions/animation.png")
 
-        .AddParameter("object", GD_T("Object"), "Sprite", false)
-        .AddParameter("operator", GD_T("Modification's sign"), "",false)
-        .AddParameter("expression", GD_T("Value"), "",false)
+        .AddParameter("object", _("Object"), "Sprite", false)
+        .AddParameter("operator", _("Modification's sign"), "",false)
+        .AddParameter("expression", _("Value"), "",false)
         .MarkAsSimple()
         .SetManipulatedType("number");
 
     obj.AddAction("ChangeDirection",
                    _("Change the direction"),
                    _("Change the direction of the object.\nIf the object is set to automatically rotate, the direction is its angle.\nIf the object is in 8 directions mode, the valid directions are 0..7"),
-                   GD_T("Do _PARAM1__PARAM2_ to the direction of _PARAM0_"),
+                   _("Do _PARAM1__PARAM2_ to the direction of _PARAM0_"),
                    _("Direction"),
                    "res/actions/direction24.png",
                    "res/actions/direction.png")
 
-        .AddParameter("object", GD_T("Object"), "Sprite", false)
-        .AddParameter("operator", GD_T("Modification's sign"), "",false)
-        .AddParameter("expression", GD_T("Value"), "",false)
+        .AddParameter("object", _("Object"), "Sprite", false)
+        .AddParameter("operator", _("Modification's sign"), "",false)
+        .AddParameter("expression", _("Value"), "",false)
         .MarkAsAdvanced()
         .SetManipulatedType("number");
 
@@ -73,66 +73,66 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
     obj.AddAction("ChangeSprite",
                    _("Current frame"),
                    _("Modify the current frame of the object"),
-                   GD_T("Do _PARAM1__PARAM2_ to animation frame of _PARAM0_"),
+                   _("Do _PARAM1__PARAM2_ to animation frame of _PARAM0_"),
                    _("Animations and images"),
                    "res/actions/sprite24.png",
                    "res/actions/sprite.png")
 
-        .AddParameter("object", GD_T("Object"), "Sprite", false)
-        .AddParameter("operator", GD_T("Modification's sign"), "",false)
-        .AddParameter("expression", GD_T("Value"), "",false)
+        .AddParameter("object", _("Object"), "Sprite", false)
+        .AddParameter("operator", _("Modification's sign"), "",false)
+        .AddParameter("expression", _("Value"), "",false)
         .MarkAsAdvanced()
         .SetManipulatedType("number");
 
     obj.AddAction("PauseAnimation",
                    _("Pause the animation"),
                    _("Pause the current animation of the object"),
-                   GD_T("Pause the current animation of _PARAM0_"),
+                   _("Pause the current animation of _PARAM0_"),
                    _("Animations and images"),
                    "res/actions/animation24.png",
                    "res/actions/animation.png")
 
-        .AddParameter("object", GD_T("Object"), "Sprite", false)
+        .AddParameter("object", _("Object"), "Sprite", false)
         .MarkAsSimple();
 
 
     obj.AddAction("PlayAnimation",
                    _("Play the animation"),
                    _("Play the current animation of the object"),
-                   GD_T("Play the current animation of _PARAM0_"),
+                   _("Play the current animation of _PARAM0_"),
                    _("Animations and images"),
                    "res/actions/animation24.png",
                    "res/actions/animation.png")
 
-        .AddParameter("object", GD_T("Object"), "Sprite", false)
+        .AddParameter("object", _("Object"), "Sprite", false)
         .MarkAsSimple();
 
     obj.AddAction("ChangeAnimationSpeedScale",
                    _("Animation speed scale"),
                    _("Modify the animation speed scale (1 = the default speed, >1 = faster and <1 = slower)."),
-                   GD_T("Do _PARAM1__PARAM2_ to the animation speed scale of _PARAM0_"),
+                   _("Do _PARAM1__PARAM2_ to the animation speed scale of _PARAM0_"),
                    _("Animations and images"),
                    "res/actions/animation24.png",
                    "res/actions/animation.png")
 
-        .AddParameter("object", GD_T("Object"), "Sprite", false)
-        .AddParameter("operator", GD_T("Modification's sign"), "",false)
-        .AddParameter("expression", GD_T("Value"), "",false)
+        .AddParameter("object", _("Object"), "Sprite", false)
+        .AddParameter("operator", _("Modification's sign"), "",false)
+        .AddParameter("expression", _("Value"), "",false)
         .MarkAsSimple()
         .SetManipulatedType("number");
 
     obj.AddAction("TourneVersPos",
                    _("Rotate an object toward a position"),
                    _("Rotate an object towards a position."),
-                   GD_T("Rotate _PARAM0_ towards _PARAM1_;_PARAM2_"),
+                   _("Rotate _PARAM0_ towards _PARAM1_;_PARAM2_"),
                    _("Direction"),
                    "res/actions/direction24.png",
                    "res/actions/direction.png")
 
-        .AddParameter("object", GD_T("Object to be rotated"), "Sprite", false)
-        .AddParameter("expression", GD_T("X position"), "",false)
-        .AddParameter("expression", GD_T("Y position"), "",false)
-        .AddParameter("expression", GD_T("Angular speed (degrees per second)"), "",false).SetDefaultValue("0")
+        .AddParameter("object", _("Object to be rotated"), "Sprite", false)
+        .AddParameter("expression", _("X position"), "",false)
+        .AddParameter("expression", _("Y position"), "",false)
+        .AddParameter("expression", _("Angular speed (degrees per second)"), "",false).SetDefaultValue("0")
         .AddCodeOnlyParameter("currentScene", "")
         .SetHidden(); //Deprecated
 
@@ -140,28 +140,28 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
     obj.AddAction("ChangeScale",
                    _("Scale"),
                    _("Modify the scale of the specified object."),
-                   GD_T("Do _PARAM1__PARAM2_ to the scale of _PARAM0_"),
+                   _("Do _PARAM1__PARAM2_ to the scale of _PARAM0_"),
                    _("Size"),
                    "res/actions/scale24.png",
                    "res/actions/scale.png")
 
-        .AddParameter("object", GD_T("Object"), "Sprite", false)
-        .AddParameter("operator", GD_T("Modification's sign"), "",false)
-        .AddParameter("expression", GD_T("Value"), "",false)
+        .AddParameter("object", _("Object"), "Sprite", false)
+        .AddParameter("operator", _("Modification's sign"), "",false)
+        .AddParameter("expression", _("Value"), "",false)
         .MarkAsAdvanced();
 
 
     obj.AddAction("ChangeScaleWidth",
                    _("Scale on X axis"),
                    _("Modify the scale of the width of an object."),
-                   GD_T("Do _PARAM1__PARAM2_ to the width's scale of _PARAM0_"),
+                   _("Do _PARAM1__PARAM2_ to the width's scale of _PARAM0_"),
                    _("Size"),
                    "res/actions/scale24.png",
                    "res/actions/scale.png")
 
-        .AddParameter("object", GD_T("Object"), "Sprite", false)
-        .AddParameter("operator", GD_T("Modification's sign"), "",false)
-        .AddParameter("expression", GD_T("Value"), "",false)
+        .AddParameter("object", _("Object"), "Sprite", false)
+        .AddParameter("operator", _("Modification's sign"), "",false)
+        .AddParameter("expression", _("Value"), "",false)
         .MarkAsAdvanced()
         .SetManipulatedType("number");
 
@@ -169,14 +169,14 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
     obj.AddAction("ChangeScaleHeight",
                    _("Scale on Y axis"),
                    _("Modify the scale of the height of an object."),
-                   GD_T("Do _PARAM1__PARAM2_ to the height's scale of _PARAM0_"),
+                   _("Do _PARAM1__PARAM2_ to the height's scale of _PARAM0_"),
                    _("Size"),
                    "res/actions/scale24.png",
                    "res/actions/scale.png")
 
-        .AddParameter("object", GD_T("Object"), "Sprite", false)
-        .AddParameter("operator", GD_T("Modification's sign"), "",false)
-        .AddParameter("expression", GD_T("Value"), "",false)
+        .AddParameter("object", _("Object"), "Sprite", false)
+        .AddParameter("operator", _("Modification's sign"), "",false)
+        .AddParameter("expression", _("Value"), "",false)
         .MarkAsAdvanced()
         .SetManipulatedType("number");
 
@@ -184,287 +184,287 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
     obj.AddCondition("Animation",
                    _("Current animation"),
                    _("Test the number of the current animation of the object."),
-                   GD_T("The number of the current animation of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("The number of the current animation of _PARAM0_ is _PARAM1__PARAM2_"),
                    _("Animations and images"),
                    "res/conditions/animation24.png",
                    "res/conditions/animation.png")
 
-        .AddParameter("object", GD_T("Object"), "Sprite", false)
-        .AddParameter("relationalOperator", GD_T("Sign of the test"), "",false)
-        .AddParameter("expression", GD_T("Number to test"), "",false)
+        .AddParameter("object", _("Object"), "Sprite", false)
+        .AddParameter("relationalOperator", _("Sign of the test"), "",false)
+        .AddParameter("expression", _("Number to test"), "",false)
         .MarkAsAdvanced()
         .SetManipulatedType("number");
 
     obj.AddCondition("Direction",
                    _("Current direction"),
                    _("Compare the direction of the object. If 8 direction mode is activated for the sprite, the value taken for direction will be from 0 to 7. Otherwise, the direction is in degrees."),
-                   GD_T("Direction of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("Direction of _PARAM0_ is _PARAM1__PARAM2_"),
                    _("Direction"),
                    "res/conditions/direction24.png",
                    "res/conditions/direction.png")
 
-        .AddParameter("object", GD_T("Object"), "Sprite", false)
-        .AddParameter("relationalOperator", GD_T("Sign of the test"), "",false)
-        .AddParameter("expression", GD_T("Direction to test"), "",false)
+        .AddParameter("object", _("Object"), "Sprite", false)
+        .AddParameter("relationalOperator", _("Sign of the test"), "",false)
+        .AddParameter("expression", _("Direction to test"), "",false)
         .SetManipulatedType("number");
 
     obj.AddCondition("Sprite",
                    _("Current frame"),
                    _("Test the number of the current animation frame."),
-                   GD_T("The animation frame of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("The animation frame of _PARAM0_ is _PARAM1__PARAM2_"),
                    _("Animations and images"),
                    "res/conditions/sprite24.png",
                    "res/conditions/sprite.png")
 
-        .AddParameter("object", GD_T("Object"), "Sprite", false)
-        .AddParameter("relationalOperator", GD_T("Sign of the test"), "",false)
-        .AddParameter("expression", GD_T("Animation frame to test"), "",false)
+        .AddParameter("object", _("Object"), "Sprite", false)
+        .AddParameter("relationalOperator", _("Sign of the test"), "",false)
+        .AddParameter("expression", _("Animation frame to test"), "",false)
         .MarkAsAdvanced()
         .SetManipulatedType("number");
 
     obj.AddCondition("AnimStopped",
                    _("Animation paused"),
                    _("Test if the animation of an object is paused"),
-                   GD_T("The animation of _PARAM0_ is paused"),
+                   _("The animation of _PARAM0_ is paused"),
                    _("Animations and images"),
                    "res/conditions/animation24.png",
                    "res/conditions/animation.png")
 
-        .AddParameter("object", GD_T("Object"), "Sprite", false)
+        .AddParameter("object", _("Object"), "Sprite", false)
         .MarkAsSimple();
 
     obj.AddCondition("AnimationEnded",
                    _("Animation finished"),
                    _("Check if the animation being played by the Sprite object is finished."),
-                   GD_T("The animation of _PARAM0_ is finished"),
+                   _("The animation of _PARAM0_ is finished"),
                    _("Animations and images"),
                    "res/conditions/animation24.png",
                    "res/conditions/animation.png")
 
-        .AddParameter("object", GD_T("Object"), "Sprite", false)
+        .AddParameter("object", _("Object"), "Sprite", false)
         .MarkAsSimple();
 
     obj.AddCondition("ScaleWidth",
                    _("Scale on X axis"),
                    _("Compare the scale of the width of an object."),
-                   GD_T("The width's scale of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("The width's scale of _PARAM0_ is _PARAM1__PARAM2_"),
                    _("Size"),
                    "res/conditions/scaleWidth24.png",
                    "res/conditions/scaleWidth.png")
 
-        .AddParameter("object", GD_T("Object"), "Sprite", false)
-        .AddParameter("relationalOperator", GD_T("Sign of the test"), "",false)
-        .AddParameter("expression", GD_T("Value to test"), "",false)
+        .AddParameter("object", _("Object"), "Sprite", false)
+        .AddParameter("relationalOperator", _("Sign of the test"), "",false)
+        .AddParameter("expression", _("Value to test"), "",false)
         .MarkAsAdvanced()
         .SetManipulatedType("number");
 
     obj.AddCondition("ScaleHeight",
                    _("Scale on Y axis"),
                    _("Compare the scale of the height of an object."),
-                   GD_T("The height's scale of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("The height's scale of _PARAM0_ is _PARAM1__PARAM2_"),
                    _("Size"),
                    "res/conditions/scaleHeight24.png",
                    "res/conditions/scaleHeight.png")
 
-        .AddParameter("object", GD_T("Object"), "Sprite", false)
-        .AddParameter("relationalOperator", GD_T("Sign of the test"), "",false)
-        .AddParameter("expression", GD_T("Value to test"), "",false)
+        .AddParameter("object", _("Object"), "Sprite", false)
+        .AddParameter("relationalOperator", _("Sign of the test"), "",false)
+        .AddParameter("expression", _("Value to test"), "",false)
         .MarkAsAdvanced()
         .SetManipulatedType("number");
 
     obj.AddCondition("Opacity",
                    _("Opacity"),
                    _("Compare the opacity of an object, between 0 (fully transparent) to 255 (opaque)"),
-                   GD_T("The opacity of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("The opacity of _PARAM0_ is _PARAM1__PARAM2_"),
                    _("Visibility"),
                    "res/conditions/opacity24.png",
                    "res/conditions/opacity.png")
 
-        .AddParameter("object", GD_T("Object"), "Sprite", false)
-        .AddParameter("relationalOperator", GD_T("Sign of the test"), "",false)
-        .AddParameter("expression", GD_T("Value to test"), "",false)
+        .AddParameter("object", _("Object"), "Sprite", false)
+        .AddParameter("relationalOperator", _("Sign of the test"), "",false)
+        .AddParameter("expression", _("Value to test"), "",false)
         .MarkAsSimple()
         .SetManipulatedType("number");
 
     obj.AddCondition("BlendMode",
                    _("Blend mode"),
                    _("Compare the number of the blend mode currently used by an object"),
-                   GD_T("The number of the current blend mode of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("The number of the current blend mode of _PARAM0_ is _PARAM1__PARAM2_"),
                    _("Effects"),
                    "res/conditions/opacity24.png",
                    "res/conditions/opacity.png")
 
-        .AddParameter("object", GD_T("Object"), "Sprite", false)
-        .AddParameter("relationalOperator", GD_T("Sign of the test"), "",false)
-        .AddParameter("expression", GD_T("Value to test  ( 0 : Alpha, 1 : Add, 2 : Multiply, 3 : None )"), "",false)
+        .AddParameter("object", _("Object"), "Sprite", false)
+        .AddParameter("relationalOperator", _("Sign of the test"), "",false)
+        .AddParameter("expression", _("Value to test  ( 0 : Alpha, 1 : Add, 2 : Multiply, 3 : None )"), "",false)
         .MarkAsAdvanced()
         .SetManipulatedType("number");
 
     obj.AddAction("CopyImageOnImageOfSprite",
                    _("Copy an image on the current one of an object"),
                    _("Copy an image on the current image of an object.\nNote that the source image must be preferably kept loaded in memory."),
-                   GD_T("Copy image _PARAM2_ on the current of _PARAM0_ at _PARAM3_;_PARAM4_"),
+                   _("Copy image _PARAM2_ on the current of _PARAM0_ at _PARAM3_;_PARAM4_"),
                    _("Effects"),
                    "res/copy24.png",
                    "res/copyicon.png")
 
-        .AddParameter("object", GD_T("Object"), "Sprite", false)
+        .AddParameter("object", _("Object"), "Sprite", false)
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("string", GD_T("Name of the source image"), "",false).CantUseUtf8()
-        .AddParameter("expression", GD_T("X position"), "",false)
-        .AddParameter("expression", GD_T("Y position"), "",false)
-        .AddParameter("yesorno", GD_T("Should the copy take in account the source transparency\?"), "",false);
+        .AddParameter("string", _("Name of the source image"), "",false).CantUseUtf8()
+        .AddParameter("expression", _("X position"), "",false)
+        .AddParameter("expression", _("Y position"), "",false)
+        .AddParameter("yesorno", _("Should the copy take in account the source transparency\?"), "",false);
 
     obj.AddAction("CreateMaskFromColorOnActualImage", //Actual is indeed a mistake : Current should have been chosen.
                    _("Make a color of the image of an object transparent"),
                    _("Make a color of the image of an object transparent."),
-                   GD_T("Make color _PARAM1_ of the current image of _PARAM0_ transparent"),
+                   _("Make color _PARAM1_ of the current image of _PARAM0_ transparent"),
                    _("Effects"),
                    "res/actions/opacity24.png",
                    "res/actions/opacity.png")
 
-        .AddParameter("object", GD_T("Object"), "Sprite", false)
-        .AddParameter("color", GD_T("Color to make transparent"), "",false);
+        .AddParameter("object", _("Object"), "Sprite", false)
+        .AddParameter("color", _("Color to make transparent"), "",false);
 
 
     obj.AddAction("ChangeColor",
                    _("Global color"),
                    _("Change the global color of an object. The default color is white."),
-                   GD_T("Change color of _PARAM0_ to _PARAM1_"),
+                   _("Change color of _PARAM0_ to _PARAM1_"),
                    _("Effects"),
                    "res/actions/color24.png",
                    "res/actions/color.png")
 
-        .AddParameter("object", GD_T("Object"), "Sprite", false)
-        .AddParameter("color", GD_T("Color"), "",false);
+        .AddParameter("object", _("Object"), "Sprite", false)
+        .AddParameter("color", _("Color"), "",false);
 
 
     obj.AddAction("ChangeBlendMode",
                    _("Blend mode"),
                    _("Change the number of the blend mode of an object.\nThe default blend mode is 0 (Alpha)."),
-                   GD_T("Change Blend mode of _PARAM0_ to _PARAM1_"),
+                   _("Change Blend mode of _PARAM0_ to _PARAM1_"),
                    _("Effects"),
                    "res/actions/color24.png",
                    "res/actions/color.png")
 
-        .AddParameter("object", GD_T("Object"), "Sprite", false)
-        .AddParameter("expression", GD_T("Mode (0 : Alpha, 1 : Add, 2 : Multiply, 3 : None)"), "",false)
+        .AddParameter("object", _("Object"), "Sprite", false)
+        .AddParameter("expression", _("Mode (0 : Alpha, 1 : Add, 2 : Multiply, 3 : None)"), "",false)
         .MarkAsSimple();
 
 
     obj.AddAction("FlipX",
                    _("Flip the object horizontally"),
                    _("Flip the object horizontally"),
-                   GD_T("Flip horizontally _PARAM0_ : _PARAM1_"),
+                   _("Flip horizontally _PARAM0_ : _PARAM1_"),
                    _("Effects"),
                    "res/actions/flipX24.png",
                    "res/actions/flipX.png")
 
-        .AddParameter("object", GD_T("Object"), "Sprite", false)
-        .AddParameter("yesorno", GD_T("Activate flipping"), "",false)
+        .AddParameter("object", _("Object"), "Sprite", false)
+        .AddParameter("yesorno", _("Activate flipping"), "",false)
         .MarkAsSimple();
 
 
     obj.AddAction("FlipY",
                    _("Flip the object vertically"),
                    _("Flip the object vertically"),
-                   GD_T("Flip vertically _PARAM0_ : _PARAM1_"),
+                   _("Flip vertically _PARAM0_ : _PARAM1_"),
                    _("Effects"),
                    "res/actions/flipY24.png",
                    "res/actions/flipY.png")
 
-        .AddParameter("object", GD_T("Object"), "Sprite", false)
-        .AddParameter("yesorno", GD_T("Activate flipping"), "",false)
+        .AddParameter("object", _("Object"), "Sprite", false)
+        .AddParameter("yesorno", _("Activate flipping"), "",false)
         .MarkAsSimple();
 
     obj.AddCondition("FlippedX",
                    _("Horizontally flipped"),
                    _("Return true if the object is horizontally flipped"),
-                   GD_T("_PARAM0_ is horizontally flipped"),
+                   _("_PARAM0_ is horizontally flipped"),
                    _("Effects"),
                    "res/actions/flipX24.png",
                    "res/actions/flipX.png")
 
-        .AddParameter("object", GD_T("Object"), "Sprite", false);
+        .AddParameter("object", _("Object"), "Sprite", false);
 
     obj.AddCondition("FlippedY",
                    _("Vertically flipped"),
                    _("Return true if the object is vertically flipped"),
-                   GD_T("_PARAM0_ is vertically flipped"),
+                   _("_PARAM0_ is vertically flipped"),
                    _("Effects"),
                    "res/actions/flipY24.png",
                    "res/actions/flipY.png")
 
-        .AddParameter("object", GD_T("Object"), "Sprite", false);
+        .AddParameter("object", _("Object"), "Sprite", false);
 
     obj.AddAction("TourneVers",
                    _("Rotate an object toward another"),
                    _("Rotate an object towards another."),
-                   GD_T("Rotate _PARAM0_ towards _PARAM1_"),
+                   _("Rotate _PARAM0_ towards _PARAM1_"),
                    _("Direction"),
                    "res/actions/direction24.png",
                    "res/actions/direction.png")
 
-        .AddParameter("object", GD_T("Object to be rotated"), "Sprite", false)
-        .AddParameter("objectPtr", GD_T("Rotate toward this object"))
+        .AddParameter("object", _("Object to be rotated"), "Sprite", false)
+        .AddParameter("objectPtr", _("Rotate toward this object"))
         .AddCodeOnlyParameter("currentScene", "")
         .SetHidden(); //Deprecated
 
-    obj.AddExpression("X", GD_T("X position of a point"), GD_T("X position of a point"), GD_T("Position"), "res/actions/position.png")
+    obj.AddExpression("X", _("X position of a point"), _("X position of a point"), _("Position"), "res/actions/position.png")
         .SetHidden()
-        .AddParameter("object", GD_T("Object"), "Sprite", false)
-        .AddParameter("", GD_T("Name of the point"), "", true);
+        .AddParameter("object", _("Object"), "Sprite", false)
+        .AddParameter("", _("Name of the point"), "", true);
 
-    obj.AddExpression("Y", GD_T("Y position of a point"), GD_T("Y position of a point"), GD_T("Position"), "res/actions/position.png")
+    obj.AddExpression("Y", _("Y position of a point"), _("Y position of a point"), _("Position"), "res/actions/position.png")
         .SetHidden()
-        .AddParameter("object", GD_T("Object"), "Sprite", false)
-        .AddParameter("", GD_T("Name of the point"), "", true);
+        .AddParameter("object", _("Object"), "Sprite", false)
+        .AddParameter("", _("Name of the point"), "", true);
 
-    obj.AddExpression("PointX", GD_T("X position of a point"), GD_T("X position of a point"), GD_T("Position"), "res/actions/position.png")
+    obj.AddExpression("PointX", _("X position of a point"), _("X position of a point"), _("Position"), "res/actions/position.png")
 
-        .AddParameter("object", GD_T("Object"), "Sprite", false)
-        .AddParameter("", GD_T("Name of the point"), "",false);
+        .AddParameter("object", _("Object"), "Sprite", false)
+        .AddParameter("", _("Name of the point"), "",false);
 
-    obj.AddExpression("PointY", GD_T("Y position of a point"), GD_T("Y position of a point"), GD_T("Position"), "res/actions/position.png")
+    obj.AddExpression("PointY", _("Y position of a point"), _("Y position of a point"), _("Position"), "res/actions/position.png")
 
-        .AddParameter("object", GD_T("Object"), "Sprite", false)
-        .AddParameter("", GD_T("Name of the point"), "",false);
+        .AddParameter("object", _("Object"), "Sprite", false)
+        .AddParameter("", _("Name of the point"), "",false);
 
-    obj.AddExpression("Direc", GD_T("Direction"), GD_T("Direction of the object"), GD_T("Direction"), "res/actions/direction.png")
+    obj.AddExpression("Direc", _("Direction"), _("Direction of the object"), _("Direction"), "res/actions/direction.png")
         .SetHidden()
-        .AddParameter("object", GD_T("Object"), "Sprite", false);
+        .AddParameter("object", _("Object"), "Sprite", false);
 
-    obj.AddExpression("Direction", GD_T("Direction"), GD_T("Direction of the object"), GD_T("Direction"), "res/actions/direction.png")
-        .AddParameter("object", GD_T("Object"), "Sprite", false);
+    obj.AddExpression("Direction", _("Direction"), _("Direction of the object"), _("Direction"), "res/actions/direction.png")
+        .AddParameter("object", _("Object"), "Sprite", false);
 
-    obj.AddExpression("Anim", GD_T("Animation"), GD_T("Animation of the object"), GD_T("Animations and images"), "res/actions/animation.png")
+    obj.AddExpression("Anim", _("Animation"), _("Animation of the object"), _("Animations and images"), "res/actions/animation.png")
         .SetHidden()
-        .AddParameter("object", GD_T("Object"), "Sprite", false);
+        .AddParameter("object", _("Object"), "Sprite", false);
 
-    obj.AddExpression("Animation", GD_T("Animation"), GD_T("Animation of the object"), GD_T("Animations and images"), "res/actions/animation.png")
-        .AddParameter("object", GD_T("Object"), "Sprite", false);
+    obj.AddExpression("Animation", _("Animation"), _("Animation of the object"), _("Animations and images"), "res/actions/animation.png")
+        .AddParameter("object", _("Object"), "Sprite", false);
 
-    obj.AddExpression("Sprite", GD_T("Image"), GD_T("Animation frame of the object"), GD_T("Animations and images"), "res/actions/sprite.png")
-        .AddParameter("object", GD_T("Object"), "Sprite", false);
+    obj.AddExpression("Sprite", _("Image"), _("Animation frame of the object"), _("Animations and images"), "res/actions/sprite.png")
+        .AddParameter("object", _("Object"), "Sprite", false);
 
-    obj.AddExpression("AnimationSpeedScale", GD_T("Animation speed scale"), GD_T("Animation speed scale"), GD_T("Animations and images"), "res/actions/animation.png")
-        .AddParameter("object", GD_T("Object"), "Sprite", false);
+    obj.AddExpression("AnimationSpeedScale", _("Animation speed scale"), _("Animation speed scale"), _("Animations and images"), "res/actions/animation.png")
+        .AddParameter("object", _("Object"), "Sprite", false);
 
-    obj.AddExpression("ScaleX", GD_T("Scale of the width of an object"), GD_T("Scale of the width of an object"), GD_T("Size"), "res/actions/scaleWidth.png")
-        .AddParameter("object", GD_T("Object"), "Sprite", false);
+    obj.AddExpression("ScaleX", _("Scale of the width of an object"), _("Scale of the width of an object"), _("Size"), "res/actions/scaleWidth.png")
+        .AddParameter("object", _("Object"), "Sprite", false);
 
-    obj.AddExpression("ScaleY", GD_T("Scale of the height of an object"), GD_T("Scale of the height of an object"), GD_T("Size"), "res/actions/scaleHeight.png")
-        .AddParameter("object", GD_T("Object"), "Sprite", false);
+    obj.AddExpression("ScaleY", _("Scale of the height of an object"), _("Scale of the height of an object"), _("Size"), "res/actions/scaleHeight.png")
+        .AddParameter("object", _("Object"), "Sprite", false);
 
     extension.AddCondition("Collision",
                       _("Collision (Pixel perfect)"),
                       _("The condition is true if there is a collision between the two objects.\nThe test is pixel-perfect."),
-                      GD_T("_PARAM0_ is in collision with _PARAM1_ (pixel perfect)"),
+                      _("_PARAM0_ is in collision with _PARAM1_ (pixel perfect)"),
                       _("Collision"),
                       "res/conditions/collision24.png",
                       "res/conditions/collision.png")
-        .AddParameter("objectList", GD_T("Object 1"), "Sprite", false)
-        .AddParameter("objectList", GD_T("Object 2"), "Sprite", false)
+        .AddParameter("objectList", _("Object 1"), "Sprite", false)
+        .AddParameter("objectList", _("Object 2"), "Sprite", false)
         .AddCodeOnlyParameter("conditionInverted", "");
     #endif
 }

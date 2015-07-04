@@ -7,7 +7,7 @@
 #ifndef ARBITRARYRESOURCEWORKER_H
 #define ARBITRARYRESOURCEWORKER_H
 
-#include <string>
+#include <GDCore/Utf8String.h>
 #include <vector>
 #include <map>
 #include <memory>
@@ -37,9 +37,9 @@ public:
     ArbitraryResourceWorker() {};
     virtual ~ArbitraryResourceWorker();
 
-    virtual void ExposeImage(std::string & imageName) = 0;
-    virtual void ExposeShader(std::string & shaderName) = 0;
-    virtual void ExposeFile(std::string & resourceFileName) = 0;
+    virtual void ExposeImage(gd::String & imageName) = 0;
+    virtual void ExposeShader(gd::String & shaderName) = 0;
+    virtual void ExposeFile(gd::String & resourceFileName) = 0;
     void ExposeResource(gd::Resource & resource);
 };
 

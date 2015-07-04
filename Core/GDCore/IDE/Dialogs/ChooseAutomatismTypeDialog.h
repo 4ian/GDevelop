@@ -43,7 +43,7 @@ public:
     /**
      * \brief Returns the selected automatism type.
      */
-    const std::string & GetSelectedAutomatismType() const { return selectedAutomatismType; }
+    const gd::String & GetSelectedAutomatismType() const { return selectedAutomatismType; }
 
     /**
      * \brief Display the dialog and add the selected automatism to the object.
@@ -91,7 +91,7 @@ private:
     void RefreshList();
 
     gd::Project & project;
-    std::string selectedAutomatismType;
+    gd::String selectedAutomatismType;
 
     DECLARE_EVENT_TABLE()
 };

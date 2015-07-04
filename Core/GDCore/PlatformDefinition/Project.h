@@ -6,7 +6,7 @@
 
 #ifndef GDCORE_PROJECT_H
 #define GDCORE_PROJECT_H
-#include <string>
+#include <GDCore/Utf8String.h>
 #include <vector>
 class wxPropertyGrid;
 class wxPropertyGridEvent;
@@ -56,45 +56,45 @@ public:
     /**
      * Change project name
      */
-    void SetName(const std::string & name_) { name = name_; };
+    void SetName(const gd::String & name_) { name = name_; };
 
     /**
      * Get project name
      */
-    const std::string & GetName() const {return name;}
+    const gd::String & GetName() const {return name;}
 
 #if defined(GD_IDE_ONLY)
     /**
      * Must change the name of the project with the name passed as parameter.
      */
-    void SetAuthor(const std::string & author_) { author = author_; };
+    void SetAuthor(const gd::String & author_) { author = author_; };
 
     /**
      * Return the name of the project.
      */
-    const std::string & GetAuthor() const {return author;}
+    const gd::String & GetAuthor() const {return author;}
 
     /**
      * Called when project file has changed.
      */
-    void SetProjectFile(const std::string & file) { gameFile = file; }
+    void SetProjectFile(const gd::String & file) { gameFile = file; }
 
     /**
      * Return project file
      * \see gd::Project::SetProjectFile
      */
-    const std::string & GetProjectFile() const { return gameFile; }
+    const gd::String & GetProjectFile() const { return gameFile; }
 
     /**
      * Called when project file has changed.
      */
-    void SetLastCompilationDirectory(const std::string & dir){ latestCompilationDirectory = dir; }
+    void SetLastCompilationDirectory(const gd::String & dir){ latestCompilationDirectory = dir; }
 
     /**
      * Return the latest directory used to compile the game
      * \see gd::Project::SetLastCompilationDirectory
      */
-    const std::string & GetLastCompilationDirectory() const {return latestCompilationDirectory;}
+    const gd::String & GetLastCompilationDirectory() const {return latestCompilationDirectory;}
 #endif
 
     /**
@@ -152,12 +152,12 @@ public:
     /**
      * Return a reference to the vector containing the names of extensions used by the project.
      */
-    const std::vector < std::string > & GetUsedExtensions() const { return extensionsUsed; };
+    const std::vector < gd::String > & GetUsedExtensions() const { return extensionsUsed; };
 
     /**
      * Return a reference to the vector containing the names of extensions used by the project.
      */
-    std::vector < std::string > & GetUsedExtensions() { return extensionsUsed; };
+    std::vector < gd::String > & GetUsedExtensions() { return extensionsUsed; };
 
     #if defined(GD_IDE_ONLY)
     /**
@@ -176,7 +176,7 @@ public:
      * \note The remove will fail if there is only one platform left.
      * \return true if the platform was removed, false otherwise.
      */
-    bool RemovePlatform(const std::string & platformName);
+    bool RemovePlatform(const gd::String & platformName);
 
     /**
      * \brief Return a reference to the platform being currently used to edit the project.
@@ -187,7 +187,7 @@ public:
      * \brief Set the platform to be used to edit the project.
      * \param platformName The name of the new current platform. If not found, the current platform won't be changed.
      */
-    void SetCurrentPlatform(const std::string & platformName);
+    void SetCurrentPlatform(const gd::String & platformName);
     #endif
 
     ///@}
@@ -208,7 +208,7 @@ public:
      * \param name The name of the object
      * \param platformName The name of the platform to be used. If empty, the first platform supporting the object is used.
      */
-    std::shared_ptr<gd::Object> CreateObject(const std::string & type, const std::string & name, const std::string & platformName = "");
+    std::shared_ptr<gd::Object> CreateObject(const gd::String & type, const gd::String & name, const gd::String & platformName = "");
 
     /**
      * Create an automatism of the given type.
@@ -221,7 +221,7 @@ public:
      * \param type The type of the automatism
      * \param platformName The name of the platform to be used. If empty, the first platform supporting the object is used.
      */
-    gd::Automatism* CreateAutomatism(const std::string & type, const std::string & platformName = "");
+    gd::Automatism* CreateAutomatism(const gd::String & type, const gd::String & platformName = "");
 
     /**
      * Create automatism shared data of the given type.
@@ -234,7 +234,7 @@ public:
      * \param type The type of automatism shared data
      * \param platformName The name of the platform to be used. If empty, the first platform supporting the object is used.
      */
-    std::shared_ptr<gd::AutomatismsSharedData> CreateAutomatismSharedDatas(const std::string & type, const std::string & platformName = "");
+    std::shared_ptr<gd::AutomatismsSharedData> CreateAutomatismSharedDatas(const gd::String & type, const gd::String & platformName = "");
 
 #if defined(GD_IDE_ONLY)
     /**
@@ -248,7 +248,7 @@ public:
      * \param type The type of the event
      * \param platformName The name of the platform to be used. If empty, the first platform supporting the object is used.
      */
-    std::shared_ptr<gd::BaseEvent> CreateEvent(const std::string & type, const std::string & platformName = "");
+    std::shared_ptr<gd::BaseEvent> CreateEvent(const gd::String & type, const gd::String & platformName = "");
     ///@}
 #endif
 
@@ -287,17 +287,17 @@ public:
     /**
      * \brief Return true if layout called "name" exists.
      */
-    bool HasLayoutNamed(const std::string & name) const;
+    bool HasLayoutNamed(const gd::String & name) const;
 
     /**
      * \brief Return a reference to the layout called "name".
      */
-    Layout & GetLayout(const std::string & name);
+    Layout & GetLayout(const gd::String & name);
 
     /**
      * \brief Return a reference to the layout called "name".
      */
-    const Layout & GetLayout(const std::string & name) const;
+    const Layout & GetLayout(const gd::String & name) const;
 
     /**
      * \brief Return a reference to the layout at position "index" in the layout list
@@ -312,7 +312,7 @@ public:
     /**
      * \brief Return the position of the layout called "name" in the layout list
      */
-    unsigned int GetLayoutPosition(const std::string & name) const;
+    unsigned int GetLayoutPosition(const gd::String & name) const;
 
     #if defined(GD_IDE_ONLY)
     /**
@@ -331,7 +331,7 @@ public:
     /**
      * \brief Must add a new empty layout called "name" at the specified position in the layout list.
      */
-    gd::Layout & InsertNewLayout(const std::string & name, unsigned int position);
+    gd::Layout & InsertNewLayout(const gd::String & name, unsigned int position);
 
     /**
      * \brief Must add a new layout constructed from the layout passed as parameter.
@@ -344,7 +344,7 @@ public:
     /**
      * Must delete layout named "name".
      */
-    void RemoveLayout(const std::string & name);
+    void RemoveLayout(const gd::String & name);
 
     ///@}
 
@@ -356,13 +356,13 @@ public:
     /**
      * \brief Load the project from a XML file.
      */
-    bool LoadFromFile(const std::string & filename);
+    bool LoadFromFile(const gd::String & filename);
 
     #if defined(GD_IDE_ONLY)
     /**
      * \brief Load the project from a JSON file.
      */
-    bool LoadFromJSONFile(const std::string & filename);
+    bool LoadFromJSONFile(const gd::String & filename);
     #endif
     #endif
 
@@ -378,14 +378,14 @@ public:
      *
      * "Dirty" flag is set to false when save is done.
      */
-    bool SaveToFile(const std::string & filename);
+    bool SaveToFile(const gd::String & filename);
 
     /**
      * \brief Save the project to a JSON file.
      *
      * "Dirty" flag is set to false when save is done.
      */
-    bool SaveToJSONFile(const std::string & filename);
+    bool SaveToJSONFile(const gd::String & filename);
     #endif
 
     /**
@@ -427,17 +427,17 @@ public:
     /**
      * Return true if external events called "name" exists.
      */
-    bool HasExternalEventsNamed(const std::string & name) const;
+    bool HasExternalEventsNamed(const gd::String & name) const;
 
     /**
      * Return a reference to the external events called "name".
      */
-    ExternalEvents & GetExternalEvents(const std::string & name);
+    ExternalEvents & GetExternalEvents(const gd::String & name);
 
     /**
      * Return a reference to the external events called "name".
      */
-    const ExternalEvents & GetExternalEvents(const std::string & name) const;
+    const ExternalEvents & GetExternalEvents(const gd::String & name) const;
 
     /**
      * Return a reference to the external events at position "index" in the external events list
@@ -452,7 +452,7 @@ public:
     /**
      * Return the position of the external events called "name" in the external events list
      */
-    unsigned int GetExternalEventsPosition(const std::string & name) const;
+    unsigned int GetExternalEventsPosition(const gd::String & name) const;
 
     /**
      * \brief Swap the specified external events.
@@ -469,7 +469,7 @@ public:
     /**
      * Must add a new empty external events sheet called "name" at the specified position in the layout list.
      */
-    ExternalEvents & InsertNewExternalEvents(const std::string & name, unsigned int position);
+    ExternalEvents & InsertNewExternalEvents(const gd::String & name, unsigned int position);
 
     /**
      * Must add a new external events sheet constructed from the layout passed as parameter.
@@ -482,7 +482,7 @@ public:
     /**
      * Must delete external events named "name".
      */
-    void RemoveExternalEvents(const std::string & name);
+    void RemoveExternalEvents(const gd::String & name);
     #endif
     ///@}
 
@@ -494,17 +494,17 @@ public:
     /**
      * Return true if external layout called "name" exists.
      */
-    bool HasExternalLayoutNamed(const std::string & name) const;
+    bool HasExternalLayoutNamed(const gd::String & name) const;
 
     /**
      * Return a reference to the external layout called "name".
      */
-    ExternalLayout & GetExternalLayout(const std::string & name);
+    ExternalLayout & GetExternalLayout(const gd::String & name);
 
     /**
      * Return a reference to the external layout called "name".
      */
-    const ExternalLayout & GetExternalLayout(const std::string & name) const;
+    const ExternalLayout & GetExternalLayout(const gd::String & name) const;
 
     /**
      * Return a reference to the external layout at position "index" in the external layout list
@@ -519,7 +519,7 @@ public:
     /**
      * Return the position of the external layout called "name" in the external layout list
      */
-    unsigned int GetExternalLayoutPosition(const std::string & name) const;
+    unsigned int GetExternalLayoutPosition(const gd::String & name) const;
 
     #if defined(GD_IDE_ONLY)
     /**
@@ -538,7 +538,7 @@ public:
     /**
      * Must add a new empty external layout called "name" at the specified position in the layout list.
      */
-    gd::ExternalLayout & InsertNewExternalLayout(const std::string & name, unsigned int position);
+    gd::ExternalLayout & InsertNewExternalLayout(const gd::String & name, unsigned int position);
 
     /**
      * Must add a new external layout constructed from the layout passed as parameter.
@@ -551,17 +551,17 @@ public:
     /**
      * Must delete external layout named "name".
      */
-    void RemoveExternalLayout(const std::string & name);
+    void RemoveExternalLayout(const gd::String & name);
 
     /**
      * Set the first layout of the project.
      */
-    void SetFirstLayout(const std::string & name ) { firstLayout = name; }
+    void SetFirstLayout(const gd::String & name ) { firstLayout = name; }
 
     /**
      * Get the first layout of the project.
      */
-    const std::string & GetFirstLayout() { return firstLayout; }
+    const gd::String & GetFirstLayout() { return firstLayout; }
 
     ///@}
 
@@ -651,14 +651,14 @@ public:
      * Default implementation check if objectName is only composed of a-z,A-Z,0-9 or _ characters an
      * if does not conflict with an expression.
      */
-    static bool ValidateObjectName(const std::string & objectName);
+    static bool ValidateObjectName(const gd::String & objectName);
 
     /**
      * Return a message that will be displayed when an invalid object name has been entered.
      *
      * \note This message will be displayed by the IDE into a tooltip.
      */
-    static std::string GetBadObjectNameWarning();
+    static gd::String GetBadObjectNameWarning();
 
     ///@}
 
@@ -683,37 +683,37 @@ public:
      * \param name The filename of the source file.
      * \param language Optional. If specified, check that the source file that exists is in this language.
      */
-    bool HasSourceFile(std::string name, std::string language = "") const;
+    bool HasSourceFile(gd::String name, gd::String language = "") const;
 
     /**
      * Return a reference to the external source file with the given name.
      */
-    SourceFile & GetSourceFile(const std::string & name);
+    SourceFile & GetSourceFile(const gd::String & name);
 
     /**
      * Return a reference to the external source file with the given name.
      */
-    const SourceFile & GetSourceFile(const std::string & name) const;
+    const SourceFile & GetSourceFile(const gd::String & name) const;
 
     /**
      * Remove the specified source file.
      */
-    void RemoveSourceFile(const std::string & name);
+    void RemoveSourceFile(const gd::String & name);
 
     /**
      * Add a new source file the specified position in the external source files list.
      */
-    gd::SourceFile & InsertNewSourceFile(const std::string & name, const std::string & language, unsigned int position = -1);
+    gd::SourceFile & InsertNewSourceFile(const gd::String & name, const gd::String & language, unsigned int position = -1);
     #endif
     ///@}
 
     //TODO: Put this in private part
     #if defined(GD_IDE_ONLY)
-    std::vector < std::string > imagesChanged; ///< Images that have been changed and which have to be reloaded
-    std::string winExecutableFilename; ///< Windows executable name
-    std::string winExecutableIconFile; ///< Icon for Windows executable
-    std::string linuxExecutableFilename;  ///< Linux executable name
-    std::string macExecutableFilename;  ///< Mac executable name
+    std::vector < gd::String > imagesChanged; ///< Images that have been changed and which have to be reloaded
+    gd::String winExecutableFilename; ///< Windows executable name
+    gd::String winExecutableIconFile; ///< Icon for Windows executable
+    gd::String linuxExecutableFilename;  ///< Linux executable name
+    gd::String macExecutableFilename;  ///< Mac executable name
     #endif
 
 private:
@@ -729,7 +729,7 @@ private:
      */
     void LoadProjectInformationFromXml(const TiXmlElement * elem);
 
-    std::string                                         name; ///< Game name
+    gd::String                                         name; ///< Game name
     unsigned int                                        windowWidth; ///< Window default width
     unsigned int                                        windowHeight; ///< Window default height
     int                                                 maxFPS; ///< Maximum Frame Per Seconds, -1 for unlimited
@@ -740,16 +740,16 @@ private:
     std::vector < std::shared_ptr<gd::ExternalLayout> >   externalLayouts; ///< List of all externals layouts
     gd::ResourcesManager                                resourcesManager; ///< Contains all resources used by the project
     std::shared_ptr<gd::ImageManager>                 imageManager;///< Image manager is accessed thanks to a (smart) ptr as it can be shared with GD C++ Platform projects.
-    std::vector < std::string >                         extensionsUsed; ///< List of extensions used
+    std::vector < gd::String >                         extensionsUsed; ///< List of extensions used
     std::vector < gd::Platform* >                       platforms; ///< Pointers to the platforms this project supports.
-    std::string                                         firstLayout;
+    gd::String                                         firstLayout;
     #if defined(GD_IDE_ONLY)
     bool                                                useExternalSourceFiles; ///< True if game used external source files.
     std::vector < std::shared_ptr<gd::SourceFile> >   externalSourceFiles; ///< List of external source files used.
     std::vector<ObjectGroup>                            objectGroups; ///< Global objects groups
-    std::string                                         author; ///< Game author name
-    std::string                                         gameFile; ///< File of the game
-    std::string                                         latestCompilationDirectory; ///< File of the game
+    gd::String                                         author; ///< Game author name
+    gd::String                                         gameFile; ///< File of the game
+    gd::String                                         latestCompilationDirectory; ///< File of the game
     gd::Platform*                                       currentPlatform; ///< The platform being used to edit the project.
     std::vector < std::shared_ptr<gd::ExternalEvents> >   externalEvents; ///< List of all externals events
     mutable unsigned int                                GDMajorVersion; ///< The GD major version used the last time the project was saved.

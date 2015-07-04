@@ -4,7 +4,7 @@
  * This project is released under the MIT License.
  */
 
-#include <string>
+#include <GDCore/Utf8String.h>
 #include "GDCore/IDE/ExtensionsLoader.h"
 #include "GDCore/IDE/PlatformLoader.h"
 #include "GDCore/IDE/PlatformManager.h"
@@ -35,7 +35,7 @@ PlatformLoader::PlatformLoader()
 {
 }
 
-void PlatformLoader::LoadAllPlatformsInManager(std::string dir)
+void PlatformLoader::LoadAllPlatformsInManager(gd::String dir)
 {
     {
         #if defined(WINDOWS)
@@ -75,19 +75,19 @@ void PlatformLoader::LoadAllPlatformsInManager(std::string dir)
     gd::ExtensionsLoader::ExtensionsLoadingDone("./CppPlatform/Extensions/");
 }
 
-std::shared_ptr<gd::Platform> PlatformLoader::LoadPlatformInManager(std::string fullpath)
+std::shared_ptr<gd::Platform> PlatformLoader::LoadPlatformInManager(gd::String fullpath)
 {
     std::cout << "Loading platform " << fullpath << "..." << std::endl;
-    Handle platformHdl = OpenLibrary(fullpath.c_str());
+    Handle platformHdl = OpenLibrary(fullpath.ToLocale().c_str()); //Use the system locale for filepath
     if (platformHdl == NULL)
     {
-        std::string error = DynamicLibraryLastError();
+        gd::String error = DynamicLibraryLastError();
 
         cout << "Loading of "<< fullpath <<" failed." << endl;
         cout << "Error returned : \"" << error << "\"" << endl;
         #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-        wxString userMsg = _("Platform ") + GD_LOC(fullpath) + 
-            _(" could not be loaded.\nContact the developer for more information.\n\nDetailed log:\n") + GD_LOC(error);
+        wxString userMsg = _("Platform ") + fullpath +
+            _(" could not be loaded.\nContact the developer for more information.\n\nDetailed log:\n") + error;
         wxMessageBox(userMsg, _("Platform not compatible"), wxOK | wxICON_EXCLAMATION);
         #endif
     }
@@ -103,7 +103,7 @@ std::shared_ptr<gd::Platform> PlatformLoader::LoadPlatformInManager(std::string 
             CloseLibrary(platformHdl);
 
             #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-            wxString userMsg = _("Platform ")+ GD_LOC(fullpath) + 
+            wxString userMsg = _("Platform ")+ fullpath +
                 _(" could not be loaded.\nContact the developer for more information.\n\nDetailed log:\nNo valid create/destroy functions." );
             wxMessageBox(userMsg, _("Platform not compatible"), wxOK | wxICON_EXCLAMATION);
             #endif
@@ -111,7 +111,7 @@ std::shared_ptr<gd::Platform> PlatformLoader::LoadPlatformInManager(std::string 
         else
         {
             #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-            gd::LocaleManager::Get()->AddCatalog(ToString(wxFileName(fullpath).GetName())); //In editor, load catalog associated with extension, if any.
+            gd::LocaleManager::Get()->AddCatalog(wxFileName(fullpath).GetName()); //In editor, load catalog associated with extension, if any.
             #endif
 
             std::shared_ptr<gd::Platform> platform(createFunPtr(), destroyFunPtr);

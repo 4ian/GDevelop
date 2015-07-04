@@ -23,7 +23,7 @@ namespace gd
 {
 
 /**
- * \brief Dialog used to enter a math or string expression, with a button to open
+ * \brief Dialog used to enter a math or gd::String expression, with a button to open
  * a full editor.
  *
  * \ingroup IDEDialogs
@@ -33,7 +33,7 @@ class AdvancedTextEntryDialog: public wxDialog
 public:
     enum MoreButtonType { None,  MathExpression, TextExpression };
 
-	AdvancedTextEntryDialog(wxWindow* parent, std::string caption, std::string description, std::string defaultText, MoreButtonType moreButtonType = None, gd::Project * project_ = NULL, gd::Layout * layout_ = NULL);
+	AdvancedTextEntryDialog(wxWindow* parent, gd::String caption, gd::String description, gd::String defaultText, MoreButtonType moreButtonType = None, gd::Project * project_ = NULL, gd::Layout * layout_ = NULL);
 	virtual ~AdvancedTextEntryDialog();
 
 	//(*Declarations(AdvancedTextEntryDialog)
@@ -45,7 +45,7 @@ public:
 	wxButton* okBt;
 	//*)
 
-	std::string text;
+	gd::String text;
 
 protected:
 	//(*Identifiers(AdvancedTextEntryDialog)

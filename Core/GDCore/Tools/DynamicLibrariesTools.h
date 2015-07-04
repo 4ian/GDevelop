@@ -8,6 +8,8 @@
 #define DYNAMICLIBRARIESTOOLS_H
 
 #include <string>
+#include <GDCore/Utf8String.h>
+
 #if defined(WINDOWS)
     #ifndef _WINDEF_
     class HINSTANCE__; // Forward or never
@@ -47,7 +49,7 @@ void GD_CORE_API CloseLibrary(Handle library);
 /**
  * \brief Get the last error occurred when loading a dynamic library
  */
-std::string GD_CORE_API DynamicLibraryLastError();
+gd::String GD_CORE_API DynamicLibraryLastError();
 
 #if defined(LINUX) || defined (MACOS)
 /**
@@ -62,4 +64,3 @@ Handle GD_CORE_API SetLibraryGlobal(const char* path);
 };
 
 #endif // DYNAMICLIBRARIESTOOLS_H
-

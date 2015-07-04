@@ -6,7 +6,7 @@
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <algorithm>
-#include <string>
+#include <GDCore/Utf8String.h>
 #include <vector>
 //(*InternalHeaders(EditExpressionDialog)
 #include <wx/bitmap.h>
@@ -102,11 +102,11 @@ BEGIN_EVENT_TABLE(EditExpressionDialog,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-EditExpressionDialog::EditExpressionDialog(wxWindow* parent, const std::string & expression_, gd::Project & project_, gd::Layout & layout_ ) :
+EditExpressionDialog::EditExpressionDialog(wxWindow* parent, const gd::String & expression_, gd::Project & project_, gd::Layout & layout_ ) :
 expression(expression_),
 project(project_),
 layout(layout_),
-lastErrorPos(std::string::npos)
+lastErrorPos(gd::String::npos)
 {
 	//(*Initialize(EditExpressionDialog)
 	wxFlexGridSizer* FlexGridSizer4;
@@ -360,7 +360,7 @@ lastErrorPos(std::string::npos)
     imageListVal->Add(( wxBitmap( "res/actions/uneaction.png", wxBITMAP_TYPE_ANY ) ) );
     ValList->AssignImageList( imageListVal );
 
-	ExpressionEdit->SetText(gd::utf8::ToWxString(expression));
+	ExpressionEdit->SetText(expression);
 	ExpressionEdit->SetLexer(wxSTC_LEX_CPP);
 	ExpressionEdit->StyleSetFont(wxSTC_STYLE_DEFAULT, gd::EventsRenderingHelper::Get()->GetFont());
 	ExpressionEdit->StyleClearAll();
@@ -373,7 +373,7 @@ lastErrorPos(std::string::npos)
 	ExpressionEdit->StyleSetBackground(35, wxColour(255, 119, 119)); //Brace
 
     //Prepare keyword highlighting
-    std::string keywords;
+    gd::String keywords;
     const vector < std::shared_ptr<PlatformExtension> > extensions = project.GetCurrentPlatform().GetAllPlatformExtensions();
 	for (unsigned int i = 0;i<extensions.size();++i)
 	{
@@ -384,37 +384,37 @@ lastErrorPos(std::string::npos)
             continue;
 
         //Add keywords of static expressions
-	    const std::map<std::string, gd::ExpressionMetadata > & allExprs = extensions[i]->GetAllExpressions();
-        for(std::map<std::string, gd::ExpressionMetadata >::const_iterator it = allExprs.begin(); it != allExprs.end(); ++it)
+	    const std::map<gd::String, gd::ExpressionMetadata > & allExprs = extensions[i]->GetAllExpressions();
+        for(std::map<gd::String, gd::ExpressionMetadata >::const_iterator it = allExprs.begin(); it != allExprs.end(); ++it)
 	        keywords += " "+it->first;
 
-	    const std::map<std::string, gd::ExpressionMetadata > & allStrExprs = extensions[i]->GetAllStrExpressions();
-        for(std::map<std::string, gd::ExpressionMetadata >::const_iterator it = allStrExprs.begin(); it != allStrExprs.end(); ++it)
+	    const std::map<gd::String, gd::ExpressionMetadata > & allStrExprs = extensions[i]->GetAllStrExpressions();
+        for(std::map<gd::String, gd::ExpressionMetadata >::const_iterator it = allStrExprs.begin(); it != allStrExprs.end(); ++it)
 	        keywords += " "+it->first;
 
         //Add keywords of objects expressions
-	    vector<string> objectsTypes = extensions[i]->GetExtensionObjectsTypes();
+	    std::vector<gd::String> objectsTypes = extensions[i]->GetExtensionObjectsTypes();
         for (unsigned int j = 0;j<objectsTypes.size();++j)
         {
-            const std::map<std::string, gd::ExpressionMetadata > & allExprs = extensions[i]->GetAllExpressionsForObject(objectsTypes[j]);
-            for(std::map<std::string, gd::ExpressionMetadata >::const_iterator it = allExprs.begin(); it != allExprs.end(); ++it)
+            const std::map<gd::String, gd::ExpressionMetadata > & allExprs = extensions[i]->GetAllExpressionsForObject(objectsTypes[j]);
+            for(std::map<gd::String, gd::ExpressionMetadata >::const_iterator it = allExprs.begin(); it != allExprs.end(); ++it)
                 keywords += " "+it->first;
 
-            const std::map<std::string, gd::ExpressionMetadata > & allStrExprs = extensions[i]->GetAllStrExpressionsForObject(objectsTypes[j]);
-            for(std::map<std::string, gd::ExpressionMetadata >::const_iterator it = allStrExprs.begin(); it != allStrExprs.end(); ++it)
+            const std::map<gd::String, gd::ExpressionMetadata > & allStrExprs = extensions[i]->GetAllStrExpressionsForObject(objectsTypes[j]);
+            for(std::map<gd::String, gd::ExpressionMetadata >::const_iterator it = allStrExprs.begin(); it != allStrExprs.end(); ++it)
                 keywords += " "+it->first;
         }
 
         //Add keywords of automatisms expressions
-	    vector<string> automatismsTypes = extensions[i]->GetAutomatismsTypes();
+	    std::vector<gd::String> automatismsTypes = extensions[i]->GetAutomatismsTypes();
         for (unsigned int j = 0;j<automatismsTypes.size();++j)
         {
-            const std::map<std::string, gd::ExpressionMetadata > & allExprs = extensions[i]->GetAllExpressionsForAutomatism(automatismsTypes[j]);
-            for(std::map<std::string, gd::ExpressionMetadata >::const_iterator it = allExprs.begin(); it != allExprs.end(); ++it)
+            const std::map<gd::String, gd::ExpressionMetadata > & allExprs = extensions[i]->GetAllExpressionsForAutomatism(automatismsTypes[j]);
+            for(std::map<gd::String, gd::ExpressionMetadata >::const_iterator it = allExprs.begin(); it != allExprs.end(); ++it)
                 keywords += " "+it->first;
 
-            const std::map<std::string, gd::ExpressionMetadata > & allStrExprs = extensions[i]->GetAllStrExpressionsForAutomatism(automatismsTypes[j]);
-            for(std::map<std::string, gd::ExpressionMetadata >::const_iterator it = allStrExprs.begin(); it != allStrExprs.end(); ++it)
+            const std::map<gd::String, gd::ExpressionMetadata > & allStrExprs = extensions[i]->GetAllStrExpressionsForAutomatism(automatismsTypes[j]);
+            for(std::map<gd::String, gd::ExpressionMetadata >::const_iterator it = allStrExprs.begin(); it != allStrExprs.end(); ++it)
                 keywords += " "+it->first;
         }
 	}
@@ -472,7 +472,7 @@ void EditExpressionDialog::UpdateTextCtrl(wxStyledTextEvent& event)
 void EditExpressionDialog::TextModified(wxStyledTextEvent& event)
 {
     //Syntax checking
-    expression = gd::utf8::FromWxString( ExpressionEdit->GetText() );
+    expression = ExpressionEdit->GetText();
 
     gd::CallbacksForExpressionCorrectnessTesting callbacks(project, layout);
     gd::ExpressionParser expressionParser(expression);
@@ -484,7 +484,7 @@ void EditExpressionDialog::TextModified(wxStyledTextEvent& event)
     else
     {
         errorTxt->SetLabel(_("No errors."));
-        lastErrorPos = std::string::npos;
+        lastErrorPos = gd::String::npos;
     }
 
     errorTxt->Refresh(); //Need to call manually update.
@@ -523,8 +523,8 @@ void EditExpressionDialog::RefreshLists()
                   extensions[i]->GetName()) == project.GetUsedExtensions().end() )
             continue;
 
-	    vector<string> objectsTypes = extensions[i]->GetExtensionObjectsTypes();
-	    vector<string> automatismsTypes = extensions[i]->GetAutomatismsTypes();
+	    std::vector<gd::String> objectsTypes = extensions[i]->GetExtensionObjectsTypes();
+	    std::vector<gd::String> automatismsTypes = extensions[i]->GetAutomatismsTypes();
 
         wxTreeItemId extensionItem = ObjList->GetRootItem();
 
@@ -532,22 +532,22 @@ void EditExpressionDialog::RefreshLists()
 	    {
             wxTreeItemId objectTypeItem =   objectsTypes[j] == "" ?
                                             ObjList->AppendItem(extensionItem, _("All objects"), 0) :
-                                            ObjList->AppendItem(extensionItem, _("Object") + wxString(" ") + gd::utf8::ToWxString(extensions[i]->GetObjectMetadata(objectsTypes[j]).GetFullName()) ,0) ;
+                                            ObjList->AppendItem(extensionItem, _("Object") + wxString(" ") + extensions[i]->GetObjectMetadata(objectsTypes[j]).GetFullName() ,0) ;
 
             //Add each object expression
-            std::map<string, gd::ExpressionMetadata > allObjExpr = extensions[i]->GetAllExpressionsForObject(objectsTypes[j]);
-            for(std::map<string, gd::ExpressionMetadata>::const_iterator it = allObjExpr.begin(); it != allObjExpr.end(); ++it)
+            std::map<gd::String, gd::ExpressionMetadata > allObjExpr = extensions[i]->GetAllExpressionsForObject(objectsTypes[j]);
+            for(std::map<gd::String, gd::ExpressionMetadata>::const_iterator it = allObjExpr.begin(); it != allObjExpr.end(); ++it)
             {
                 if ( it->second.IsShown() )
                 {
                     //Search and/or add group item
                     wxTreeItemIdValue cookie;
                     wxTreeItemId groupItem = ObjList->GetFirstChild(objectTypeItem, cookie);
-                    while ( groupItem.IsOk() && ObjList->GetItemText(groupItem) != gd::utf8::ToWxString(it->second.GetGroup()) )
+                    while ( groupItem.IsOk() && ObjList->GetItemText(groupItem) != it->second.GetGroup() )
                     {
                         groupItem = ObjList->GetNextSibling(groupItem);
                     }
-                    if ( !groupItem.IsOk() ) groupItem = ObjList->AppendItem(objectTypeItem, gd::utf8::ToWxString(it->second.GetGroup()), 0);
+                    if ( !groupItem.IsOk() ) groupItem = ObjList->AppendItem(objectTypeItem, it->second.GetGroup(), 0);
 
                     //Add expression item
                     int IDimage = 0;
@@ -558,7 +558,7 @@ void EditExpressionDialog::RefreshLists()
                     }
 
                     gd::TreeItemExpressionMetadata * associatedData = new gd::TreeItemExpressionMetadata(it->first, it->second);
-                    ObjList->AppendItem(groupItem, gd::utf8::ToWxString(it->second.GetFullName()), IDimage, -1, associatedData);
+                    ObjList->AppendItem(groupItem, it->second.GetFullName(), IDimage, -1, associatedData);
                 }
             }
 	    }
@@ -567,22 +567,22 @@ void EditExpressionDialog::RefreshLists()
 	    {
             wxTreeItemId automatismTypeItem =   automatismsTypes[j] == "" ?
                                             ObjList->AppendItem(extensionItem, _("All objects"), 0) :
-                                            ObjList->AppendItem(extensionItem, _("Automatism") + wxString(" ") + gd::utf8::ToWxString(extensions[i]->GetAutomatismMetadata(automatismsTypes[j]).GetFullName()),0) ;
+                                            ObjList->AppendItem(extensionItem, _("Automatism") + wxString(" ") + extensions[i]->GetAutomatismMetadata(automatismsTypes[j]).GetFullName(),0) ;
 
             //Add each automatism expression
-            std::map<string, gd::ExpressionMetadata > allAutoExpr = extensions[i]->GetAllExpressionsForAutomatism(automatismsTypes[j]);
-            for(std::map<string, gd::ExpressionMetadata>::const_iterator it = allAutoExpr.begin(); it != allAutoExpr.end(); ++it)
+            std::map<gd::String, gd::ExpressionMetadata > allAutoExpr = extensions[i]->GetAllExpressionsForAutomatism(automatismsTypes[j]);
+            for(std::map<gd::String, gd::ExpressionMetadata>::const_iterator it = allAutoExpr.begin(); it != allAutoExpr.end(); ++it)
             {
                 if ( it->second.IsShown() )
                 {
                     //Search and/or add group item
                     wxTreeItemIdValue cookie;
                     wxTreeItemId groupItem = ObjList->GetFirstChild(automatismTypeItem, cookie);
-                    while ( groupItem.IsOk() && ObjList->GetItemText(groupItem) != gd::utf8::ToWxString(it->second.GetGroup()) )
+                    while ( groupItem.IsOk() && ObjList->GetItemText(groupItem) != it->second.GetGroup())
                     {
                         groupItem = ObjList->GetNextSibling(groupItem);
                     }
-                    if ( !groupItem.IsOk() ) groupItem = ObjList->AppendItem(automatismTypeItem, gd::utf8::ToWxString(it->second.GetGroup()), 0);
+                    if ( !groupItem.IsOk() ) groupItem = ObjList->AppendItem(automatismTypeItem, it->second.GetGroup(), 0);
 
                     //Add expression item
                     int IDimage = 0;
@@ -593,7 +593,7 @@ void EditExpressionDialog::RefreshLists()
                     }
 
                     gd::TreeItemExpressionMetadata * associatedData = new gd::TreeItemExpressionMetadata(it->first, it->second);
-                    ObjList->AppendItem(groupItem, gd::utf8::ToWxString(it->second.GetFullName()), IDimage, -1, associatedData);
+                    ObjList->AppendItem(groupItem, it->second.GetFullName(), IDimage, -1, associatedData);
                 }
             }
 	    }
@@ -601,19 +601,19 @@ void EditExpressionDialog::RefreshLists()
         //Add each expression
         extensionItem = ValList->GetRootItem();
 
-        std::map<string, gd::ExpressionMetadata > allExpr = extensions[i]->GetAllExpressions();
-        for(std::map<string, gd::ExpressionMetadata>::const_iterator it = allExpr.begin(); it != allExpr.end(); ++it)
+        std::map<gd::String, gd::ExpressionMetadata > allExpr = extensions[i]->GetAllExpressions();
+        for(std::map<gd::String, gd::ExpressionMetadata>::const_iterator it = allExpr.begin(); it != allExpr.end(); ++it)
         {
             if ( it->second.IsShown() )
             {
                 //Search and/or add group item
                 wxTreeItemIdValue cookie;
                 wxTreeItemId groupItem = ValList->GetFirstChild(extensionItem, cookie);
-                while ( groupItem.IsOk() && ValList->GetItemText(groupItem) != gd::utf8::ToWxString(it->second.GetGroup()) )
+                while ( groupItem.IsOk() && ValList->GetItemText(groupItem) != it->second.GetGroup())
                 {
                     groupItem = ValList->GetNextSibling(groupItem);
                 }
-                if ( !groupItem.IsOk() ) groupItem = ValList->AppendItem(extensionItem, gd::utf8::ToWxString(it->second.GetGroup()), 0);
+                if ( !groupItem.IsOk() ) groupItem = ValList->AppendItem(extensionItem, it->second.GetGroup(), 0);
 
                 //Add expression item
                 int IDimage = 0;
@@ -624,7 +624,7 @@ void EditExpressionDialog::RefreshLists()
                 }
 
                 gd::TreeItemExpressionMetadata * associatedData = new gd::TreeItemExpressionMetadata(it->first, it->second);
-                ValList->AppendItem(groupItem, gd::utf8::ToWxString(it->second.GetFullName()), IDimage, -1, associatedData);
+                ValList->AppendItem(groupItem, it->second.GetFullName(), IDimage, -1, associatedData);
             }
         }
 	}
@@ -676,7 +676,7 @@ void EditExpressionDialog::OnSinBtClick(wxCommandEvent& event)
 /**
  * Show a dialog for completing a parameter
  */
-string EditExpressionDialog::ShowParameterDialog(const gd::ParameterMetadata & parameterMetadata, bool & userCancelled, std::string objectNameAssociated)
+gd::String EditExpressionDialog::ShowParameterDialog(const gd::ParameterMetadata & parameterMetadata, bool & userCancelled, gd::String objectNameAssociated)
 {
     if ( parameterMetadata.type == "expression" )
     {
@@ -733,7 +733,7 @@ string EditExpressionDialog::ShowParameterDialog(const gd::ParameterMetadata & p
         else if ( project.HasObjectNamed(objectNameAssociated) )
             object = &project.GetObject(objectNameAssociated);
         else
-            return ToString(wxGetTextFromUser(parameterMetadata.description, _("Variable"), "", this));
+            return wxGetTextFromUser(parameterMetadata.description, _("Variable"), "", this);
 
         gd::ChooseVariableDialog dialog(this, object->GetVariables());
         dialog.SetAssociatedObject(&project, &layout, object);
@@ -744,12 +744,12 @@ string EditExpressionDialog::ShowParameterDialog(const gd::ParameterMetadata & p
     }
     else if ( parameterMetadata.type == "camera" )
     {
-        string param = ToString(wxGetTextFromUser(parameterMetadata.description, _("Camera number"), "0", this));
+        gd::String param = wxGetTextFromUser(parameterMetadata.description, _("Camera number"), "0", this);
         return param;
     }
     else
     {
-        string param = gd::utf8::FromWxString(wxGetTextFromUser(parameterMetadata.description, _("Parameter"), "", this));
+        gd::String param = wxGetTextFromUser(parameterMetadata.description, _("Parameter"), "", this);
         return param;
     }
 
@@ -766,11 +766,11 @@ void EditExpressionDialog::OnAddPropBtClick(wxCommandEvent& event)
         if ( infos->GetExpressionMetadata().parameters.empty() ) return; //Not even a parameter for the object ?
 
         bool cancelled = false;
-        string object = ShowParameterDialog(infos->GetExpressionMetadata().parameters[0], cancelled);
+        gd::String object = ShowParameterDialog(infos->GetExpressionMetadata().parameters[0], cancelled);
         if ( cancelled ) return;
 
         //Add parameters
-        string parametersStr, automatismStr;
+        gd::String parametersStr, automatismStr;
         for (unsigned int i = 1;i<infos->GetExpressionMetadata().parameters.size();++i)
         {
             if ( infos->GetExpressionMetadata().parameters[i].codeOnly ) continue;
@@ -790,7 +790,7 @@ void EditExpressionDialog::OnAddPropBtClick(wxCommandEvent& event)
         }
 
         if ( ExpressionEdit->GetText() == "0" ) ExpressionEdit->SetText("");
-        ExpressionEdit->AddText(object+"."+automatismStr+infos->GetName()+"("+gd::utf8::ToWxString(parametersStr)+")");
+        ExpressionEdit->AddText(object+"."+automatismStr+infos->GetName()+"("+parametersStr+")");
         return;
     }
 }
@@ -802,7 +802,7 @@ void EditExpressionDialog::OnAddValBtClick(wxCommandEvent& event)
     gd::TreeItemExpressionMetadata * infos = dynamic_cast<gd::TreeItemExpressionMetadata *>(ValList->GetItemData(itemVal));
     if ( infos != NULL )
     {
-        string parametersStr;
+        gd::String parametersStr;
         for (unsigned int i = 0;i<infos->GetExpressionMetadata().parameters.size();++i)
         {
             if ( infos->GetExpressionMetadata().parameters[i].codeOnly ) continue;
@@ -814,7 +814,7 @@ void EditExpressionDialog::OnAddValBtClick(wxCommandEvent& event)
         }
 
         if ( ExpressionEdit->GetText() == "0" ) ExpressionEdit->SetText("");
-        ExpressionEdit->AddText(infos->GetName()+"("+gd::utf8::ToWxString(parametersStr)+")");
+        ExpressionEdit->AddText(infos->GetName()+"("+parametersStr+")");
         return;
     }
 }
@@ -906,7 +906,7 @@ void EditExpressionDialog::OnintBtClick(wxCommandEvent& event)
 
 void EditExpressionDialog::OnerrorTxtClick(wxCommandEvent& event)
 {
-    if ( lastErrorPos != std::string::npos )
+    if ( lastErrorPos != gd::String::npos )
         ExpressionEdit->GotoPos(lastErrorPos);
 }
 

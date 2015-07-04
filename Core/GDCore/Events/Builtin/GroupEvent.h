@@ -36,24 +36,24 @@ public:
     /**
      * \brief Get the name of the group.
      */
-    const std::string & GetName() const { return name; }
+    const gd::String & GetName() const { return name; }
 
     /**
      * \brief Change the name of the group.
      */
-    void SetName(const std::string & name_) { name = name_; }
+    void SetName(const gd::String & name_) { name = name_; }
 
     /**
      * \brief Get the source of the group.
      * \note The source is usually an URL from which
      * the group and its events was downloaded.
      */
-    const std::string & GetSource() const { return source; }
+    const gd::String & GetSource() const { return source; }
 
     /**
      * \brief Set the source of the group.
      */
-    void SetSource(const std::string & source_) { source = source_; }
+    void SetSource(const gd::String & source_) { source = source_; }
 
     /**
      * \brief Get the vector containing the parameters that have been used to
@@ -63,8 +63,8 @@ public:
      * to update the group with a new version of the template, the parameters
      * can be displayed again to easy the update.
      */
-    std::vector<std::string> & GetCreationParameters() { return parameters; }
-    const std::vector<std::string> & GetCreationParameters() const { return parameters; }
+    std::vector<gd::String> & GetCreationParameters() { return parameters; }
+    const std::vector<gd::String> & GetCreationParameters() const { return parameters; }
 
     /**
      * \brief Return the creation timestamp
@@ -121,10 +121,10 @@ public:
 private:
     EventsList events;
 
-    std::string name; ///<Optional. A name displayed in the events editor.
-    std::string source; ///< Optional. The source can contains the URL from which the group was downloaded.
+    gd::String name; ///<Optional. A name displayed in the events editor.
+    gd::String source; ///< Optional. The source can contains the URL from which the group was downloaded.
     unsigned int creationTime; ///< Optional. The time when the group was created from an event template.
-    std::vector<std::string> parameters; ///< Optional. Can be used to remember the parameters used if the group was created from an events template.
+    std::vector<gd::String> parameters; ///< Optional. Can be used to remember the parameters used if the group was created from an events template.
     unsigned int colorR;
     unsigned int colorG;
     unsigned int colorB;

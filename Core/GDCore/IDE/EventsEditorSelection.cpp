@@ -220,7 +220,7 @@ gd::InstructionsList * EventsEditorSelection::EndDragInstruction(bool deleteDrag
 
     //Find where to drag
     gd::InstructionsList * list = NULL;
-    size_t positionInList = std::string::npos;
+    size_t positionInList = gd::String::npos;
     if ( instructionHighlighted.instructionList != NULL )
     {
         list = instructionHighlighted.instructionList;

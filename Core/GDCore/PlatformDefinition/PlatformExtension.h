@@ -7,7 +7,7 @@
 #ifndef GDCORE_PLATFORMEXTENSION_H
 #define GDCORE_PLATFORMEXTENSION_H
 #include <map>
-#include <string>
+#include <GDCore/Utf8String.h>
 #include <vector>
 #include <memory>
 #include "GDCore/Events/ObjectMetadata.h"
@@ -28,7 +28,7 @@ namespace gd { class Automatism; }
 namespace gd { class Object; }
 
 typedef void (*DestroyFunPtr)(gd::Object*);
-typedef gd::Object * (*CreateFunPtr)(std::string name);
+typedef gd::Object * (*CreateFunPtr)(gd::String name);
 
 namespace gd
 {
@@ -62,7 +62,7 @@ class GD_CORE_API CompilationInfo
     int wxWidgetsSubReleaseNumber;
     #endif
 
-    std::string gdCoreVersion;
+    gd::String gdCoreVersion;
     int sizeOfpInt;
 };
 
@@ -83,53 +83,53 @@ public:
     /**
      * \brief Must be called to declare the main information about the extension.
      */
-    void SetExtensionInformation(const std::string & name_,
-                                 const std::string & fullname_,
-                                 const std::string & description_,
-                                 const std::string & author_,
-                                 const std::string & license_);
+    void SetExtensionInformation(const gd::String & name_,
+                                 const gd::String & fullname_,
+                                 const gd::String & description_,
+                                 const gd::String & author_,
+                                 const gd::String & license_);
 
     /**
      * \brief Declare a new condition as being part of the extension.
      * \note This method does nothing when used for GD C++ runtime.
      */
-    gd::InstructionMetadata & AddCondition(const std::string & name_,
+    gd::InstructionMetadata & AddCondition(const gd::String & name_,
                                            const gd::String & fullname_,
                                            const gd::String & description_,
-                                           const std::string & sentence_,
+                                           const gd::String & sentence_,
                                            const gd::String & group_,
-                                           const std::string & icon_,
-                                           const std::string & smallicon_);
+                                           const gd::String & icon_,
+                                           const gd::String & smallicon_);
 
     /**
      * \brief Declare a new action as being part of the extension.
      * \note This method does nothing when used for GD C++ runtime.
      */
-    gd::InstructionMetadata & AddAction(const std::string & name_,
+    gd::InstructionMetadata & AddAction(const gd::String & name_,
                                            const gd::String & fullname_,
                                            const gd::String & description_,
-                                           const std::string & sentence_,
+                                           const gd::String & sentence_,
                                            const gd::String & group_,
-                                           const std::string & icon_,
-                                           const std::string & smallicon_);
+                                           const gd::String & icon_,
+                                           const gd::String & smallicon_);
     /**
      * \brief Declare a new expression as being part of the extension.
      * \note This method does nothing when used for GD C++ runtime.
      */
-    gd::ExpressionMetadata & AddExpression(const std::string & name_,
-                                           const std::string & fullname_,
-                                           const std::string & description_,
-                                           const std::string & group_,
-                                           const std::string & smallicon_);
+    gd::ExpressionMetadata & AddExpression(const gd::String & name_,
+                                           const gd::String & fullname_,
+                                           const gd::String & description_,
+                                           const gd::String & group_,
+                                           const gd::String & smallicon_);
     /**
-     * \brief Declare a new string expression as being part of the extension.
+     * \brief Declare a new String expression as being part of the extension.
      * \note This method does nothing when used for GD C++ runtime.
      */
-    gd::ExpressionMetadata & AddStrExpression(const std::string & name_,
-                                           const std::string & fullname_,
-                                           const std::string & description_,
-                                           const std::string & group_,
-                                           const std::string & smallicon_);
+    gd::ExpressionMetadata & AddStrExpression(const gd::String & name_,
+                                           const gd::String & fullname_,
+                                           const gd::String & description_,
+                                           const gd::String & group_,
+                                           const gd::String & smallicon_);
 
     /**
      * \brief Declare a new object as being part of the extension.
@@ -143,16 +143,16 @@ public:
      *
      * Example of the create function:
      \code
-    gd::Object * CreateMyObject(std::string name)
+    gd::Object * CreateMyObject(gd::String name)
     {
         return new MyObject(name);
     }
      \endcode
      */
-    gd::ObjectMetadata & AddObject(const std::string & name_,
-                                   const std::string & fullname_,
-                                   const std::string & description_,
-                                   const std::string & icon24x24_,
+    gd::ObjectMetadata & AddObject(const gd::String & name_,
+                                   const gd::String & fullname_,
+                                   const gd::String & description_,
+                                   const gd::String & icon24x24_,
                                    CreateFunPtr createFunPtrP);
 
     /**
@@ -167,13 +167,13 @@ public:
      * \param instance An instance of the automatism that will be used to create the automatism
      * \param sharedDatasInstance Optional instance of the data shared by the automatisms having the same name.
      */
-    gd::AutomatismMetadata & AddAutomatism(const std::string & name_,
-                                          const std::string & fullname_,
-                                          const std::string & defaultName_,
-                                          const std::string & description_,
-                                          const std::string & group_,
-                                          const std::string & icon24x24_,
-                                          const std::string & className_,
+    gd::AutomatismMetadata & AddAutomatism(const gd::String & name_,
+                                          const gd::String & fullname_,
+                                          const gd::String & defaultName_,
+                                          const gd::String & description_,
+                                          const gd::String & group_,
+                                          const gd::String & icon24x24_,
+                                          const gd::String & className_,
                                           std::shared_ptr<gd::Automatism> instance,
                                           std::shared_ptr<gd::AutomatismsSharedData> sharedDatasInstance);
 
@@ -181,37 +181,37 @@ public:
      * \brief Declare a new event as being part of the extension.
      * \note This method does nothing when used for GD C++ runtime.
      */
-    gd::EventMetadata & AddEvent(const std::string & name_,
-                                 const std::string & fullname_,
-                                 const std::string & description_,
-                                 const std::string & group_,
-                                 const std::string & smallicon_,
+    gd::EventMetadata & AddEvent(const gd::String & name_,
+                                 const gd::String & fullname_,
+                                 const gd::String & description_,
+                                 const gd::String & group_,
+                                 const gd::String & smallicon_,
                                  std::shared_ptr<gd::BaseEvent> instance);
 
     /**
      * \brief Return the name extension user friendly name.
      */
-    const std::string & GetFullName() const { return fullname; }
+    const gd::String & GetFullName() const { return fullname; }
 
     /**
      * \brief Return the name of the extension
      */
-    const std::string & GetName() const { return name; }
+    const gd::String & GetName() const { return name; }
 
     /**
      * \brief Return a description of the extension
      */
-    const std::string & GetDescription() const { return informations; }
+    const gd::String & GetDescription() const { return informations; }
 
     /**
      * \brief Return the name of the extension developer
      */
-    const std::string & GetAuthor() const { return author; }
+    const gd::String & GetAuthor() const { return author; }
 
     /**
      * \brief Return the name of extension license
      */
-    const std::string & GetLicense() const { return license; }
+    const gd::String & GetLicense() const { return license; }
 
     /**
      * \brief Return true if the extension is a standard extension that cannot be deactivated
@@ -222,118 +222,118 @@ public:
      * \brief Get the namespace of the extension.
      * \note The namespace is simply the name of the extension concatenated with "::" at the end.
      */
-    std::string GetNameSpace() { return nameSpace; };
+    gd::String GetNameSpace() { return nameSpace; };
 
     /**
      * \brief Return a vector containing all the object types provided by the extension
      */
-    std::vector < std::string > GetExtensionObjectsTypes() const;
+    std::vector < gd::String > GetExtensionObjectsTypes() const;
 
     /**
      * \brief Return a vector containing all the automatism types provided by the extension
      */
-    std::vector < std::string > GetAutomatismsTypes() const;
+    std::vector < gd::String > GetAutomatismsTypes() const;
 
     /**
      * \brief Return a function to create the object if the type is handled by the extension
      */
-    CreateFunPtr GetObjectCreationFunctionPtr(std::string objectType) const;
+    CreateFunPtr GetObjectCreationFunctionPtr(gd::String objectType) const;
 
     /**
      * \brief Create a custom event.
      *
      * Return an empty pointer if \a eventType is not provided by the extension.
      */
-    std::shared_ptr<gd::BaseEvent> CreateEvent(std::string eventType) const;
+    std::shared_ptr<gd::BaseEvent> CreateEvent(gd::String eventType) const;
     /**
      * \brief Create an automatism
      *
      * Return NULL if \a automatismType is not provided by the extension.
      */
-    gd::Automatism* CreateAutomatism(std::string automatismType) const;
+    gd::Automatism* CreateAutomatism(gd::String automatismType) const;
 
     /**
      * \brief Create shared data for an automatism
      *
      * Return NULL if \a automatismType is not provided by the extension.
      */
-    std::shared_ptr<gd::AutomatismsSharedData> CreateAutomatismSharedDatas(std::string automatismType) const;
+    std::shared_ptr<gd::AutomatismsSharedData> CreateAutomatismSharedDatas(gd::String automatismType) const;
 
     /**
      * \brief Return a reference to the ObjectMetadata object associated to \a objectType
      */
-    ObjectMetadata & GetObjectMetadata(const std::string & objectType);
+    ObjectMetadata & GetObjectMetadata(const gd::String & objectType);
 
     /**
      * \brief Return a reference to the AutomatismMetadata object associated to \a automatismType
      */
-    AutomatismMetadata & GetAutomatismMetadata(const std::string & automatismType);
+    AutomatismMetadata & GetAutomatismMetadata(const gd::String & automatismType);
 
     /**
      * \brief Return a map containing all the events provided by the extension
      */
-    std::map<std::string, gd::EventMetadata > & GetAllEvents();
+    std::map<gd::String, gd::EventMetadata > & GetAllEvents();
 
     #if defined(GD_IDE_ONLY)
     /**
      * \brief Return a reference to a map containing the names of the actions (in the first members) and the metadata associated with (in the second members).
      */
-    std::map<std::string, gd::InstructionMetadata > & GetAllActions();
+    std::map<gd::String, gd::InstructionMetadata > & GetAllActions();
 
     /**
      * \see gd::PlatformExtension::GetAllActions
      */
-    std::map<std::string, gd::InstructionMetadata > & GetAllConditions();
+    std::map<gd::String, gd::InstructionMetadata > & GetAllConditions();
 
     /**
      * \see gd::PlatformExtension::GetAllActions
      */
-    std::map<std::string, gd::ExpressionMetadata > & GetAllExpressions();
+    std::map<gd::String, gd::ExpressionMetadata > & GetAllExpressions();
 
     /**
      * \see gd::PlatformExtension::GetAllActions
      */
-    std::map<std::string, gd::ExpressionMetadata > & GetAllStrExpressions();
+    std::map<gd::String, gd::ExpressionMetadata > & GetAllStrExpressions();
 
     /**
      * \brief Return a reference to a map containing the names of the actions, related to the object type, and the metadata associated with.
      */
-    std::map<std::string, gd::InstructionMetadata > & GetAllActionsForObject(std::string objectType);
+    std::map<gd::String, gd::InstructionMetadata > & GetAllActionsForObject(gd::String objectType);
 
     /**
      * \see gd::PlatformExtension::GetAllActionsForObject
      */
-    std::map<std::string, gd::InstructionMetadata > & GetAllConditionsForObject(std::string objectType);
+    std::map<gd::String, gd::InstructionMetadata > & GetAllConditionsForObject(gd::String objectType);
 
     /**
      * \see gd::PlatformExtension::GetAllActionsForObject
      */
-    std::map<std::string, gd::ExpressionMetadata > & GetAllExpressionsForObject(std::string objectType);
+    std::map<gd::String, gd::ExpressionMetadata > & GetAllExpressionsForObject(gd::String objectType);
 
     /**
      * \see gd::PlatformExtension::GetAllActionsForObject
      */
-    std::map<std::string, gd::ExpressionMetadata > & GetAllStrExpressionsForObject(std::string objectType);
+    std::map<gd::String, gd::ExpressionMetadata > & GetAllStrExpressionsForObject(gd::String objectType);
 
     /**
      * \see gd::PlatformExtension::GetAllActionsForObject
      */
-    std::map<std::string, gd::InstructionMetadata > & GetAllActionsForAutomatism(std::string autoType);
+    std::map<gd::String, gd::InstructionMetadata > & GetAllActionsForAutomatism(gd::String autoType);
 
     /**
      * \see gd::PlatformExtension::GetAllActionsForObject
      */
-    std::map<std::string, gd::InstructionMetadata > & GetAllConditionsForAutomatism(std::string autoType);
+    std::map<gd::String, gd::InstructionMetadata > & GetAllConditionsForAutomatism(gd::String autoType);
 
     /**
      * \see gd::PlatformExtension::GetAllActionsForObject
      */
-    std::map<std::string, gd::ExpressionMetadata > & GetAllExpressionsForAutomatism(std::string autoType);
+    std::map<gd::String, gd::ExpressionMetadata > & GetAllExpressionsForAutomatism(gd::String autoType);
 
     /**
      * \see gd::PlatformExtension::GetAllActionsForObject
      */
-    std::map<std::string, gd::ExpressionMetadata > & GetAllStrExpressionsForAutomatism(std::string autoType);
+    std::map<gd::String, gd::ExpressionMetadata > & GetAllStrExpressionsForAutomatism(gd::String autoType);
 
     /**
      * Called ( e.g. during compilation ) so as to inventory resources used by conditions and update their filename
@@ -361,7 +361,7 @@ public:
      * \param stripFunctionsNameAndCodeGeneration If set to true, all functions names and code generator of all instructions/expression/events
      * will be removed.
      */
-    void CloneExtension(const std::string & platformName, const std::string & extensionName, bool stripFunctionsNameAndCodeGeneration = true);
+    void CloneExtension(const gd::String & platformName, const gd::String & extensionName, bool stripFunctionsNameAndCodeGeneration = true);
 
     /**
      * \brief Delete all instructions having no functions name or custom code generator.
@@ -372,39 +372,39 @@ public:
     /**
      * \brief Return the name of all the extensions which are considered provided by platforms.
      */
-    static std::vector<std::string> GetBuiltinExtensionsNames();
+    static std::vector<gd::String> GetBuiltinExtensionsNames();
 
 private:
 
     /**
-     * Set the namespace ( the string each actions/conditions/expressions start with )
+     * Set the namespace ( the String each actions/conditions/expressions start with )
      */
-    void SetNameSpace(std::string nameSpace_);
+    void SetNameSpace(gd::String nameSpace_);
 
-    std::string name; ///<Name identifying the extension
-    std::string nameSpace; ///<Automatically set from the name of the extension, and added to every actions/conditions/expressions/objects/automatism/event.
-    std::string fullname; ///<Name displayed to users at edittime
-    std::string informations; ///<Description displayed to users at edittime
-    std::string author; ///<Author displayed to users at edittime
-    std::string license;  ///<License name displayed to users at edittime
+    gd::String name; ///<Name identifying the extension
+    gd::String nameSpace; ///<Automatically set from the name of the extension, and added to every actions/conditions/expressions/objects/automatism/event.
+    gd::String fullname; ///<Name displayed to users at edittime
+    gd::String informations; ///<Description displayed to users at edittime
+    gd::String author; ///<Author displayed to users at edittime
+    gd::String license;  ///<License name displayed to users at edittime
 
-    std::map<std::string, gd::ObjectMetadata > objectsInfos;
-    std::map<std::string, gd::AutomatismMetadata > automatismsInfo;
+    std::map<gd::String, gd::ObjectMetadata > objectsInfos;
+    std::map<gd::String, gd::AutomatismMetadata > automatismsInfo;
     #if defined(GD_IDE_ONLY)
-    std::map<std::string, gd::InstructionMetadata > conditionsInfos;
-    std::map<std::string, gd::InstructionMetadata > actionsInfos;
-    std::map<std::string, gd::ExpressionMetadata > expressionsInfos;
-    std::map<std::string, gd::ExpressionMetadata > strExpressionsInfos;
-    std::map<std::string, gd::EventMetadata > eventsInfos;
+    std::map<gd::String, gd::InstructionMetadata > conditionsInfos;
+    std::map<gd::String, gd::InstructionMetadata > actionsInfos;
+    std::map<gd::String, gd::ExpressionMetadata > expressionsInfos;
+    std::map<gd::String, gd::ExpressionMetadata > strExpressionsInfos;
+    std::map<gd::String, gd::EventMetadata > eventsInfos;
     #endif
 
     ObjectMetadata badObjectMetadata;
     AutomatismMetadata badAutomatismMetadata;
     #if defined(GD_IDE_ONLY)
-    static std::map<std::string, gd::InstructionMetadata > badConditionsMetadata; ///< Used when a condition is not found in the extension
-    static std::map<std::string, gd::InstructionMetadata > badActionsMetadata;  ///< Used when an action is not found in the extension
-    static std::map<std::string, gd::ExpressionMetadata > badExpressionsMetadata; ///< Used when an expression is not found in the extension
-    static std::map<std::string, gd::ExpressionMetadata > badStrExpressionsMetadata;///< Used when an expression is not found in the extension
+    static std::map<gd::String, gd::InstructionMetadata > badConditionsMetadata; ///< Used when a condition is not found in the extension
+    static std::map<gd::String, gd::InstructionMetadata > badActionsMetadata;  ///< Used when an action is not found in the extension
+    static std::map<gd::String, gd::ExpressionMetadata > badExpressionsMetadata; ///< Used when an expression is not found in the extension
+    static std::map<gd::String, gd::ExpressionMetadata > badStrExpressionsMetadata;///< Used when an expression is not found in the extension
     #endif
 };
 

@@ -8,7 +8,7 @@
 #ifndef GDCORE_CHOOSEOBJECTDIALOG_H
 #define GDCORE_CHOOSEOBJECTDIALOG_H
 
-#include <string>
+#include <GDCore/Utf8String.h>
 #include <vector>
 //(*Headers(ChooseObjectDialog)
 #include <wx/treectrl.h>
@@ -49,7 +49,7 @@ public:
                        Project & project,
                        gd::Layout & layout,
                        bool canSelectGroup = true,
-                       std::string onlyObjectOfType_ = "",
+                       gd::String onlyObjectOfType_ = "",
                        bool allowMultipleSelection_ = false);
 
     virtual ~ChooseObjectDialog();
@@ -57,12 +57,12 @@ public:
     /**
      * Return the chosen object
      */
-    const std::string & GetChosenObject() const { return objectChosen; }
+    const gd::String & GetChosenObject() const { return objectChosen; }
 
     /**
      * Return the chosen objects when multiple selection is allowed
      */
-    const std::vector <std::string> & GetChosenObjects() const  { return objectsChosen; }
+    const std::vector <gd::String> & GetChosenObjects() const  { return objectsChosen; }
 
     //(*Declarations(ChooseObjectDialog)
     wxMenu Menu2;
@@ -123,11 +123,11 @@ private:
     Project & project;
     gd::Layout & layout;
 
-    std::string objectChosen;
-    std::vector <std::string> objectsChosen; ///< Used if dialog support multiple selection.
+    gd::String objectChosen;
+    std::vector <gd::String> objectsChosen; ///< Used if dialog support multiple selection.
 
     wxImageList * imageList;
-    std::string onlyObjectOfType;
+    gd::String onlyObjectOfType;
     bool allowMultipleSelection;
     bool canSelectGroup;
 

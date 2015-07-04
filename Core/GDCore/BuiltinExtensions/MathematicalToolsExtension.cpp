@@ -13,171 +13,171 @@ namespace gd
 void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(gd::PlatformExtension & extension)
 {
     extension.SetExtensionInformation("BuiltinMathematicalTools",
-                          GD_T("Mathematical tools"),
-                          GD_T("Built-in extension providing mathematical tools"),
+                          _("Mathematical tools"),
+                          _("Built-in extension providing mathematical tools"),
                           "Florian Rival",
                           "Open source (MIT License)");
 
     #if defined(GD_IDE_ONLY)
 
-    extension.AddExpression("AngleDifference", GD_T("Difference between two angles"), GD_T("Difference between two angles"), GD_T("Mathematical tools"), "res/mathfunction.png")
-        .AddParameter("expression", GD_T("First angle"))
-        .AddParameter("expression", GD_T("Second angle"));
+    extension.AddExpression("AngleDifference", _("Difference between two angles"), _("Difference between two angles"), _("Mathematical tools"), "res/mathfunction.png")
+        .AddParameter("expression", _("First angle"))
+        .AddParameter("expression", _("Second angle"));
 
 
-    extension.AddExpression("mod", GD_T("Modulo"), GD_T("x mod y"), GD_T("Mathematical tools"), "res/mathfunction.png")
-        .AddParameter("expression", GD_T("x ( as in x mod y )"))
-        .AddParameter("expression", GD_T("y ( as in x mod y )"));
+    extension.AddExpression("mod", _("Modulo"), _("x mod y"), _("Mathematical tools"), "res/mathfunction.png")
+        .AddParameter("expression", _("x ( as in x mod y )"))
+        .AddParameter("expression", _("y ( as in x mod y )"));
 
 
-    extension.AddExpression("min", GD_T("Minimum of two numbers"), GD_T("Minimum of two numbers"), GD_T("Mathematical tools"), "res/mathfunction.png")
-        .AddParameter("expression", GD_T("First expression"))
-        .AddParameter("expression", GD_T("Second expression"));
+    extension.AddExpression("min", _("Minimum of two numbers"), _("Minimum of two numbers"), _("Mathematical tools"), "res/mathfunction.png")
+        .AddParameter("expression", _("First expression"))
+        .AddParameter("expression", _("Second expression"));
 
 
-    extension.AddExpression("max", GD_T("Maximum of two numbers"), GD_T("Maximum of two numbers"), GD_T("Mathematical tools"), "res/mathfunction.png")
-        .AddParameter("expression", GD_T("First expression"))
-        .AddParameter("expression", GD_T("Second expression"));
+    extension.AddExpression("max", _("Maximum of two numbers"), _("Maximum of two numbers"), _("Mathematical tools"), "res/mathfunction.png")
+        .AddParameter("expression", _("First expression"))
+        .AddParameter("expression", _("Second expression"));
 
 
-    extension.AddExpression("abs", GD_T("Absolute value"), GD_T("Absolute value"), GD_T("Mathematical tools"), "res/mathfunction.png")
-        .AddParameter("expression", GD_T("Expression"));
+    extension.AddExpression("abs", _("Absolute value"), _("Absolute value"), _("Mathematical tools"), "res/mathfunction.png")
+        .AddParameter("expression", _("Expression"));
 
 
-    extension.AddExpression("acos", GD_T("Arccosine"), GD_T("Arccosine"), GD_T("Mathematical tools"), "res/mathfunction.png")
-        .AddParameter("expression", GD_T("Expression"));
+    extension.AddExpression("acos", _("Arccosine"), _("Arccosine"), _("Mathematical tools"), "res/mathfunction.png")
+        .AddParameter("expression", _("Expression"));
 
 
-    extension.AddExpression("acosh", GD_T("Hyperbolic arccosine"), GD_T("Hyperbolic arccosine"), GD_T("Mathematical tools"), "res/mathfunction.png")
-        .AddParameter("expression", GD_T("Expression"));
+    extension.AddExpression("acosh", _("Hyperbolic arccosine"), _("Hyperbolic arccosine"), _("Mathematical tools"), "res/mathfunction.png")
+        .AddParameter("expression", _("Expression"));
 
 
-    extension.AddExpression("asin", GD_T("Arcsine"), GD_T("Arcsine"), GD_T("Mathematical tools"), "res/mathfunction.png")
-        .AddParameter("expression", GD_T("Expression"));
+    extension.AddExpression("asin", _("Arcsine"), _("Arcsine"), _("Mathematical tools"), "res/mathfunction.png")
+        .AddParameter("expression", _("Expression"));
 
 
-    extension.AddExpression("asinh", GD_T("Arcsine"), GD_T("Arcsine"), GD_T("Mathematical tools"), "res/mathfunction.png")
-        .AddParameter("expression", GD_T("Expression"));
+    extension.AddExpression("asinh", _("Arcsine"), _("Arcsine"), _("Mathematical tools"), "res/mathfunction.png")
+        .AddParameter("expression", _("Expression"));
 
 
-    extension.AddExpression("atan", GD_T("Arctangent"), GD_T("Arctangent"), GD_T("Mathematical tools"), "res/mathfunction.png")
-        .AddParameter("expression", GD_T("Expression"));
+    extension.AddExpression("atan", _("Arctangent"), _("Arctangent"), _("Mathematical tools"), "res/mathfunction.png")
+        .AddParameter("expression", _("Expression"));
 
 
-    extension.AddExpression("atan2", GD_T("2 argument arctangent"), GD_T("2 argument arctangent ( atan2 )"), GD_T("Mathematical tools"), "res/mathfunction.png")
-        .AddParameter("expression", GD_T("Y"))
-        .AddParameter("expression", GD_T("X"));
+    extension.AddExpression("atan2", _("2 argument arctangent"), _("2 argument arctangent ( atan2 )"), _("Mathematical tools"), "res/mathfunction.png")
+        .AddParameter("expression", _("Y"))
+        .AddParameter("expression", _("X"));
 
 
-    extension.AddExpression("atanh", GD_T("Hyperbolic arctangent"), GD_T("Hyperbolic arctangent"), GD_T("Mathematical tools"), "res/mathfunction.png")
-        .AddParameter("expression", GD_T("Expression"));
+    extension.AddExpression("atanh", _("Hyperbolic arctangent"), _("Hyperbolic arctangent"), _("Mathematical tools"), "res/mathfunction.png")
+        .AddParameter("expression", _("Expression"));
 
 
-    extension.AddExpression("cbrt", GD_T("Cube root"), GD_T("Cube root"), GD_T("Mathematical tools"), "res/mathfunction.png")
-        .AddParameter("expression", GD_T("Expression"));
+    extension.AddExpression("cbrt", _("Cube root"), _("Cube root"), _("Mathematical tools"), "res/mathfunction.png")
+        .AddParameter("expression", _("Expression"));
 
 
-    extension.AddExpression("ceil", GD_T("Ceil (round up)"), GD_T("Round number up to an integer"), GD_T("Mathematical tools"), "res/mathfunction.png")
-        .AddParameter("expression", GD_T("Expression"));
+    extension.AddExpression("ceil", _("Ceil (round up)"), _("Round number up to an integer"), _("Mathematical tools"), "res/mathfunction.png")
+        .AddParameter("expression", _("Expression"));
 
 
-    extension.AddExpression("floor", GD_T("Floor (round down)"), GD_T("Round number down to an integer"), GD_T("Mathematical tools"), "res/mathfunction.png")
-        .AddParameter("expression", GD_T("Expression"));
+    extension.AddExpression("floor", _("Floor (round down)"), _("Round number down to an integer"), _("Mathematical tools"), "res/mathfunction.png")
+        .AddParameter("expression", _("Expression"));
 
 
-    extension.AddExpression("cos", GD_T("Cosine"), GD_T("Cosine of a number"), GD_T("Mathematical tools"), "res/mathfunction.png")
-        .AddParameter("expression", GD_T("Expression"));
+    extension.AddExpression("cos", _("Cosine"), _("Cosine of a number"), _("Mathematical tools"), "res/mathfunction.png")
+        .AddParameter("expression", _("Expression"));
 
 
-    extension.AddExpression("cosh", GD_T("Hyperbolic cosine"), GD_T("Hyperbolic cosine"), GD_T("Mathematical tools"), "res/mathfunction.png")
-        .AddParameter("expression", GD_T("Expression"));
+    extension.AddExpression("cosh", _("Hyperbolic cosine"), _("Hyperbolic cosine"), _("Mathematical tools"), "res/mathfunction.png")
+        .AddParameter("expression", _("Expression"));
 
 
-    extension.AddExpression("cot", GD_T("Cotangent"), GD_T("Cotangent of a number"), GD_T("Mathematical tools"), "res/mathfunction.png")
-        .AddParameter("expression", GD_T("Expression"));
+    extension.AddExpression("cot", _("Cotangent"), _("Cotangent of a number"), _("Mathematical tools"), "res/mathfunction.png")
+        .AddParameter("expression", _("Expression"));
 
 
-    extension.AddExpression("csc", GD_T("Cosecant"), GD_T("Cosecant of a number"), GD_T("Mathematical tools"), "res/mathfunction.png")
-        .AddParameter("expression", GD_T("Expression"));
+    extension.AddExpression("csc", _("Cosecant"), _("Cosecant of a number"), _("Mathematical tools"), "res/mathfunction.png")
+        .AddParameter("expression", _("Expression"));
 
 
-    extension.AddExpression("int", GD_T("Round"), GD_T("Round a number"), GD_T("Mathematical tools"), "res/mathfunction.png")
+    extension.AddExpression("int", _("Round"), _("Round a number"), _("Mathematical tools"), "res/mathfunction.png")
         .SetHidden()
-        .AddParameter("expression", GD_T("Expression"));
+        .AddParameter("expression", _("Expression"));
 
-    extension.AddExpression("rint", GD_T("Round"), GD_T("Round a number"), GD_T("Mathematical tools"), "res/mathfunction.png")
+    extension.AddExpression("rint", _("Round"), _("Round a number"), _("Mathematical tools"), "res/mathfunction.png")
         .SetHidden()
-        .AddParameter("expression", GD_T("Expression"));
+        .AddParameter("expression", _("Expression"));
 
-    extension.AddExpression("round", GD_T("Round"), GD_T("Round a number"), GD_T("Mathematical tools"), "res/mathfunction.png")
-        .AddParameter("expression", GD_T("Expression"));
-
-
-    extension.AddExpression("exp", GD_T("Exponential"), GD_T("Exponential of a number"), GD_T("Mathematical tools"), "res/mathfunction.png")
-        .AddParameter("expression", GD_T("Expression"));
+    extension.AddExpression("round", _("Round"), _("Round a number"), _("Mathematical tools"), "res/mathfunction.png")
+        .AddParameter("expression", _("Expression"));
 
 
-    extension.AddExpression("log", GD_T("Logarithm"), GD_T("Logarithm"), GD_T("Mathematical tools"), "res/mathfunction.png")
-        .AddParameter("expression", GD_T("Expression"));
+    extension.AddExpression("exp", _("Exponential"), _("Exponential of a number"), _("Mathematical tools"), "res/mathfunction.png")
+        .AddParameter("expression", _("Expression"));
 
 
-    extension.AddExpression("ln", GD_T("Logarithm"), GD_T("Logarithm"), GD_T("Mathematical tools"), "res/mathfunction.png")
+    extension.AddExpression("log", _("Logarithm"), _("Logarithm"), _("Mathematical tools"), "res/mathfunction.png")
+        .AddParameter("expression", _("Expression"));
+
+
+    extension.AddExpression("ln", _("Logarithm"), _("Logarithm"), _("Mathematical tools"), "res/mathfunction.png")
         .SetHidden()
-        .AddParameter("expression", GD_T("Expression"));
+        .AddParameter("expression", _("Expression"));
 
 
-    extension.AddExpression("log2", GD_T("Base-2 logarithm"), GD_T("Base 2 Logarithm"), GD_T("Mathematical tools"), "res/mathfunction.png")
-        .AddParameter("expression", GD_T("Expression"));
+    extension.AddExpression("log2", _("Base-2 logarithm"), _("Base 2 Logarithm"), _("Mathematical tools"), "res/mathfunction.png")
+        .AddParameter("expression", _("Expression"));
 
 
-    extension.AddExpression("log10", GD_T("Base-10 logarithm"), GD_T("Base-10 logarithm"), GD_T("Mathematical tools"), "res/mathfunction.png")
-        .AddParameter("expression", GD_T("Expression"));
+    extension.AddExpression("log10", _("Base-10 logarithm"), _("Base-10 logarithm"), _("Mathematical tools"), "res/mathfunction.png")
+        .AddParameter("expression", _("Expression"));
 
 
-    extension.AddExpression("nthroot", GD_T("Nth root"), GD_T("Nth root of a number"), GD_T("Mathematical tools"), "res/mathfunction.png")
-        .AddParameter("expression", GD_T("Number"))
-        .AddParameter("expression", GD_T("N"));
+    extension.AddExpression("nthroot", _("Nth root"), _("Nth root of a number"), _("Mathematical tools"), "res/mathfunction.png")
+        .AddParameter("expression", _("Number"))
+        .AddParameter("expression", _("N"));
 
 
-    extension.AddExpression("pow", GD_T("Power"), GD_T("Raise a number to power n"), GD_T("Mathematical tools"), "res/mathfunction.png")
-        .AddParameter("expression", GD_T("Number"))
-        .AddParameter("expression", GD_T("The exponent ( n in x^n )"));
+    extension.AddExpression("pow", _("Power"), _("Raise a number to power n"), _("Mathematical tools"), "res/mathfunction.png")
+        .AddParameter("expression", _("Number"))
+        .AddParameter("expression", _("The exponent ( n in x^n )"));
 
 
-    extension.AddExpression("sec", GD_T("Secant"), GD_T("Secant"), GD_T("Mathematical tools"), "res/mathfunction.png")
-        .AddParameter("expression", GD_T("Expression"));
+    extension.AddExpression("sec", _("Secant"), _("Secant"), _("Mathematical tools"), "res/mathfunction.png")
+        .AddParameter("expression", _("Expression"));
 
 
-    extension.AddExpression("sign", GD_T("Sign of a number"), GD_T("Return the sign of a number ( 1,-1 or 0 )"), GD_T("Mathematical tools"), "res/mathfunction.png")
-        .AddParameter("expression", GD_T("Expression"));
+    extension.AddExpression("sign", _("Sign of a number"), _("Return the sign of a number ( 1,-1 or 0 )"), _("Mathematical tools"), "res/mathfunction.png")
+        .AddParameter("expression", _("Expression"));
 
 
-    extension.AddExpression("sin", GD_T("Sine"), GD_T("Sine of a number"), GD_T("Mathematical tools"), "res/mathfunction.png")
-        .AddParameter("expression", GD_T("Expression"));
+    extension.AddExpression("sin", _("Sine"), _("Sine of a number"), _("Mathematical tools"), "res/mathfunction.png")
+        .AddParameter("expression", _("Expression"));
 
 
-    extension.AddExpression("sinh", GD_T("Hyperbolic sine"), GD_T("Hyperbolic sine"), GD_T("Mathematical tools"), "res/mathfunction.png")
-        .AddParameter("expression", GD_T("Expression"));
+    extension.AddExpression("sinh", _("Hyperbolic sine"), _("Hyperbolic sine"), _("Mathematical tools"), "res/mathfunction.png")
+        .AddParameter("expression", _("Expression"));
 
 
-    extension.AddExpression("sqrt", GD_T("Square root"), GD_T("Square root of a number"), GD_T("Mathematical tools"), "res/mathfunction.png")
-        .AddParameter("expression", GD_T("Expression"));
+    extension.AddExpression("sqrt", _("Square root"), _("Square root of a number"), _("Mathematical tools"), "res/mathfunction.png")
+        .AddParameter("expression", _("Expression"));
 
 
-    extension.AddExpression("tan", GD_T("Tangent"), GD_T("Tangent of a number"), GD_T("Mathematical tools"), "res/mathfunction.png")
-        .AddParameter("expression", GD_T("Expression"));
+    extension.AddExpression("tan", _("Tangent"), _("Tangent of a number"), _("Mathematical tools"), "res/mathfunction.png")
+        .AddParameter("expression", _("Expression"));
 
 
-    extension.AddExpression("tanh", GD_T("Hyperbolic tangent"), GD_T("Hyperbolic tangent"), GD_T("Mathematical tools"), "res/mathfunction.png")
-        .AddParameter("expression", GD_T("Expression"));
+    extension.AddExpression("tanh", _("Hyperbolic tangent"), _("Hyperbolic tangent"), _("Mathematical tools"), "res/mathfunction.png")
+        .AddParameter("expression", _("Expression"));
 
-    extension.AddExpression("trunc", GD_T("Truncation"), GD_T("Troncate a number"), GD_T("Mathematical tools"), "res/mathfunction.png")
-        .AddParameter("expression", GD_T("Expression"));
+    extension.AddExpression("trunc", _("Truncation"), _("Troncate a number"), _("Mathematical tools"), "res/mathfunction.png")
+        .AddParameter("expression", _("Expression"));
 
-    extension.AddExpression("lerp", GD_T("Lerp (Linear interpolation)"), GD_T("Linearly interpolate a to b by x"), GD_T("Mathematical tools"), "res/mathfunction.png")
-        .AddParameter("expression", GD_T("a (in a+(b-a)*x)"))
-        .AddParameter("expression", GD_T("b (in a+(b-a)*x)"))
-        .AddParameter("expression", GD_T("x (in a+(b-a)*x)"));
+    extension.AddExpression("lerp", _("Lerp (Linear interpolation)"), _("Linearly interpolate a to b by x"), _("Mathematical tools"), "res/mathfunction.png")
+        .AddParameter("expression", _("a (in a+(b-a)*x)"))
+        .AddParameter("expression", _("b (in a+(b-a)*x)"))
+        .AddParameter("expression", _("x (in a+(b-a)*x)"));
 
     #endif
 }

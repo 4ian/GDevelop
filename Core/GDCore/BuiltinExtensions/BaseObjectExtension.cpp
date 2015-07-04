@@ -14,14 +14,14 @@ namespace gd
 void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd::PlatformExtension & extension)
 {
     extension.SetExtensionInformation("BuiltinObject",
-                          GD_T("Base object"),
-                          GD_T("Base object"),
+                          _("Base object"),
+                          _("Base object"),
                           "Florian Rival",
                           "Open source (MIT License)");
 
     gd::ObjectMetadata & obj = extension.AddObject("",
-               GD_T("Base object"),
-               GD_T("Base object"),
+               _("Base object"),
+               _("Base object"),
                "res/objeticon24.png",
                &CreateBaseObject);
 
@@ -29,692 +29,692 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
     obj.AddCondition("PosX",
                    _("Compare X position of an object"),
                    _("Compare the X position of the object."),
-                   GD_T("The X position of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("The X position of _PARAM0_ is _PARAM1__PARAM2_"),
                    _("Position"),
                    "res/conditions/position24.png",
                    "res/conditions/position.png")
 
-        .AddParameter("object", GD_T("Object"))
-        .AddParameter("relationalOperator", GD_T("Sign of the test"))
-        .AddParameter("expression", GD_T("X position"))
+        .AddParameter("object", _("Object"))
+        .AddParameter("relationalOperator", _("Sign of the test"))
+        .AddParameter("expression", _("X position"))
         .MarkAsSimple()
         .SetManipulatedType("number");
 
     obj.AddAction("MettreX",
                    _("X position of an object"),
                    _("Change the X position of an object."),
-                   GD_T("Do _PARAM1__PARAM2_ to the X position of _PARAM0_"),
+                   _("Do _PARAM1__PARAM2_ to the X position of _PARAM0_"),
                    _("Position"),
                    "res/actions/position24.png",
                    "res/actions/position.png")
 
-        .AddParameter("object", GD_T("Object"))
-        .AddParameter("operator", GD_T("Modification's sign"))
-        .AddParameter("expression", GD_T("Value"))
+        .AddParameter("object", _("Object"))
+        .AddParameter("operator", _("Modification's sign"))
+        .AddParameter("expression", _("Value"))
         .MarkAsSimple()
         .SetManipulatedType("number");
 
     obj.AddCondition("PosY",
                    _("Compare Y position of an object"),
                    _("Compare the Y position of an object."),
-                   GD_T("The Y position of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("The Y position of _PARAM0_ is _PARAM1__PARAM2_"),
                    _("Position"),
                    "res/conditions/position24.png",
                    "res/conditions/position.png")
 
-        .AddParameter("object", GD_T("Object"))
-        .AddParameter("relationalOperator", GD_T("Sign of the test"))
-        .AddParameter("expression", GD_T("Y position"))
+        .AddParameter("object", _("Object"))
+        .AddParameter("relationalOperator", _("Sign of the test"))
+        .AddParameter("expression", _("Y position"))
         .MarkAsSimple()
         .SetManipulatedType("number");
 
     obj.AddAction("MettreY",
                    _("Y position of an object"),
                    _("Change the Y position of an object."),
-                   GD_T("Do _PARAM1__PARAM2_ to the Y position of _PARAM0_"),
+                   _("Do _PARAM1__PARAM2_ to the Y position of _PARAM0_"),
                    _("Position"),
                    "res/actions/position24.png",
                    "res/actions/position.png")
 
-        .AddParameter("object", GD_T("Object"))
-        .AddParameter("operator", GD_T("Modification's sign"))
-        .AddParameter("expression", GD_T("Value"))
+        .AddParameter("object", _("Object"))
+        .AddParameter("operator", _("Modification's sign"))
+        .AddParameter("expression", _("Value"))
         .MarkAsSimple()
         .SetManipulatedType("number");
 
     obj.AddAction("MettreXY",
                    _("Position of an object"),
                    _("Change the position of an object."),
-                   GD_T("Do _PARAM1__PARAM2_;_PARAM3__PARAM4_ to the position of _PARAM0_"),
+                   _("Do _PARAM1__PARAM2_;_PARAM3__PARAM4_ to the position of _PARAM0_"),
                    _("Position"),
                    "res/actions/position24.png",
                    "res/actions/position.png")
 
-        .AddParameter("object", GD_T("Object"))
-        .AddParameter("operator", GD_T("Modification's sign"))
-        .AddParameter("expression", GD_T("X position"))
-        .AddParameter("operator", GD_T("Modification's sign"))
-        .AddParameter("expression", GD_T("Y position"))
+        .AddParameter("object", _("Object"))
+        .AddParameter("operator", _("Modification's sign"))
+        .AddParameter("expression", _("X position"))
+        .AddParameter("operator", _("Modification's sign"))
+        .AddParameter("expression", _("Y position"))
         .MarkAsSimple();
 
     obj.AddAction("MettreAutourPos",
                    _("Put an object around a position"),
                    _("Position an object around a position, with specified angle and distance."),
-                   GD_T("Put _PARAM0_ around _PARAM1_;_PARAM2_, with an angle of _PARAM4_ degrees and _PARAM3_ pixels distance."),
+                   _("Put _PARAM0_ around _PARAM1_;_PARAM2_, with an angle of _PARAM4_ degrees and _PARAM3_ pixels distance."),
                    _("Position"),
                    "res/actions/positionAutour24.png",
                    "res/actions/positionAutour.png")
 
-        .AddParameter("object", GD_T("Object"))
-        .AddParameter("expression", GD_T("X position"))
-        .AddParameter("expression", GD_T("Y position"))
-        .AddParameter("expression", GD_T("Distance"))
-        .AddParameter("expression", GD_T("Angle, in degrees"))
+        .AddParameter("object", _("Object"))
+        .AddParameter("expression", _("X position"))
+        .AddParameter("expression", _("Y position"))
+        .AddParameter("expression", _("Distance"))
+        .AddParameter("expression", _("Angle, in degrees"))
         .MarkAsAdvanced();
 
     obj.AddAction("SetAngle",
                    _("Angle"),
                    _("Change the angle of rotation of an object."),
-                   GD_T("Do _PARAM1__PARAM2_ to angle of _PARAM0_"),
+                   _("Do _PARAM1__PARAM2_ to angle of _PARAM0_"),
                    _("Angle"),
                    "res/actions/direction24.png",
                    "res/actions/direction.png")
 
-        .AddParameter("object", GD_T("Object"))
-        .AddParameter("operator", GD_T("Modification's sign"))
-        .AddParameter("expression", GD_T("Value"))
+        .AddParameter("object", _("Object"))
+        .AddParameter("operator", _("Modification's sign"))
+        .AddParameter("expression", _("Value"))
         .SetManipulatedType("number");
 
     obj.AddAction("Rotate",
                    _("Rotate"),
                    _("Rotate an object, clockwise if the speed is positive, counterclockwise otherwise."),
-                   GD_T("Rotate _PARAM0_ at speed _PARAM1_deg/second"),
+                   _("Rotate _PARAM0_ at speed _PARAM1_deg/second"),
                    _("Angle"),
                    "res/actions/direction24.png",
                    "res/actions/direction.png")
 
-        .AddParameter("object", GD_T("Object"), "", false)
-        .AddParameter("expression", GD_T("Angular speed (in degrees per second)"), "",false)
+        .AddParameter("object", _("Object"), "", false)
+        .AddParameter("expression", _("Angular speed (in degrees per second)"), "",false)
         .AddCodeOnlyParameter("currentScene", "")
         .MarkAsSimple();
 
     obj.AddAction("RotateTowardAngle",
                    _("Rotate toward angle"),
                    _("Rotate an object towards an angle with the specified speed."),
-                   GD_T("Rotate _PARAM0_ towards _PARAM1_ at speed _PARAM2_deg/second"),
+                   _("Rotate _PARAM0_ towards _PARAM1_ at speed _PARAM2_deg/second"),
                    _("Angle"),
                    "res/actions/direction24.png",
                    "res/actions/direction.png")
 
-        .AddParameter("object", GD_T("Object"), "", false)
-        .AddParameter("expression", GD_T("Angle to rotate towards (in degrees)"), "",false)
-        .AddParameter("expression", GD_T("Angular speed (in degrees per second) (0 for immediate rotation)"), "",false)
+        .AddParameter("object", _("Object"), "", false)
+        .AddParameter("expression", _("Angle to rotate towards (in degrees)"), "",false)
+        .AddParameter("expression", _("Angular speed (in degrees per second) (0 for immediate rotation)"), "",false)
         .AddCodeOnlyParameter("currentScene", "");
 
     obj.AddAction("RotateTowardPosition",
                    _("Rotate toward position"),
                    _("Rotate an object towards a position, with the specified speed."),
-                   GD_T("Rotate _PARAM0_ towards _PARAM1_;_PARAM2_ at speed _PARAM3_deg/second"),
+                   _("Rotate _PARAM0_ towards _PARAM1_;_PARAM2_ at speed _PARAM3_deg/second"),
                    _("Angle"),
                    "res/actions/direction24.png",
                    "res/actions/direction.png")
 
-        .AddParameter("object", GD_T("Object"), "", false)
-        .AddParameter("expression", GD_T("X position"), "",false)
-        .AddParameter("expression", GD_T("Y position"), "",false)
-        .AddParameter("expression", GD_T("Angular speed (in degrees per second) (0 for immediate rotation)"), "",false)
+        .AddParameter("object", _("Object"), "", false)
+        .AddParameter("expression", _("X position"), "",false)
+        .AddParameter("expression", _("Y position"), "",false)
+        .AddParameter("expression", _("Angular speed (in degrees per second) (0 for immediate rotation)"), "",false)
         .AddCodeOnlyParameter("currentScene", "")
         .MarkAsAdvanced();
 
     obj.AddAction("AddForceXY",
                    _("Add a force to an object"),
                    _("Add a force to an object. The object will move according to\nall forces it owns. This action create the force with its X and Y coordinates."),
-                   GD_T("Add to _PARAM0_ a force of _PARAM1_ p/s on X axis and _PARAM2_ p/s on Y axis"),
+                   _("Add to _PARAM0_ a force of _PARAM1_ p/s on X axis and _PARAM2_ p/s on Y axis"),
                    _("Movement"),
                    "res/actions/force24.png",
                    "res/actions/force.png")
 
-        .AddParameter("object", GD_T("Object"))
-        .AddParameter("expression", GD_T("X coordinate of moving"))
-        .AddParameter("expression", GD_T("Y coordinate of moving"))
-        .AddParameter("expression", GD_T("Damping (Default: 0)"));
+        .AddParameter("object", _("Object"))
+        .AddParameter("expression", _("X coordinate of moving"))
+        .AddParameter("expression", _("Y coordinate of moving"))
+        .AddParameter("expression", _("Damping (Default: 0)"));
 
     obj.AddAction("AddForceAL",
                    _("Add a force ( angle )"),
                    _("Add a force to an object. The object will move according to\nall forces it owns. This action creates the force using the specified angle and length."),
-                   GD_T("Add to _PARAM0_ a force, angle: _PARAM1_ degrees and length: _PARAM2_ pixels"),
+                   _("Add to _PARAM0_ a force, angle: _PARAM1_ degrees and length: _PARAM2_ pixels"),
                    _("Movement"),
                    "res/actions/force24.png",
                    "res/actions/force.png")
 
-        .AddParameter("object", GD_T("Object"))
-        .AddParameter("expression", GD_T("Angle"))
-        .AddParameter("expression", GD_T("Length (in pixels)"))
-        .AddParameter("expression", GD_T("Damping (Default: 0)"))
+        .AddParameter("object", _("Object"))
+        .AddParameter("expression", _("Angle"))
+        .AddParameter("expression", _("Length (in pixels)"))
+        .AddParameter("expression", _("Damping (Default: 0)"))
         .MarkAsAdvanced();
 
     obj.AddAction("AddForceVersPos",
                    _("Add a force so as to move to a position"),
                    _("Add a force to an object so as it moves to the position."),
-                   GD_T("Move _PARAM0_ to _PARAM1_;_PARAM2_ with a force of _PARAM3_ pixels"),
+                   _("Move _PARAM0_ to _PARAM1_;_PARAM2_ with a force of _PARAM3_ pixels"),
                    _("Movement"),
                    "res/actions/force24.png",
                    "res/actions/force.png")
 
-        .AddParameter("object", GD_T("Object"))
-        .AddParameter("expression", GD_T("X position"))
-        .AddParameter("expression", GD_T("Y position"))
-        .AddParameter("expression", GD_T("Length (in pixels)"))
-        .AddParameter("expression", GD_T("Damping (Default: 0)"))
+        .AddParameter("object", _("Object"))
+        .AddParameter("expression", _("X position"))
+        .AddParameter("expression", _("Y position"))
+        .AddParameter("expression", _("Length (in pixels)"))
+        .AddParameter("expression", _("Damping (Default: 0)"))
         .MarkAsAdvanced();
 
     obj.AddAction("AddForceTournePos",
                    _("Add a force so as to move around a position"),
                    _("Add a force to an object so as it rotates toward a position.\nNote that the moving is not precise, especially if the speed is high.\nTo position an object around a position more precisly, use the actions in the category  \"Position\"."),
-                   GD_T("Rotate _PARAM0_ around _PARAM1_;_PARAM2_ with _PARAM3_ deg/sec and _PARAM4_ pixels away"),
+                   _("Rotate _PARAM0_ around _PARAM1_;_PARAM2_ with _PARAM3_ deg/sec and _PARAM4_ pixels away"),
                    _("Movement"),
                    "res/actions/forceTourne24.png",
                    "res/actions/forceTourne.png")
 
-        .AddParameter("object", GD_T("Object"))
-        .AddParameter("expression", GD_T("X position of the center"))
-        .AddParameter("expression", GD_T("Y position of the center"))
-        .AddParameter("expression", GD_T("Speed (in Degrees per seconds)"))
-        .AddParameter("expression", GD_T("Distance (in pixels)"))
-        .AddParameter("expression", GD_T("Damping (Default: 0)"))
+        .AddParameter("object", _("Object"))
+        .AddParameter("expression", _("X position of the center"))
+        .AddParameter("expression", _("Y position of the center"))
+        .AddParameter("expression", _("Speed (in Degrees per seconds)"))
+        .AddParameter("expression", _("Distance (in pixels)"))
+        .AddParameter("expression", _("Damping (Default: 0)"))
         .SetHidden();
 
 
     obj.AddAction("Arreter",
                    _("Stop the object"),
                    _("Stop the object by deleting all its forces."),
-                   GD_T("Stop the object _PARAM0_"),
+                   _("Stop the object _PARAM0_"),
                    _("Movement"),
                    "res/actions/arreter24.png",
                    "res/actions/arreter.png")
 
-        .AddParameter("object", GD_T("Object"))
+        .AddParameter("object", _("Object"))
         .MarkAsAdvanced();
 
     obj.AddAction("Delete",
                    _("Delete an object"),
                    _("Delete the specified object."),
-                   GD_T("Delete object _PARAM0_"),
+                   _("Delete object _PARAM0_"),
                    _("Objects"),
                    "res/actions/delete24.png",
                    "res/actions/delete.png")
 
-        .AddParameter("object", GD_T("Object"))
+        .AddParameter("object", _("Object"))
         .AddCodeOnlyParameter("currentScene","")
         .MarkAsSimple();
 
     obj.AddAction("ChangePlan",
                    _("Z order"),
                    _("Modify the z order of an object"),
-                   GD_T("Do _PARAM1__PARAM2_ to z-Order of _PARAM0_"),
+                   _("Do _PARAM1__PARAM2_ to z-Order of _PARAM0_"),
                    _("Z order"),
                    "res/actions/planicon24.png",
                    "res/actions/planicon.png")
 
-        .AddParameter("object", GD_T("Object"))
-        .AddParameter("operator", GD_T("Modification's sign"))
-        .AddParameter("expression", GD_T("Value"))
+        .AddParameter("object", _("Object"))
+        .AddParameter("operator", _("Modification's sign"))
+        .AddParameter("expression", _("Value"))
         .SetManipulatedType("number");
 
     obj.AddAction("ChangeLayer",
                    _("Layer"),
                    _("Change the layer where is the object."),
-                   GD_T("Put _PARAM0_ on the layer _PARAM1_"),
+                   _("Put _PARAM0_ on the layer _PARAM1_"),
                    _("Layers and cameras"),
                    "res/actions/layer24.png",
                    "res/actions/layer.png")
 
-        .AddParameter("object", GD_T("Object"))
-        .AddParameter("layer", GD_T("Put on the layer (base layer if empty)")).SetDefaultValue("\"\"")
+        .AddParameter("object", _("Object"))
+        .AddParameter("layer", _("Put on the layer (base layer if empty)")).SetDefaultValue("\"\"")
         .MarkAsAdvanced();
 
     obj.AddAction("ModVarObjet",
                    _("Modify a variable of an object"),
                    _("Modify the value of a variable of an object"),
-                   GD_T("Do _PARAM2__PARAM3_ to variable _PARAM1_ of _PARAM0_"),
+                   _("Do _PARAM2__PARAM3_ to variable _PARAM1_ of _PARAM0_"),
                    _("Variables"),
                    "res/actions/var24.png",
                    "res/actions/var.png")
 
-        .AddParameter("object", GD_T("Object"))
-        .AddParameter("objectvar", GD_T("Variable"))
-        .AddParameter("operator", GD_T("Modification's sign"))
-        .AddParameter("expression", GD_T("Value"))
+        .AddParameter("object", _("Object"))
+        .AddParameter("objectvar", _("Variable"))
+        .AddParameter("operator", _("Modification's sign"))
+        .AddParameter("expression", _("Value"))
         .SetManipulatedType("number");
 
     obj.AddAction("ModVarObjetTxt",
                    _("Modify the text of a variable of an object"),
                    _("Modify the text of a variable of an object"),
-                   GD_T("Do _PARAM2__PARAM3_ to the text of variable _PARAM1_ of _PARAM0_"),
+                   _("Do _PARAM2__PARAM3_ to the text of variable _PARAM1_ of _PARAM0_"),
                    _("Variables"),
                    "res/actions/var24.png",
                    "res/actions/var.png")
 
-        .AddParameter("object", GD_T("Object"))
-        .AddParameter("objectvar", GD_T("Variable"))
-        .AddParameter("operator", GD_T("Modification's sign"))
-        .AddParameter("string", GD_T("Text"))
+        .AddParameter("object", _("Object"))
+        .AddParameter("objectvar", _("Variable"))
+        .AddParameter("operator", _("Modification's sign"))
+        .AddParameter("string", _("Text"))
         .SetManipulatedType("string");
 
     obj.AddCondition("ObjectVariableChildExists",
              _("Child existence"),
              _("Return true if the specified child of the variable exists."),
-             GD_T("Child _PARAM2_ of variable _PARAM1_ of _PARAM0_ exists"),
+             _("Child _PARAM2_ of variable _PARAM1_ of _PARAM0_ exists"),
              _("Variables/Structures"),
              "res/conditions/var24.png",
              "res/conditions/var.png")
-        .AddParameter("object", GD_T("Object"))
-        .AddParameter("objectvar", GD_T("Variable"))
-        .AddParameter("string", GD_T("Name of the child"))
+        .AddParameter("object", _("Object"))
+        .AddParameter("objectvar", _("Variable"))
+        .AddParameter("string", _("Name of the child"))
         .MarkAsAdvanced();
 
     obj.AddAction("ObjectVariableRemoveChild",
                _("Remove a child"),
                _("Remove a child from a variable of an object."),
-               GD_T("Remove child _PARAM2_ from variable _PARAM1_ of _PARAM0_"),
+               _("Remove child _PARAM2_ from variable _PARAM1_ of _PARAM0_"),
                _("Variables/Structure"),
                "res/actions/var24.png",
                "res/actions/var.png")
-        .AddParameter("object", GD_T("Object"))
-        .AddParameter("objectvar", GD_T("Variable"))
-        .AddParameter("string", GD_T("Child's name"))
+        .AddParameter("object", _("Object"))
+        .AddParameter("objectvar", _("Variable"))
+        .AddParameter("string", _("Child's name"))
         .MarkAsAdvanced();
 
     obj.AddAction("Cache",
                    _("Hide"),
                    _("Hide the specified object."),
-                   GD_T("Hide the object _PARAM0_"),
+                   _("Hide the object _PARAM0_"),
                    _("Visibility"),
                    "res/actions/visibilite24.png",
                    "res/actions/visibilite.png")
 
-        .AddParameter("object", GD_T("Object"))
+        .AddParameter("object", _("Object"))
         .MarkAsSimple();
 
     obj.AddAction("Montre",
                    _("Show"),
                    _("Show the specified object"),
-                   GD_T("Show object _PARAM0_"),
+                   _("Show object _PARAM0_"),
                    _("Visibility"),
                    "res/actions/visibilite24.png",
                    "res/actions/visibilite.png")
 
-        .AddParameter("object", GD_T("Object"))
+        .AddParameter("object", _("Object"))
         .AddCodeOnlyParameter("inlineCode", "false")
         .MarkAsSimple();
 
     obj.AddCondition("Angle",
                    _("Angle"),
                    _("Compare angle of the specified object."),
-                   GD_T("Angle of _PARAM0_ is _PARAM1__PARAM2_ deg."),
+                   _("Angle of _PARAM0_ is _PARAM1__PARAM2_ deg."),
                    _("Angle"),
                    "res/conditions/direction24.png",
                    "res/conditions/direction.png")
 
-        .AddParameter("object", GD_T("Object"))
-        .AddParameter("relationalOperator", GD_T("Sign of the test"))
-        .AddParameter("expression", GD_T("Value to compare (in degrees)"))
+        .AddParameter("object", _("Object"))
+        .AddParameter("relationalOperator", _("Sign of the test"))
+        .AddParameter("expression", _("Value to compare (in degrees)"))
         .MarkAsAdvanced()
         .SetManipulatedType("number");
 
     obj.AddCondition("Plan",
                    _("Compare Z order"),
                    _("Compare the z-order of the specified object."),
-                   GD_T("Z Order of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("Z Order of _PARAM0_ is _PARAM1__PARAM2_"),
                    _("Z order"),
                    "res/conditions/planicon24.png",
                    "res/conditions/planicon.png")
 
-        .AddParameter("object", GD_T("Object"))
-        .AddParameter("relationalOperator", GD_T("Sign of the test"))
-        .AddParameter("expression", GD_T("Z order"))
+        .AddParameter("object", _("Object"))
+        .AddParameter("relationalOperator", _("Sign of the test"))
+        .AddParameter("expression", _("Z order"))
         .MarkAsAdvanced()
         .SetManipulatedType("number");
 
     obj.AddCondition("Layer",
                    _("Compare layer"),
                    _("Test if the object is on the specified layer."),
-                   GD_T("_PARAM0_ is on layer _PARAM1_"),
+                   _("_PARAM0_ is on layer _PARAM1_"),
                    _("Layer"),
                    "res/conditions/layer24.png",
                    "res/conditions/layer.png")
 
-        .AddParameter("object", GD_T("Object"))
-        .AddParameter("layer", GD_T("Layer"))
+        .AddParameter("object", _("Object"))
+        .AddParameter("layer", _("Layer"))
         .MarkAsAdvanced();
 
     obj.AddCondition("Visible",
                    _("Visibility of an object"),
                    _("Test if an object is not hidden."),
-                   GD_T("The object _PARAM0_ is visible"),
+                   _("The object _PARAM0_ is visible"),
                    _("Visibility"),
                    "res/conditions/visibilite24.png",
                    "res/conditions/visibilite.png")
 
-        .AddParameter("object", GD_T("Object"))
+        .AddParameter("object", _("Object"))
         .MarkAsSimple();
 
     obj.AddCondition("Invisible",
                    _("Invisibility of an object"),
                    _("Test if an object is hidden."),
-                   GD_T("_PARAM0_ is hidden"),
+                   _("_PARAM0_ is hidden"),
                    _("Visibility"),
                    "res/conditions/visibilite24.png",
                    "res/conditions/visibilite.png")
 
-        .AddParameter("object", GD_T("Object"))
+        .AddParameter("object", _("Object"))
         .SetHidden(); //Inverted "Visible" condition  does the same thing.
 
     obj.AddCondition("Arret",
                    _("Object is stopped"),
                    _("Test if an object does not move"),
-                   GD_T("_PARAM0_ is stopped"),
+                   _("_PARAM0_ is stopped"),
                    _("Movement"),
                    "res/conditions/arret24.png",
                    "res/conditions/arret.png")
 
-        .AddParameter("object", GD_T("Object"))
+        .AddParameter("object", _("Object"))
         .MarkAsAdvanced();
 
     obj.AddCondition("Vitesse",
                    _("Speed"),
                    _("Compare the overall speed of an object"),
-                   GD_T("Overall speed of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("Overall speed of _PARAM0_ is _PARAM1__PARAM2_"),
                    _("Movement"),
                    "res/conditions/vitesse24.png",
                    "res/conditions/vitesse.png")
 
-        .AddParameter("object", GD_T("Object"))
-        .AddParameter("relationalOperator", GD_T("Sign of the test"))
-        .AddParameter("expression", GD_T("Speed"))
+        .AddParameter("object", _("Object"))
+        .AddParameter("relationalOperator", _("Sign of the test"))
+        .AddParameter("expression", _("Speed"))
         .MarkAsAdvanced()
         .SetManipulatedType("number");
 
     obj.AddCondition("AngleOfDisplacement",
                    _("Angle of moving"),
                    _("Compare the angle of displacement of an object"),
-                   GD_T("Angle of displacement of _PARAM0_ is _PARAM1_ (tolerance : _PARAM2_ degrees)"),
+                   _("Angle of displacement of _PARAM0_ is _PARAM1_ (tolerance : _PARAM2_ degrees)"),
                    _("Movement"),
                    "res/conditions/vitesse24.png",
                    "res/conditions/vitesse.png")
 
-        .AddParameter("object", GD_T("Object"))
-        .AddParameter("expression", GD_T("Angle, in degrees"))
-        .AddParameter("expression", GD_T("Tolerance"))
+        .AddParameter("object", _("Object"))
+        .AddParameter("expression", _("Angle, in degrees"))
+        .AddParameter("expression", _("Tolerance"))
         .MarkAsAdvanced();
 
     obj.AddCondition("VarObjet",
                    _("Value of an object's variable"),
                    _("Compare the value of a variable of an object."),
-                   GD_T("Variable _PARAM1_ of _PARAM0_ is _PARAM2__PARAM3_"),
+                   _("Variable _PARAM1_ of _PARAM0_ is _PARAM2__PARAM3_"),
                    _("Variables"),
                    "res/conditions/var24.png",
                    "res/conditions/var.png")
 
-        .AddParameter("object", GD_T("Object"))
-        .AddParameter("objectvar", GD_T("Variable"))
-        .AddParameter("relationalOperator", GD_T("Sign of the test"))
-        .AddParameter("expression", GD_T("Value to test"))
+        .AddParameter("object", _("Object"))
+        .AddParameter("objectvar", _("Variable"))
+        .AddParameter("relationalOperator", _("Sign of the test"))
+        .AddParameter("expression", _("Value to test"))
         .SetManipulatedType("number");
 
     obj.AddCondition("VarObjetTxt",
                    _("Text of an object's variable"),
                    _("Compare the text of a variable of an object."),
-                   GD_T("The text of variable _PARAM1_ of _PARAM0_ is _PARAM2__PARAM3_"),
+                   _("The text of variable _PARAM1_ of _PARAM0_ is _PARAM2__PARAM3_"),
                    _("Variables"),
                    "res/conditions/var24.png",
                    "res/conditions/var.png")
 
-        .AddParameter("object", GD_T("Object"))
-        .AddParameter("objectvar", GD_T("Variable"))
-        .AddParameter("relationalOperator", GD_T("Sign of the test"))
-        .AddParameter("string", GD_T("Text to test"))
+        .AddParameter("object", _("Object"))
+        .AddParameter("objectvar", _("Variable"))
+        .AddParameter("relationalOperator", _("Sign of the test"))
+        .AddParameter("string", _("Text to test"))
         .SetManipulatedType("string");
 
     obj.AddCondition("VarObjetDef",
                    _("Variable defined"),
                    _("Test "),
-                   GD_T("Variable _PARAM1 of _PARAM0_ is defined"),
+                   _("Variable _PARAM1 of _PARAM0_ is defined"),
                    _("Variables"),
                    "res/conditions/var24.png",
                    "res/conditions/var.png")
 
-        .AddParameter("object", GD_T("Object"))
-        .AddParameter("string", GD_T("Variable"))
+        .AddParameter("object", _("Object"))
+        .AddParameter("string", _("Variable"))
         .SetHidden();
 
     obj.AddCondition("AutomatismActivated",
                    _("Automatism activated"),
                    _("Return true if the automatism is activated for the object."),
-                   GD_T("Automatism _PARAM1_ of _PARAM0_ is activated"),
+                   _("Automatism _PARAM1_ of _PARAM0_ is activated"),
                    _("Automatisms"),
                    "res/automatism24.png",
                    "res/automatism16.png")
 
-        .AddParameter("object", GD_T("Object"))
-        .AddParameter("automatism", GD_T("Automatism"))
+        .AddParameter("object", _("Object"))
+        .AddParameter("automatism", _("Automatism"))
         .MarkAsAdvanced();
 
     obj.AddAction("ActivateAutomatism",
                    _("De/activate an automatism"),
                    _("De/activate the automatism for the object."),
-                   GD_T("Activate automatism _PARAM1_ of _PARAM0_: _PARAM2_"),
+                   _("Activate automatism _PARAM1_ of _PARAM0_: _PARAM2_"),
                    _("Automatisms"),
                    "res/automatism24.png",
                    "res/automatism16.png")
 
-        .AddParameter("object", GD_T("Object"))
-        .AddParameter("automatism", GD_T("Automatism"))
-        .AddParameter("yesorno", GD_T("Activate \?"))
+        .AddParameter("object", _("Object"))
+        .AddParameter("automatism", _("Automatism"))
+        .AddParameter("yesorno", _("Activate \?"))
         .MarkAsAdvanced();
 
     obj.AddAction("AddForceVers",
                    _("Add a force so as to move to an object"),
                    _("Add a force to an object so as it moves to another."),
-                   GD_T("Move _PARAM0_ to _PARAM1_ with a force of _PARAM2_ pixels"),
+                   _("Move _PARAM0_ to _PARAM1_ with a force of _PARAM2_ pixels"),
                    _("Movement"),
                    "res/actions/forceVers24.png",
                    "res/actions/forceVers.png")
 
-        .AddParameter("object", GD_T("Object"))
-        .AddParameter("objectPtr", GD_T("Target Object"))
-        .AddParameter("expression", GD_T("Length in pixel"))
-        .AddParameter("expression", GD_T("Damping (Default: 0)"))
+        .AddParameter("object", _("Object"))
+        .AddParameter("objectPtr", _("Target Object"))
+        .AddParameter("expression", _("Length in pixel"))
+        .AddParameter("expression", _("Damping (Default: 0)"))
         .MarkAsAdvanced();
 
     obj.AddAction("AddForceTourne",
                    _("Add a force so as to move around an object"),
                    _("Add a force to an object so as it rotates around another.\nNote that the moving is not precise, especially if the speed is high.\nTo position an object around a position more precisly, use the actions in the category  \"Position\"."),
-                   GD_T("Rotate _PARAM0_ around _PARAM1_ with _PARAM2_ deg/sec and _PARAM3_ pixels away"),
+                   _("Rotate _PARAM0_ around _PARAM1_ with _PARAM2_ deg/sec and _PARAM3_ pixels away"),
                    _("Movement"),
                    "res/actions/forceTourne24.png",
                    "res/actions/forceTourne.png")
 
-        .AddParameter("object", GD_T("Object"))
-        .AddParameter("objectPtr", GD_T("Rotate around this object"))
-        .AddParameter("expression", GD_T("Speed ( Degrees per second )"))
-        .AddParameter("expression", GD_T("Distance ( in pixel )"))
-        .AddParameter("expression", GD_T("Damping (Default: 0)"))
+        .AddParameter("object", _("Object"))
+        .AddParameter("objectPtr", _("Rotate around this object"))
+        .AddParameter("expression", _("Speed ( Degrees per second )"))
+        .AddParameter("expression", _("Distance ( in pixel )"))
+        .AddParameter("expression", _("Damping (Default: 0)"))
         .MarkAsAdvanced();
 
 
     obj.AddAction("MettreAutour",
                    _("Put an object around another"),
                    _("Position an object around another, with the specified angle and distance."),
-                   GD_T("Put _PARAM0_ around _PARAM1_, with an angle of _PARAM3_ degrees and _PARAM2_ pixels distance."),
+                   _("Put _PARAM0_ around _PARAM1_, with an angle of _PARAM3_ degrees and _PARAM2_ pixels distance."),
                    _("Position"),
                    "res/actions/positionAutour24.png",
                    "res/actions/positionAutour.png")
 
-        .AddParameter("object", GD_T("Object"))
-        .AddParameter("objectPtr", GD_T("\"Center\" Object"))
-        .AddParameter("expression", GD_T("Distance"))
-        .AddParameter("expression", GD_T("Angle, in degrees"))
+        .AddParameter("object", _("Object"))
+        .AddParameter("objectPtr", _("\"Center\" Object"))
+        .AddParameter("expression", _("Distance"))
+        .AddParameter("expression", _("Angle, in degrees"))
         .MarkAsAdvanced();
 
     //Deprecated action
     obj.AddAction("Rebondir",
                    _("Move an object away from another"),
                    _("Move an object away from another, using forces."),
-                   GD_T("Move away _PARAM0_ of _PARAM1_ ( only _PARAM0_ will move )"),
+                   _("Move away _PARAM0_ of _PARAM1_ ( only _PARAM0_ will move )"),
                    _("Movement"),
                    "res/actions/ecarter24.png",
                    "res/actions/ecarter.png")
 
         .SetHidden()
-        .AddParameter("object", GD_T("Object"))
-        .AddParameter("objectList", GD_T("Object 2 ( won't move )"));
+        .AddParameter("object", _("Object"))
+        .AddParameter("objectList", _("Object 2 ( won't move )"));
 
 
     //Deprecated action
     obj.AddAction("Ecarter",
                    _("Move an object away from another"),
                    _("Move an object away from another without using forces."),
-                   GD_T("Move away _PARAM0_ of _PARAM2_ ( only _PARAM0_ will move )"),
+                   _("Move away _PARAM0_ of _PARAM2_ ( only _PARAM0_ will move )"),
                    _("Position"),
                    "res/actions/ecarter24.png",
                    "res/actions/ecarter.png")
 
         .SetHidden()
-        .AddParameter("object", GD_T("Object"))
-        .AddParameter("objectList", GD_T("Object 2 ( won't move )"));
+        .AddParameter("object", _("Object"))
+        .AddParameter("objectList", _("Object 2 ( won't move )"));
 
 
     obj.AddAction("SeparateFromObjects",
                    _("Separate two objects"),
                    _("Move an object away from another using their collision masks.\nBe sure to call this action on a reasonable number of objects so as\nnot to slow down the game."),
-                   GD_T("Move away _PARAM0_ of _PARAM1_ (only _PARAM0_ will move)"),
+                   _("Move away _PARAM0_ of _PARAM1_ (only _PARAM0_ will move)"),
                    _("Position"),
                    "res/actions/ecarter24.png",
                    "res/actions/ecarter.png")
 
-        .AddParameter("object", GD_T("Object"))
-        .AddParameter("objectList", GD_T("Objects"))
+        .AddParameter("object", _("Object"))
+        .AddParameter("objectList", _("Objects"))
         .MarkAsSimple();
 
-    obj.AddExpression("X", GD_T("X position"), GD_T("X position of the object"), GD_T("Position"), "res/actions/position.png")
-        .AddParameter("object", GD_T("Object"));
+    obj.AddExpression("X", _("X position"), _("X position of the object"), _("Position"), "res/actions/position.png")
+        .AddParameter("object", _("Object"));
 
-    obj.AddExpression("Y", GD_T("Y position"), GD_T("Y position of the object"), GD_T("Position"), "res/actions/position.png")
-        .AddParameter("object", GD_T("Object"));
+    obj.AddExpression("Y", _("Y position"), _("Y position of the object"), _("Position"), "res/actions/position.png")
+        .AddParameter("object", _("Object"));
 
-    obj.AddExpression("Angle", GD_T("Angle"), GD_T("Current angle, in degrees, of the object"), GD_T("Angle"), "res/actions/direction.png")
-        .AddParameter("object", GD_T("Object"));
+    obj.AddExpression("Angle", _("Angle"), _("Current angle, in degrees, of the object"), _("Angle"), "res/actions/direction.png")
+        .AddParameter("object", _("Object"));
 
-    obj.AddExpression("ForceX", GD_T("Average X coordinates of forces"), GD_T("Average X coordinates of forces"), GD_T("Movement"), "res/actions/force.png")
-        .AddParameter("object", GD_T("Object"));
+    obj.AddExpression("ForceX", _("Average X coordinates of forces"), _("Average X coordinates of forces"), _("Movement"), "res/actions/force.png")
+        .AddParameter("object", _("Object"));
 
-    obj.AddExpression("ForceY", GD_T("Average Y coordinates of forces"), GD_T("Average Y coordinates of forces"), GD_T("Movement"), "res/actions/force.png")
-        .AddParameter("object", GD_T("Object"));
+    obj.AddExpression("ForceY", _("Average Y coordinates of forces"), _("Average Y coordinates of forces"), _("Movement"), "res/actions/force.png")
+        .AddParameter("object", _("Object"));
 
-    obj.AddExpression("ForceAngle", GD_T("Average angle of the forces"), GD_T("Average angle of the forces"), GD_T("Movement"), "res/actions/force.png")
-        .AddParameter("object", GD_T("Object"));
+    obj.AddExpression("ForceAngle", _("Average angle of the forces"), _("Average angle of the forces"), _("Movement"), "res/actions/force.png")
+        .AddParameter("object", _("Object"));
 
-    obj.AddExpression("ForceLength", GD_T("Average length of the forces"), GD_T("Average length of the forces"), GD_T("Movement"), "res/actions/force.png")
-        .AddParameter("object", GD_T("Object"));
+    obj.AddExpression("ForceLength", _("Average length of the forces"), _("Average length of the forces"), _("Movement"), "res/actions/force.png")
+        .AddParameter("object", _("Object"));
 
-    obj.AddExpression("Longueur", GD_T("Average length of the forces"), GD_T("Average length of the forces"), GD_T("Movement"), "res/actions/force.png")
-        .AddParameter("object", GD_T("Object"))
+    obj.AddExpression("Longueur", _("Average length of the forces"), _("Average length of the forces"), _("Movement"), "res/actions/force.png")
+        .AddParameter("object", _("Object"))
         .SetHidden();
 
 
-    obj.AddExpression("Width", GD_T("Width"), GD_T("Width of the object"), GD_T("Size"), "res/actions/scaleWidth.png")
-        .AddParameter("object", GD_T("Object"));
+    obj.AddExpression("Width", _("Width"), _("Width of the object"), _("Size"), "res/actions/scaleWidth.png")
+        .AddParameter("object", _("Object"));
 
-    obj.AddExpression("Largeur", GD_T("Width"), GD_T("Width of the object"), GD_T("Size"), "res/actions/scaleWidth.png")
-        .AddParameter("object", GD_T("Object"))
+    obj.AddExpression("Largeur", _("Width"), _("Width of the object"), _("Size"), "res/actions/scaleWidth.png")
+        .AddParameter("object", _("Object"))
         .SetHidden();
 
-    obj.AddExpression("Height", GD_T("Height"), GD_T("Height of the object"), GD_T("Size"), "res/actions/scaleHeight.png")
-        .AddParameter("object", GD_T("Object"));
+    obj.AddExpression("Height", _("Height"), _("Height of the object"), _("Size"), "res/actions/scaleHeight.png")
+        .AddParameter("object", _("Object"));
 
-    obj.AddExpression("Hauteur", GD_T("Height"), GD_T("Height of the object"), GD_T("Size"), "res/actions/scaleHeight.png")
-        .AddParameter("object", GD_T("Object"))
+    obj.AddExpression("Hauteur", _("Height"), _("Height of the object"), _("Size"), "res/actions/scaleHeight.png")
+        .AddParameter("object", _("Object"))
         .SetHidden();
 
-    obj.AddExpression("ZOrder", GD_T("Z order"), GD_T("Z order of an object"), GD_T("Visibility"), "res/actions/planicon.png")
-        .AddParameter("object", GD_T("Object"));
+    obj.AddExpression("ZOrder", _("Z order"), _("Z order of an object"), _("Visibility"), "res/actions/planicon.png")
+        .AddParameter("object", _("Object"));
 
-    obj.AddExpression("Plan", GD_T("Z order"), GD_T("Z order of an object"), GD_T("Visibility"), "res/actions/planicon.png")
-        .AddParameter("object", GD_T("Object"))
+    obj.AddExpression("Plan", _("Z order"), _("Z order of an object"), _("Visibility"), "res/actions/planicon.png")
+        .AddParameter("object", _("Object"))
         .SetHidden();
 
-    obj.AddExpression("Distance", GD_T("Distance between two objects"), GD_T("Distance between two objects"), GD_T("Position"), "res/conditions/distance.png")
-        .AddParameter("object", GD_T("Object"))
-        .AddParameter("objectPtr", GD_T("Object"));
+    obj.AddExpression("Distance", _("Distance between two objects"), _("Distance between two objects"), _("Position"), "res/conditions/distance.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("objectPtr", _("Object"));
 
-    obj.AddExpression("SqDistance", GD_T("Square distance between two objects"), GD_T("Square distance between two objects"), GD_T("Position"), "res/conditions/distance.png")
-        .AddParameter("object", GD_T("Object"))
-        .AddParameter("objectPtr", GD_T("Object"));
+    obj.AddExpression("SqDistance", _("Square distance between two objects"), _("Square distance between two objects"), _("Position"), "res/conditions/distance.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("objectPtr", _("Object"));
 
-    obj.AddExpression("Variable", GD_T("Object's variable"), GD_T("Object's variable"), GD_T("Variables"), "res/actions/var.png")
-        .AddParameter("object", GD_T("Object"))
-        .AddParameter("objectvar", GD_T("Variable"));
+    obj.AddExpression("Variable", _("Object's variable"), _("Object's variable"), _("Variables"), "res/actions/var.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("objectvar", _("Variable"));
 
-    obj.AddStrExpression("VariableString", GD_T("Object's variable"), GD_T("Text of variable of an object"), GD_T("Variables"), "res/actions/var.png")
-        .AddParameter("object", GD_T("Object"))
-        .AddParameter("objectvar", GD_T("Variable"));
+    obj.AddStrExpression("VariableString", _("Object's variable"), _("Text of variable of an object"), _("Variables"), "res/actions/var.png")
+        .AddParameter("object", _("Object"))
+        .AddParameter("objectvar", _("Variable"));
 
     extension.AddAction("Create",
                    _("Create an object"),
                    _("Create an object at specified position"),
-                   GD_T("Create object _PARAM1_ at position _PARAM2_;_PARAM3_"),
+                   _("Create object _PARAM1_ at position _PARAM2_;_PARAM3_"),
                    _("Objects"),
                    "res/actions/create24.png",
                    "res/actions/create.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("objectListWithoutPicking", GD_T("Object to create"))
-        .AddParameter("expression", GD_T("X position"))
-        .AddParameter("expression", GD_T("Y position"))
-        .AddParameter("layer", GD_T("Layer ( Base layer if empty )"), "", true).SetDefaultValue("\"\"")
+        .AddParameter("objectListWithoutPicking", _("Object to create"))
+        .AddParameter("expression", _("X position"))
+        .AddParameter("expression", _("Y position"))
+        .AddParameter("layer", _("Layer ( Base layer if empty )"), "", true).SetDefaultValue("\"\"")
         .MarkAsSimple();
 
     extension.AddAction("CreateByName",
                    _("Create an object from its name"),
                    _("Among the objects of the specified group, the action will create the object with the specified name."),
-                   GD_T("Among objects _PARAM1_, create object named _PARAM2_ at position _PARAM3_;_PARAM4_"),
+                   _("Among objects _PARAM1_, create object named _PARAM2_ at position _PARAM3_;_PARAM4_"),
                    _("Objects"),
                    "res/actions/create24.png",
                    "res/actions/create.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("objectListWithoutPicking", GD_T("Groups containing objects which can be created by the action"))
-        .AddParameter("string", GD_T("Text representing the name of the object to create"))
-        .AddParameter("expression", GD_T("X position"))
-        .AddParameter("expression", GD_T("Y position"))
-        .AddParameter("layer", GD_T("Layer ( Base layer if empty )"), "", true).SetDefaultValue("\"\"")
+        .AddParameter("objectListWithoutPicking", _("Groups containing objects which can be created by the action"))
+        .AddParameter("string", _("Text representing the name of the object to create"))
+        .AddParameter("expression", _("X position"))
+        .AddParameter("expression", _("Y position"))
+        .AddParameter("layer", _("Layer ( Base layer if empty )"), "", true).SetDefaultValue("\"\"")
         .MarkAsAdvanced();
 
     extension.AddAction("AjoutObjConcern",
                    _("Consider objects"),
                    _("Pick all objects with this name."),
-                   GD_T("Consider all _PARAM1_ "),
+                   _("Consider all _PARAM1_ "),
                    _("Objects"),
                    "res/actions/add24.png",
                    "res/actions/add.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("objectList", GD_T("Object"))
+        .AddParameter("objectList", _("Object"))
         .MarkAsAdvanced();
 
     extension.AddAction("AjoutHasard",
                    _("Take a random object"),
                    _("Take only one object with this name among all"),
-                   GD_T("Take a random _PARAM1_ "),
+                   _("Take a random _PARAM1_ "),
                    _("Objects"),
                    "res/actions/ajouthasard24.png",
                    "res/actions/ajouthasard.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("objectList", GD_T("Object"))
+        .AddParameter("objectList", _("Object"))
         .MarkAsSimple();
 
     extension.AddAction("MoveObjects",
                    _("Make objects moving"),
                    _("Moves the objects according to the forces they have. GDevelop call this action at the end of the events by default."),
-                   GD_T("Make objects moving"),
+                   _("Make objects moving"),
                    _("Movement"),
                    "res/actions/doMove24.png",
                    "res/actions/doMove.png")
@@ -724,104 +724,104 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
     extension.AddCondition("SeDirige",
                    _("An object is moving to another"),
                    _("Test if an object moves towards another.\nThe first object must move."),
-                   GD_T("_PARAM0_ is moving toward _PARAM1_"),
+                   _("_PARAM0_ is moving toward _PARAM1_"),
                    _("Movement"),
                    "res/conditions/sedirige24.png",
                    "res/conditions/sedirige.png")
-        .AddParameter("objectList", GD_T("Object"))
-        .AddParameter("objectList", GD_T("Object 2"))
-        .AddParameter("expression", GD_T("Angle of tolerance"))
+        .AddParameter("objectList", _("Object"))
+        .AddParameter("objectList", _("Object 2"))
+        .AddParameter("expression", _("Angle of tolerance"))
         .AddCodeOnlyParameter("conditionInverted", "")
         .MarkAsAdvanced();
 
     extension.AddCondition("Distance",
                    _("Distance between two objects"),
                    _("Test the distance between two objects.\nIf condition is inverted, only objects that have a distance greater than specified to any other object will be picked."),
-                   GD_T("_PARAM0_ distance to _PARAM1_ is below _PARAM2_ pixels"),
+                   _("_PARAM0_ distance to _PARAM1_ is below _PARAM2_ pixels"),
                    _("Position"),
                    "res/conditions/distance24.png",
                    "res/conditions/distance.png")
-        .AddParameter("objectList", GD_T("Object"))
-        .AddParameter("objectList", GD_T("Object 2"))
-        .AddParameter("expression", GD_T("Distance"))
+        .AddParameter("objectList", _("Object"))
+        .AddParameter("objectList", _("Object 2"))
+        .AddParameter("expression", _("Distance"))
         .AddCodeOnlyParameter("conditionInverted", "")
         .MarkAsSimple();
 
     extension.AddCondition("AjoutObjConcern",
                    _("Consider objects"),
                    _("Pick all objects with this name."),
-                   GD_T("Consider all _PARAM1_ "),
+                   _("Consider all _PARAM1_ "),
                    _("Objects"),
                    "res/conditions/add24.png",
                    "res/conditions/add.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("objectList", GD_T("Object"))
+        .AddParameter("objectList", _("Object"))
         .MarkAsAdvanced();
 
     extension.AddCondition("AjoutHasard",
                    _("Take a random object"),
                    _("Take only one object with this name among all"),
-                   GD_T("Take a random _PARAM1_ "),
+                   _("Take a random _PARAM1_ "),
                    _("Objects"),
                    "res/conditions/ajouthasard24.png",
                    "res/conditions/ajouthasard.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("objectList", GD_T("Object"))
+        .AddParameter("objectList", _("Object"))
         .MarkAsSimple();
 
     extension.AddCondition("PickNearest",
                    _("Pick nearest object"),
                    _("Among the objects, pick the one that is nearest (or furthest if condition is inverted) from the specified position."),
-                   GD_T("Pick nearest _PARAM0_ to _PARAM1_;_PARAM2_"),
+                   _("Pick nearest _PARAM0_ to _PARAM1_;_PARAM2_"),
                    _("Objects"),
                    "res/conditions/distance24.png",
                    "res/conditions/distance.png")
-        .AddParameter("objectList", GD_T("Object"))
-        .AddParameter("expression", GD_T("X position"))
-        .AddParameter("expression", GD_T("Y position"))
+        .AddParameter("objectList", _("Object"))
+        .AddParameter("expression", _("X position"))
+        .AddParameter("expression", _("Y position"))
         .AddCodeOnlyParameter("conditionInverted", "")
         .MarkAsSimple();
 
     extension.AddCondition("NbObjet",
                    _("Number of objects"),
                    _("Test the number of concerned objects."),
-                   GD_T("The number of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("The number of _PARAM0_ is _PARAM1__PARAM2_"),
                    _("Objects"),
                    "res/conditions/nbObjet24.png",
                    "res/conditions/nbObjet.png")
-        .AddParameter("objectList", GD_T("Object"))
-        .AddParameter("relationalOperator", GD_T("Sign of the test"))
-        .AddParameter("expression", GD_T("Value to test"))
+        .AddParameter("objectList", _("Object"))
+        .AddParameter("relationalOperator", _("Sign of the test"))
+        .AddParameter("expression", _("Value to test"))
         .MarkAsSimple()
         .SetManipulatedType("number");
 
     extension.AddCondition("CollisionNP", //"CollisionNP" cames from an old condition to test collision between two sprites non precisely.
                    _("Collision"),
                    _("Test the collision between two objects using their collision mask.\nNote that some objects may not have a collision mask.\nSome others, like Sprite, provide also more precise collision conditions."),
-                   GD_T("_PARAM0_ is in collision with _PARAM1_"),
+                   _("_PARAM0_ is in collision with _PARAM1_"),
                    _("Collision"),
                    "res/conditions/collision24.png",
                    "res/conditions/collision.png")
-        .AddParameter("objectList", GD_T("Object"))
-        .AddParameter("objectList", GD_T("Object"))
+        .AddParameter("objectList", _("Object"))
+        .AddParameter("objectList", _("Object"))
         .AddCodeOnlyParameter("conditionInverted", "")
         .MarkAsSimple();
 
     extension.AddCondition("EstTourne",
                       _("An object is turned toward another"),
                       _("Test if an object is turned toward another"),
-                      GD_T("_PARAM0_ is rotated towards _PARAM1_"),
+                      _("_PARAM0_ is rotated towards _PARAM1_"),
                       _("Angle"),
                       "res/conditions/estTourne24.png",
                       "res/conditions/estTourne.png")
-        .AddParameter("objectList", GD_T("Name of the object"), "", false)
-        .AddParameter("objectList", GD_T("Name of the second object"))
-        .AddParameter("expression", GD_T("Angle of tolerance, in degrees (0: minimum tolerance)"), "",false)
+        .AddParameter("objectList", _("Name of the object"), "", false)
+        .AddParameter("objectList", _("Name of the second object"))
+        .AddParameter("expression", _("Angle of tolerance, in degrees (0: minimum tolerance)"), "",false)
         .AddCodeOnlyParameter("conditionInverted", "")
         .MarkAsAdvanced();
 
-    extension.AddExpression("Count", GD_T("Number of objects"), GD_T("Count the number of the specified objects currently picked"), GD_T("Objects"), "res/conditions/nbObjet.png")
-        .AddParameter("objectList", GD_T("Object"));
+    extension.AddExpression("Count", _("Number of objects"), _("Count the number of the specified objects currently picked"), _("Objects"), "res/conditions/nbObjet.png")
+        .AddParameter("objectList", _("Object"));
     #endif
 }
 

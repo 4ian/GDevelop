@@ -6,7 +6,7 @@
 
 #include <map>
 #include <vector>
-#include <string>
+#include <GDCore/Utf8String.h>
 #include <fstream>
 #include <stdio.h>
 #include <SFML/System/Utf.hpp>
@@ -110,7 +110,7 @@ Project::~Project()
 {
 }
 
-std::shared_ptr<gd::Object> Project::CreateObject(const std::string & type, const std::string & name, const std::string & platformName)
+std::shared_ptr<gd::Object> Project::CreateObject(const gd::String & type, const gd::String & name, const gd::String & platformName)
 {
     for (unsigned int i = 0;i<platforms.size();++i)
     {
@@ -123,7 +123,7 @@ std::shared_ptr<gd::Object> Project::CreateObject(const std::string & type, cons
     return std::shared_ptr<gd::Object>();
 }
 
-gd::Automatism* Project::CreateAutomatism(const std::string & type, const std::string & platformName)
+gd::Automatism* Project::CreateAutomatism(const gd::String & type, const gd::String & platformName)
 {
     for (unsigned int i = 0;i<platforms.size();++i)
     {
@@ -136,7 +136,7 @@ gd::Automatism* Project::CreateAutomatism(const std::string & type, const std::s
     return NULL;
 }
 
-std::shared_ptr<gd::AutomatismsSharedData> Project::CreateAutomatismSharedDatas(const std::string & type, const std::string & platformName)
+std::shared_ptr<gd::AutomatismsSharedData> Project::CreateAutomatismSharedDatas(const gd::String & type, const gd::String & platformName)
 {
     for (unsigned int i = 0;i<platforms.size();++i)
     {
@@ -150,7 +150,7 @@ std::shared_ptr<gd::AutomatismsSharedData> Project::CreateAutomatismSharedDatas(
 }
 
 #if defined(GD_IDE_ONLY)
-std::shared_ptr<gd::BaseEvent> Project::CreateEvent(const std::string & type, const std::string & platformName)
+std::shared_ptr<gd::BaseEvent> Project::CreateEvent(const gd::String & type, const gd::String & platformName)
 {
     for (unsigned int i = 0;i<platforms.size();++i)
     {
@@ -184,7 +184,7 @@ void Project::AddPlatform(Platform & platform)
     if ( currentPlatform == NULL ) currentPlatform = &platform;
 }
 
-void Project::SetCurrentPlatform(const std::string & platformName)
+void Project::SetCurrentPlatform(const gd::String & platformName)
 {
     for (unsigned int i = 0;i<platforms.size();++i)
     {
@@ -196,7 +196,7 @@ void Project::SetCurrentPlatform(const std::string & platformName)
     }
 }
 
-bool Project::RemovePlatform(const std::string & platformName)
+bool Project::RemovePlatform(const gd::String & platformName)
 {
     if ( platforms.size() <= 1 ) return false;
 
@@ -217,15 +217,15 @@ bool Project::RemovePlatform(const std::string & platformName)
 }
 #endif
 
-bool Project::HasLayoutNamed(const std::string & name) const
+bool Project::HasLayoutNamed(const gd::String & name) const
 {
     return ( find_if(scenes.begin(), scenes.end(), bind2nd(gd::LayoutHasName(), name)) != scenes.end() );
 }
-gd::Layout & Project::GetLayout(const std::string & name)
+gd::Layout & Project::GetLayout(const gd::String & name)
 {
     return *(*find_if(scenes.begin(), scenes.end(), bind2nd(gd::LayoutHasName(), name)));
 }
-const gd::Layout & Project::GetLayout(const std::string & name) const
+const gd::Layout & Project::GetLayout(const gd::String & name) const
 {
     return *(*find_if(scenes.begin(), scenes.end(), bind2nd(gd::LayoutHasName(), name)));
 }
@@ -237,13 +237,13 @@ const gd::Layout & Project::GetLayout (unsigned int index) const
 {
     return *scenes[index];
 }
-unsigned int Project::GetLayoutPosition(const std::string & name) const
+unsigned int Project::GetLayoutPosition(const gd::String & name) const
 {
     for (unsigned int i = 0;i<scenes.size();++i)
     {
         if ( scenes[i]->GetName() == name ) return i;
     }
-    return std::string::npos;
+    return gd::String::npos;
 }
 unsigned int Project::GetLayoutsCount() const
 {
@@ -263,7 +263,7 @@ void Project::SwapLayouts(unsigned int first, unsigned int second)
 }
 #endif
 
-gd::Layout & Project::InsertNewLayout(const std::string & name, unsigned int position)
+gd::Layout & Project::InsertNewLayout(const gd::String & name, unsigned int position)
 {
     std::shared_ptr<gd::Layout> newScene = std::shared_ptr<gd::Layout>(new Layout);
     if (position<scenes.size())
@@ -294,7 +294,7 @@ gd::Layout & Project::InsertLayout(const gd::Layout & layout, unsigned int posit
     return *newScene;
 }
 
-void Project::RemoveLayout(const std::string & name)
+void Project::RemoveLayout(const gd::String & name)
 {
     std::vector< std::shared_ptr<gd::Layout> >::iterator scene = find_if(scenes.begin(), scenes.end(), bind2nd(gd::LayoutHasName(), name));
     if ( scene == scenes.end() ) return;
@@ -303,15 +303,15 @@ void Project::RemoveLayout(const std::string & name)
 }
 
 #if defined(GD_IDE_ONLY)
-bool Project::HasExternalEventsNamed(const std::string & name) const
+bool Project::HasExternalEventsNamed(const gd::String & name) const
 {
     return ( find_if(externalEvents.begin(), externalEvents.end(), bind2nd(gd::ExternalEventsHasName(), name)) != externalEvents.end() );
 }
-gd::ExternalEvents & Project::GetExternalEvents(const std::string & name)
+gd::ExternalEvents & Project::GetExternalEvents(const gd::String & name)
 {
     return *(*find_if(externalEvents.begin(), externalEvents.end(), bind2nd(gd::ExternalEventsHasName(), name)));
 }
-const gd::ExternalEvents & Project::GetExternalEvents(const std::string & name) const
+const gd::ExternalEvents & Project::GetExternalEvents(const gd::String & name) const
 {
     return *(*find_if(externalEvents.begin(), externalEvents.end(), bind2nd(gd::ExternalEventsHasName(), name)));
 }
@@ -323,20 +323,20 @@ const gd::ExternalEvents & Project::GetExternalEvents (unsigned int index) const
 {
     return *externalEvents[index];
 }
-unsigned int Project::GetExternalEventsPosition(const std::string & name) const
+unsigned int Project::GetExternalEventsPosition(const gd::String & name) const
 {
     for (unsigned int i = 0;i<externalEvents.size();++i)
     {
         if ( externalEvents[i]->GetName() == name ) return i;
     }
-    return std::string::npos;
+    return gd::String::npos;
 }
 unsigned int Project::GetExternalEventsCount() const
 {
     return externalEvents.size();
 }
 
-gd::ExternalEvents & Project::InsertNewExternalEvents(const std::string & name, unsigned int position)
+gd::ExternalEvents & Project::InsertNewExternalEvents(const gd::String & name, unsigned int position)
 {
     std::shared_ptr<gd::ExternalEvents> newExternalEvents(new gd::ExternalEvents);
     if (position<externalEvents.size())
@@ -356,7 +356,7 @@ void Project::InsertExternalEvents(const gd::ExternalEvents & events, unsigned i
         externalEvents.push_back(std::shared_ptr<gd::ExternalEvents>(new gd::ExternalEvents(events)));
 }
 
-void Project::RemoveExternalEvents(const std::string & name)
+void Project::RemoveExternalEvents(const gd::String & name)
 {
     std::vector< std::shared_ptr<gd::ExternalEvents> >::iterator events = find_if(externalEvents.begin(), externalEvents.end(), bind2nd(gd::ExternalEventsHasName(), name));
     if ( events == externalEvents.end() ) return;
@@ -386,15 +386,15 @@ void Project::SwapExternalLayouts(unsigned int first, unsigned int second)
     externalLayouts[second] = firstItem;
 }
 #endif
-bool Project::HasExternalLayoutNamed(const std::string & name) const
+bool Project::HasExternalLayoutNamed(const gd::String & name) const
 {
     return ( find_if(externalLayouts.begin(), externalLayouts.end(), bind2nd(gd::ExternalLayoutHasName(), name)) != externalLayouts.end() );
 }
-gd::ExternalLayout & Project::GetExternalLayout(const std::string & name)
+gd::ExternalLayout & Project::GetExternalLayout(const gd::String & name)
 {
     return *(*find_if(externalLayouts.begin(), externalLayouts.end(), bind2nd(gd::ExternalLayoutHasName(), name)));
 }
-const gd::ExternalLayout & Project::GetExternalLayout(const std::string & name) const
+const gd::ExternalLayout & Project::GetExternalLayout(const gd::String & name) const
 {
     return *(*find_if(externalLayouts.begin(), externalLayouts.end(), bind2nd(gd::ExternalLayoutHasName(), name)));
 }
@@ -406,13 +406,13 @@ const gd::ExternalLayout & Project::GetExternalLayout (unsigned int index) const
 {
     return *externalLayouts[index];
 }
-unsigned int Project::GetExternalLayoutPosition(const std::string & name) const
+unsigned int Project::GetExternalLayoutPosition(const gd::String & name) const
 {
     for (unsigned int i = 0;i<externalLayouts.size();++i)
     {
         if ( externalLayouts[i]->GetName() == name ) return i;
     }
-    return std::string::npos;
+    return gd::String::npos;
 }
 
 unsigned int Project::GetExternalLayoutsCount() const
@@ -420,7 +420,7 @@ unsigned int Project::GetExternalLayoutsCount() const
     return externalLayouts.size();
 }
 
-gd::ExternalLayout & Project::InsertNewExternalLayout(const std::string & name, unsigned int position)
+gd::ExternalLayout & Project::InsertNewExternalLayout(const gd::String & name, unsigned int position)
 {
     std::shared_ptr<gd::ExternalLayout> newExternalLayout = std::shared_ptr<gd::ExternalLayout>(new gd::ExternalLayout);
     if (position<externalLayouts.size())
@@ -442,7 +442,7 @@ void Project::InsertExternalLayout(const gd::ExternalLayout & layout, unsigned i
         externalLayouts.push_back(newLayout);
 }
 
-void Project::RemoveExternalLayout(const std::string & name)
+void Project::RemoveExternalLayout(const gd::String & name)
 {
     std::vector< std::shared_ptr<gd::ExternalLayout> >::iterator externalLayout = find_if(externalLayouts.begin(), externalLayouts.end(), bind2nd(gd::ExternalLayoutHasName(), name));
     if ( externalLayout == externalLayouts.end() ) return;
@@ -494,7 +494,7 @@ void Project::UnserializeFrom(const SerializerElement & element)
 {
     //Checking version
     #if defined(GD_IDE_ONLY)
-    std::string updateText;
+    gd::String updateText;
 
     const SerializerElement & gdVersionElement = element.GetChild("gdVersion", 0, "GDVersion");
     GDMajorVersion = gdVersionElement.GetIntAttribute("major", GDMajorVersion, "Major");
@@ -544,14 +544,14 @@ void Project::UnserializeFrom(const SerializerElement & element)
     extensionsElement.ConsiderAsArrayOf("extension", "Extension");
     for(unsigned int i = 0;i<extensionsElement.GetChildrenCount();++i)
     {
-        std::string extensionName = extensionsElement.GetChild(i).GetStringAttribute("name");
+        gd::String extensionName = extensionsElement.GetChild(i).GetStringAttribute("name");
         if ( find(GetUsedExtensions().begin(), GetUsedExtensions().end(), extensionName ) == GetUsedExtensions().end() )
             GetUsedExtensions().push_back(extensionName);
     }
 
     #if defined(GD_IDE_ONLY)
     currentPlatform = NULL;
-    std::string currentPlatformName = propElement.GetChild("currentPlatform").GetValue().GetString();
+    gd::String currentPlatformName = propElement.GetChild("currentPlatform").GetValue().GetString();
     //Compatibility code
     if ( VersionWrapper::IsOlderOrEqual(GDMajorVersion, GDMajorVersion, GDMinorVersion, 0, 3, 4, 73, 0) )
     {
@@ -564,7 +564,7 @@ void Project::UnserializeFrom(const SerializerElement & element)
     platformsElement.ConsiderAsArrayOf("platform", "Platform");
     for(unsigned int i = 0;i<platformsElement.GetChildrenCount();++i)
     {
-        std::string name = platformsElement.GetChild(i).GetStringAttribute("name");
+        gd::String name = platformsElement.GetChild(i).GetStringAttribute("name");
         //Compatibility code
         if ( VersionWrapper::IsOlderOrEqual(GDMajorVersion, GDMajorVersion, GDMinorVersion, 0, 3, 4, 73, 0) )
         {
@@ -711,14 +711,14 @@ void Project::UnserializeFrom(const SerializerElement & element)
 }
 
 #if !defined(EMSCRIPTEN)
-bool Project::LoadFromFile(const std::string & filename)
+bool Project::LoadFromFile(const gd::String & filename)
 {
     //Load the XML document structure
     TiXmlDocument doc;
-    if ( !doc.LoadFile(filename.c_str(), TIXML_ENCODING_UTF8) )
+    if ( !doc.LoadFile(filename.ToLocale().c_str(), TIXML_ENCODING_UTF8) )
     {
-        std::string errorTinyXmlDesc = doc.ErrorDesc();
-        std::string error = GD_T( "Error while loading :" ) + "\n" + errorTinyXmlDesc + "\n\n" +GD_T("Make sure the file exists and that you have the right to open the file.");
+        gd::String errorTinyXmlDesc = doc.ErrorDesc();
+        gd::String error = GD_T( "Error while loading :" ) + "\n" + errorTinyXmlDesc + "\n\n" +GD_T("Make sure the file exists and that you have the right to open the file.");
 
         gd::LogError( error );
         return false;
@@ -740,7 +740,7 @@ bool Project::LoadFromFile(const std::string & filename)
     {
         //The document is not encoded in UTF8, we need to convert the file first then reload it
         std::string docStr;
-        FILE *docFile = fopen(filename.c_str(), "rb");
+        FILE *docFile = fopen(filename.ToLocale().c_str(), "rb");
 
         while(!feof(docFile))
         {
@@ -755,8 +755,8 @@ bool Project::LoadFromFile(const std::string & filename)
         {
             std::cout << "Project file not encoded in UTF8, converting it !" << std::endl;
 
-            std::string newFilename = filename + ".utf8";
-            docFile = fopen(newFilename.c_str(), "wb");
+            gd::String newFilename = filename + ".utf8";
+            docFile = fopen(newFilename.ToLocale().c_str(), "wb");
 
             std::string convertedStr;
 
@@ -767,8 +767,8 @@ bool Project::LoadFromFile(const std::string & filename)
             fputs(convertedStr.c_str() + '\0', docFile);
             fclose(docFile);
 
-            doc.LoadFile(newFilename.c_str(), TIXML_ENCODING_UTF8);
-            
+            doc.LoadFile(newFilename.ToLocale().c_str(), TIXML_ENCODING_UTF8);
+
             std::cout << " -> Conversion ended !" << std::endl;
         }
     }
@@ -790,12 +790,12 @@ bool Project::LoadFromFile(const std::string & filename)
 }
 
 #if defined(GD_IDE_ONLY)
-bool Project::LoadFromJSONFile(const std::string & filename)
+bool Project::LoadFromJSONFile(const gd::String & filename)
 {
-    std::ifstream ifs(filename.c_str());
+    std::ifstream ifs(filename.ToLocale().c_str());
     if (!ifs.is_open())
     {
-        std::string error = GD_T( "Unable to open the file") + GD_T("Make sure the file exists and that you have the right to open the file.");
+        gd::String error = GD_T( "Unable to open the file") + GD_T("Make sure the file exists and that you have the right to open the file.");
         gd::LogError( error );
         return false;
     }
@@ -816,10 +816,10 @@ bool Project::LoadFromJSONFile(const std::string & filename)
 void Project::SerializeTo(SerializerElement & element) const
 {
     SerializerElement & versionElement = element.AddChild("gdVersion");
-    versionElement.SetAttribute("major", ToString( gd::VersionWrapper::Major() ) );
-    versionElement.SetAttribute("minor", ToString( gd::VersionWrapper::Minor() ) );
-    versionElement.SetAttribute("build", ToString( gd::VersionWrapper::Build() ) );
-    versionElement.SetAttribute("revision", ToString( gd::VersionWrapper::Revision() ) );
+    versionElement.SetAttribute("major", gd::VersionWrapper::Major() );
+    versionElement.SetAttribute("minor", gd::VersionWrapper::Minor() );
+    versionElement.SetAttribute("build", gd::VersionWrapper::Build() );
+    versionElement.SetAttribute("revision", gd::VersionWrapper::Revision() );
 
     SerializerElement & propElement = element.AddChild("properties");
     propElement.AddChild("name").SetValue(GetName());
@@ -888,7 +888,7 @@ void Project::SerializeTo(SerializerElement & element) const
 }
 
 #if !defined(EMSCRIPTEN)
-bool Project::SaveToFile(const std::string & filename)
+bool Project::SaveToFile(const gd::String & filename)
 {
     //Serialize the whole project
     gd::SerializerElement rootElement;
@@ -904,7 +904,7 @@ bool Project::SaveToFile(const std::string & filename)
     gd::Serializer::ToXML(rootElement, root); //...and put the serialized project in it.
 
     //Write XML to file
-    if ( !doc.SaveFile( filename.c_str() ) )
+    if ( !doc.SaveFile( filename.ToLocale().c_str() ) )
     {
         gd::LogError( GD_T( "Unable to save file ") + filename + GD_T("!\nCheck that the drive has enough free space, is not write-protected and that you have read/write permissions." ) );
         return false;
@@ -913,7 +913,7 @@ bool Project::SaveToFile(const std::string & filename)
     return true;
 }
 
-bool Project::SaveToJSONFile(const std::string & filename)
+bool Project::SaveToJSONFile(const gd::String & filename)
 {
     //Serialize the whole project
     gd::SerializerElement rootElement;
@@ -921,7 +921,7 @@ bool Project::SaveToJSONFile(const std::string & filename)
 
     //Write JSON to file
     std::string str = gd::Serializer::ToJSON(rootElement);
-    ofstream ofs(filename.c_str());
+    ofstream ofs(filename.ToLocale().c_str());
     if (!ofs.is_open())
     {
         gd::LogError( GD_T( "Unable to save file ")+ filename + GD_T("!\nCheck that the drive has enough free space, is not write-protected and that you have read/write permissions." ) );
@@ -934,13 +934,13 @@ bool Project::SaveToJSONFile(const std::string & filename)
 }
 #endif
 
-bool Project::ValidateObjectName(const std::string & name)
+bool Project::ValidateObjectName(const gd::String & name)
 {
-    std::string allowedCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
-    return !(name.find_first_not_of(allowedCharacters) != std::string::npos);
+    gd::String allowedCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
+    return !(name.find_first_not_of(allowedCharacters) != gd::String::npos);
 }
 
-std::string Project::GetBadObjectNameWarning()
+gd::String Project::GetBadObjectNameWarning()
 {
     return GD_T("Please use only letters, digits\nand underscores ( _ ).");
 }
@@ -948,7 +948,7 @@ std::string Project::GetBadObjectNameWarning()
 void Project::ExposeResources(gd::ArbitraryResourceWorker & worker)
 {
     //Add project resources
-    std::vector<std::string> resources = GetResourcesManager().GetAllResourcesList();
+    std::vector<gd::String> resources = GetResourcesManager().GetAllResourcesList();
     for ( unsigned int i = 0;i < resources.size() ;i++ )
     {
         if ( GetResourcesManager().GetResource(resources[i]).UseFile() )
@@ -984,7 +984,7 @@ void Project::ExposeResources(gd::ArbitraryResourceWorker & worker)
     #endif
 }
 
-bool Project::HasSourceFile(std::string name, std::string language) const
+bool Project::HasSourceFile(gd::String name, gd::String language) const
 {
     vector< std::shared_ptr<SourceFile> >::const_iterator sourceFile =
         find_if(externalSourceFiles.begin(), externalSourceFiles.end(),
@@ -996,17 +996,17 @@ bool Project::HasSourceFile(std::string name, std::string language) const
     return language.empty() || (*sourceFile)->GetLanguage() == language;
 }
 
-gd::SourceFile & Project::GetSourceFile(const std::string & name)
+gd::SourceFile & Project::GetSourceFile(const gd::String & name)
 {
     return *(*find_if(externalSourceFiles.begin(), externalSourceFiles.end(), bind2nd(gd::ExternalSourceFileHasName(), name)));
 }
 
-const gd::SourceFile & Project::GetSourceFile(const std::string & name) const
+const gd::SourceFile & Project::GetSourceFile(const gd::String & name) const
 {
     return *(*find_if(externalSourceFiles.begin(), externalSourceFiles.end(), bind2nd(gd::ExternalSourceFileHasName(), name)));
 }
 
-void Project::RemoveSourceFile(const std::string & name)
+void Project::RemoveSourceFile(const gd::String & name)
 {
     std::vector< std::shared_ptr<gd::SourceFile> >::iterator sourceFile =
         find_if(externalSourceFiles.begin(), externalSourceFiles.end(), bind2nd(gd::ExternalSourceFileHasName(), name));
@@ -1015,7 +1015,7 @@ void Project::RemoveSourceFile(const std::string & name)
     externalSourceFiles.erase(sourceFile);
 }
 
-gd::SourceFile & Project::InsertNewSourceFile(const std::string & name, const std::string & language, unsigned int position)
+gd::SourceFile & Project::InsertNewSourceFile(const gd::String & name, const gd::String & language, unsigned int position)
 {
     if (HasSourceFile(name, language))
         return GetSourceFile(name);
@@ -1074,9 +1074,9 @@ void Project::PopulatePropertyGrid(wxPropertyGrid * grid)
 void Project::UpdateFromPropertyGrid(wxPropertyGrid * grid)
 {
     if ( grid->GetProperty(_("Name of the project")) != NULL)
-        SetName(gd::ToString(grid->GetProperty(_("Name of the project"))->GetValueAsString()));
+        SetName(grid->GetProperty(_("Name of the project"))->GetValueAsString());
     if ( grid->GetProperty(_("Author")) != NULL)
-        SetAuthor(gd::ToString(grid->GetProperty(_("Author"))->GetValueAsString()));
+        SetAuthor(grid->GetProperty(_("Author"))->GetValueAsString());
     if ( grid->GetProperty(_("Width")) != NULL)
         SetDefaultWidth(grid->GetProperty(_("Width"))->GetValue().GetInteger());
     if ( grid->GetProperty(_("Height")) != NULL)
@@ -1091,13 +1091,13 @@ void Project::UpdateFromPropertyGrid(wxPropertyGrid * grid)
         SetMinimumFPS(grid->GetProperty(_("Minimum FPS"))->GetValue().GetInteger());
 
     if ( grid->GetProperty(_("Windows executable name")) != NULL)
-        winExecutableFilename = gd::ToString(grid->GetProperty(_("Windows executable name"))->GetValueAsString());
+        winExecutableFilename = grid->GetProperty(_("Windows executable name"))->GetValueAsString();
     if ( grid->GetProperty(_("Windows executable icon")) != NULL)
-        winExecutableIconFile = gd::ToString(grid->GetProperty(_("Windows executable icon"))->GetValueAsString());
+        winExecutableIconFile = grid->GetProperty(_("Windows executable icon"))->GetValueAsString();
     if ( grid->GetProperty(_("Linux executable name")) != NULL)
-        linuxExecutableFilename = gd::ToString(grid->GetProperty(_("Linux executable name"))->GetValueAsString());
+        linuxExecutableFilename = grid->GetProperty(_("Linux executable name"))->GetValueAsString();
     if ( grid->GetProperty(_("Mac OS executable name")) != NULL)
-        macExecutableFilename = gd::ToString(grid->GetProperty(_("Mac OS executable name"))->GetValueAsString());
+        macExecutableFilename = grid->GetProperty(_("Mac OS executable name"))->GetValueAsString();
     if ( grid->GetProperty(_("Activate the use of C++/JS source files")) != NULL)
         useExternalSourceFiles =grid->GetProperty(_("Activate the use of C++/JS source files"))->GetValue().GetBool();
 }

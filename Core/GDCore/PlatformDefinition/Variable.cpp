@@ -5,7 +5,7 @@
  */
 
 #include "GDCore/PlatformDefinition/Variable.h"
-#include <string>
+#include <GDCore/Utf8String.h>
 #include <sstream>
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/TinyXml/tinyxml.h"
@@ -30,7 +30,7 @@ double Variable::GetValue() const
     return value;
 }
 
-const std::string & Variable::GetString() const
+const gd::String & Variable::GetString() const
 {
     if (isNumber)
     {
@@ -42,7 +42,7 @@ const std::string & Variable::GetString() const
     return str;
 }
 
-bool Variable::HasChild(const std::string & name) const
+bool Variable::HasChild(const gd::String & name) const
 {
     return isStructure && children.find(name) != children.end();
 }
@@ -53,9 +53,9 @@ bool Variable::HasChild(const std::string & name) const
  * If the variable is not a structure or has not
  * the specified child, an empty variable is returned.
  */
-Variable & Variable::GetChild(const std::string & name)
+Variable & Variable::GetChild(const gd::String & name)
 {
-    std::map<std::string, Variable>::iterator it = children.find(name);
+    std::map<gd::String, Variable>::iterator it = children.find(name);
     if ( it != children.end() ) return it->second;
 
     isStructure = true;
@@ -70,9 +70,9 @@ Variable & Variable::GetChild(const std::string & name)
  * If the variable is not a structure or has not
  * the specified child, an empty variable is returned.
  */
-const Variable & Variable::GetChild(const std::string & name) const
+const Variable & Variable::GetChild(const gd::String & name) const
 {
-    std::map<std::string, Variable>::iterator it = children.find(name);
+    std::map<gd::String, Variable>::iterator it = children.find(name);
     if ( it != children.end() ) return it->second;
 
     isStructure = true;
@@ -87,7 +87,7 @@ const Variable & Variable::GetChild(const std::string & name) const
  * If the variable is not a structure or has not
  * the specified child, nothing is done.
  */
-void Variable::RemoveChild(const std::string & name)
+void Variable::RemoveChild(const gd::String & name)
 {
     if ( !isStructure ) return;
     children.erase(name);
@@ -101,7 +101,7 @@ void Variable::SerializeTo(SerializerElement & element) const
     {
         SerializerElement & childrenElement = element.AddChild("children");
         childrenElement.ConsiderAsArrayOf("variable");
-        for (std::map<std::string, gd::Variable>::iterator i = children.begin(); i != children.end(); ++i)
+        for (std::map<gd::String, gd::Variable>::iterator i = children.begin(); i != children.end(); ++i)
         {
             SerializerElement & variableElement = childrenElement.AddChild("variable");
             variableElement.SetAttribute("name", i->first);
@@ -121,7 +121,7 @@ void Variable::UnserializeFrom(const SerializerElement & element)
         for (int i = 0; i < childrenElement.GetChildrenCount(); ++i)
         {
             const SerializerElement & childElement = childrenElement.GetChild(i);
-            std::string name = childElement.GetStringAttribute("name", "", "Name");
+            gd::String name = childElement.GetStringAttribute("name", "", "Name");
 
             gd::Variable childVariable;
             childVariable.UnserializeFrom(childElement);
@@ -142,7 +142,7 @@ void Variable::SaveToXml(TiXmlElement * element) const
     {
         TiXmlElement * childrenElem = new TiXmlElement( "Children" );
         element->LinkEndChild( childrenElem );
-        for (std::map<std::string, gd::Variable>::iterator i = children.begin(); i != children.end(); ++i)
+        for (std::map<gd::String, gd::Variable>::iterator i = children.begin(); i != children.end(); ++i)
         {
             TiXmlElement * variable = new TiXmlElement( "Variable" );
             childrenElem->LinkEndChild( variable );
@@ -164,7 +164,7 @@ void Variable::LoadFromXml(const TiXmlElement * element)
         const TiXmlElement * child = element->FirstChildElement("Children")->FirstChildElement();
         while ( child )
         {
-            std::string name = child->Attribute("Name") ? child->Attribute("Name") : "";
+            gd::String name = child->Attribute("Name") ? child->Attribute("Name") : "";
             gd::Variable childVariable;
             childVariable.LoadFromXml(child);
             children[name] = childVariable;

@@ -191,7 +191,6 @@ tempLayer(layer_)
 	if ( layer.GetName() == "" )
         nameEdit->SetEditable(false);
 
-
     for (unsigned int i = 0;i<layer.GetCameraCount();++i)
     	cameraChoice->Append(ToString(i));
 
@@ -220,7 +219,7 @@ void EditLayerDialog::OnokBtClick(wxCommandEvent& event)
         return;
     }
 
-    tempLayer.SetName(ToString(nameEdit->GetValue()));
+    tempLayer.SetName(nameEdit->GetValue());
     tempLayer.SetVisibility(visibilityCheck->GetValue());
 
     layer = tempLayer;
@@ -229,7 +228,7 @@ void EditLayerDialog::OnokBtClick(wxCommandEvent& event)
 
 void EditLayerDialog::OnaddCameraBtClick(wxCommandEvent& event)
 {
-    cameraChoice->Append(ToString(tempLayer.GetCameraCount()));
+    cameraChoice->Append(gd::String::FromUInt(tempLayer.GetCameraCount()));
     tempLayer.SetCameraCount(tempLayer.GetCameraCount()+1);
 }
 

@@ -13,7 +13,7 @@
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
-#include <string>
+#include <GDCore/Utf8String.h>
 #include <vector>
 #include "GDCore/CommonTools.h"
 
@@ -37,7 +37,7 @@ BEGIN_EVENT_TABLE(ObjectsOnBadLayerDialog,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-ObjectsOnBadLayerDialog::ObjectsOnBadLayerDialog(wxWindow* parent, const std::vector < std::string > & availableLayers)
+ObjectsOnBadLayerDialog::ObjectsOnBadLayerDialog(wxWindow* parent, const std::vector < gd::String > & availableLayers)
 {
 	//(*Initialize(ObjectsOnBadLayerDialog)
 	wxFlexGridSizer* FlexGridSizer4;
@@ -86,7 +86,7 @@ ObjectsOnBadLayerDialog::ObjectsOnBadLayerDialog(wxWindow* parent, const std::ve
 
 	for (unsigned int i =0;i<availableLayers.size();++i)
 	{
-	    std::string name = availableLayers[i];
+	    gd::String name = availableLayers[i];
 	    if ( name == "" ) name = GD_T("Base layer");
 		Choice1->Insert(name, 0);
 	}
@@ -109,7 +109,7 @@ void ObjectsOnBadLayerDialog::OnMoveClick(wxCommandEvent& event)
 {
     if ( Choice1->GetStringSelection() != "" )
     {
-        moveOnLayerNamed = gd::utf8::FromWxString(Choice1->GetStringSelection());
+        moveOnLayerNamed = Choice1->GetStringSelection();
         if ( moveOnLayerNamed == GD_T("Base layer") )  moveOnLayerNamed = "";
         EndModal(2);
     }

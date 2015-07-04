@@ -5,7 +5,7 @@
  */
 #ifndef GDCORE_ARBITRARYEVENTSWORKER_H
 #define GDCORE_ARBITRARYEVENTSWORKER_H
-#include <string>
+#include <GDCore/Utf8String.h>
 #include <vector>
 #include <map>
 #include <memory>

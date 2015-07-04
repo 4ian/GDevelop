@@ -33,7 +33,7 @@ namespace gd {
 
 Animation SpriteObject::badAnimation;
 
-SpriteObject::SpriteObject(std::string name_) :
+SpriteObject::SpriteObject(gd::String name_) :
     Object(name_)
 {
 }
@@ -199,7 +199,7 @@ bool SpriteObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thu
     //Generate a thumbnail from the first animation
     if ( !HasNoAnimations() && !GetAnimation(0).HasNoDirections() && !GetAnimation(0).GetDirection(0).HasNoSprites() )
     {
-        std::string imageName = GetAnimation(0).GetDirection(0).GetSprite(0).GetImageName();
+        gd::String imageName = GetAnimation(0).GetDirection(0).GetSprite(0).GetImageName();
 
         if ( project.GetResourcesManager().HasResource(imageName) && wxFileExists(project.GetResourcesManager().GetResource(imageName).GetAbsoluteFile(project)) )
         {
@@ -237,19 +237,19 @@ void SpriteObject::EditObject( wxWindow* parent, gd::Project & project, gd::Main
 }
 
 
-std::map<std::string, gd::PropertyDescriptor> SpriteObject::GetInitialInstanceProperties(const gd::InitialInstance & position, gd::Project & project, gd::Layout & scene)
+std::map<gd::String, gd::PropertyDescriptor> SpriteObject::GetInitialInstanceProperties(const gd::InitialInstance & position, gd::Project & project, gd::Layout & scene)
 {
-    std::map<std::string, gd::PropertyDescriptor> properties;
-    properties[GD_T("Animation")] = position.floatInfos.find("animation") != position.floatInfos.end() ?
-                                           ToString(position.floatInfos.find("animation")->second) :
-                                           "0";
+    std::map<gd::String, gd::PropertyDescriptor> properties;
+    properties[_("Animation")] = position.floatInfos.find("animation") != position.floatInfos.end() ?
+                                           gd::String::FromFloat(position.floatInfos.find("animation")->second) :
+                                           gd::String("0");
 
     return properties;
 }
 
-bool SpriteObject::UpdateInitialInstanceProperty(gd::InitialInstance & position, const std::string & name, const std::string & value, gd::Project & project, gd::Layout & scene)
+bool SpriteObject::UpdateInitialInstanceProperty(gd::InitialInstance & position, const gd::String & name, const gd::String & value, gd::Project & project, gd::Layout & scene)
 {
-    if ( name == GD_T("Animation") ) position.floatInfos["animation"] = ToInt(value);
+    if ( name == _("Animation") ) position.floatInfos["animation"] = value.ToInt();
 
     return true;
 }
@@ -295,7 +295,7 @@ void SpriteObject::SwapAnimations(unsigned int firstIndex, unsigned int secondIn
  * Function creating an extension Object.
  * GDevelop can not directly create an extension object
  */
-gd::Object * CreateSpriteObject(std::string name)
+gd::Object * CreateSpriteObject(gd::String name)
 {
     return new SpriteObject(name);
 }

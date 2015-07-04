@@ -7,7 +7,7 @@
 #define RESSOURCESLOADER_H
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
-#include <string>
+#include <GDCore/Utf8String.h>
 #undef LoadImage //Undef macro from windows.h
 
 namespace gd
@@ -28,7 +28,7 @@ public:
     /**
      * Load a SFML texture.
      */
-    sf::Texture LoadSFMLTexture( const std::string & filename );
+    sf::Texture LoadSFMLTexture( const gd::String & filename );
 
     /**
      * Load a SFML Font.
@@ -39,29 +39,29 @@ public:
      * that need to be kept alive while the font is used (can be NULL if the font was loaded
      * from a file).
      */
-    std::pair<sf::Font *, char *> LoadFont( const std::string & filename );
+    std::pair<sf::Font *, char *> LoadFont( const gd::String & filename );
 
     /**
      * Load a SFML Sound Buffer
      */
-    sf::SoundBuffer LoadSoundBuffer( const std::string & filename );
+    sf::SoundBuffer LoadSoundBuffer( const gd::String & filename );
 
     /**
      * Load a plain text file
      */
-    std::string LoadPlainText( const std::string & filename );
+    gd::String LoadPlainText( const gd::String & filename );
 
     /**
      * Get a buffer for file.
      * Be careful, the buffer will be invalided by any subsequent call to Load[Something]. Make
      * a copy of the buffer if you want it to stay alive longer.
      */
-    char* LoadBinaryFile( const std::string & filename );
+    char* LoadBinaryFile( const gd::String & filename );
 
     /**
      * Get the size of a file
      */
-    long int GetBinaryFileSize( const std::string & filename);
+    long int GetBinaryFileSize( const gd::String & filename);
 
     static ResourcesLoader *Get()
     {

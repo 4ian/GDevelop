@@ -17,7 +17,7 @@
 #include <wx/button.h>
 #include <wx/dialog.h>
 //*)
-#include <string>
+#include <GDCore/Utf8String.h>
 #include <vector>
 
 namespace gd
@@ -37,7 +37,7 @@ class ObjectsOnBadLayerDialog: public wxDialog
 {
 public:
 
-    ObjectsOnBadLayerDialog(wxWindow* parent, const std::vector < std::string > & availableLayers);
+    ObjectsOnBadLayerDialog(wxWindow* parent, const std::vector < gd::String > & availableLayers);
     virtual ~ObjectsOnBadLayerDialog();
 
     //(*Declarations(ObjectsOnBadLayerDialog)
@@ -52,7 +52,7 @@ public:
     wxChoice* Choice1;
     //*)
 
-    std::string moveOnLayerNamed;
+    gd::String moveOnLayerNamed;
 
 protected:
 

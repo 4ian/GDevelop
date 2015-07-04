@@ -86,8 +86,8 @@ gd::BaseEvent::EditEventReturnType GroupEvent::EditEvent(wxWindow* parent_, gd::
         gd::EventStoreDialog dialog(parent_, project, scene);
 
         size_t found = source.rfind("/");
-        if (found != std::string::npos && found < source.size()-1) {
-            std::string sourceId = source.substr(found+1, source.size());
+        if (found != gd::String::npos && found < source.size()-1) {
+            gd::String sourceId = source.substr(found+1, source.size());
             dialog.RefreshWith(sourceId, parameters);
         }
 

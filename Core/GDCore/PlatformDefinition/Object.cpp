@@ -22,11 +22,11 @@ namespace gd
 Object::~Object()
 {
     //Do not forget to delete automatisms which are managed using raw pointers.
-    for (std::map<std::string, Automatism* >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
+    for (std::map<gd::String, Automatism* >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
     	delete it->second;
 }
 
-Object::Object(const std::string & name_) :
+Object::Object(const gd::String & name_) :
     name(name_)
 {
 }
@@ -38,11 +38,11 @@ void Object::Init(const gd::Object & object)
     objectVariables = object.objectVariables;
 
     //Do not forget to delete automatisms which are managed using raw pointers.
-    for (std::map<std::string, Automatism* >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
+    for (std::map<gd::String, Automatism* >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
     	delete it->second;
 
     automatisms.clear();
-    for (std::map<std::string, Automatism* >::const_iterator it = object.automatisms.begin() ; it != object.automatisms.end(); ++it )
+    for (std::map<gd::String, Automatism* >::const_iterator it = object.automatisms.begin() ; it != object.automatisms.end(); ++it )
     	automatisms[it->first] = it->second->Clone();
 }
 
@@ -57,17 +57,17 @@ sf::Vector2f Object::GetInitialInstanceOrigin(gd::InitialInstance & instance, gd
     return sf::Vector2f(0,0);
 }
 
-std::vector < std::string > Object::GetAllAutomatismNames() const
+std::vector < gd::String > Object::GetAllAutomatismNames() const
 {
-    std::vector < std::string > allNameIdentifiers;
+    std::vector < gd::String > allNameIdentifiers;
 
-    for (std::map<std::string, Automatism* >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
+    for (std::map<gd::String, Automatism* >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
     	allNameIdentifiers.push_back(it->first);
 
     return allNameIdentifiers;
 }
 
-void Object::RemoveAutomatism(const std::string & name)
+void Object::RemoveAutomatism(const gd::String & name)
 {
     //Do not forget to delete automatisms which are managed using raw pointers.
     delete(automatisms[name]);
@@ -75,7 +75,7 @@ void Object::RemoveAutomatism(const std::string & name)
     automatisms.erase(name);
 }
 
-bool Object::RenameAutomatism(const std::string & name, const std::string & newName)
+bool Object::RenameAutomatism(const gd::String & name, const gd::String & newName)
 {
     if ( automatisms.find(name) == automatisms.end()
       || automatisms.find(newName) != automatisms.end() ) return false;
@@ -88,7 +88,7 @@ bool Object::RenameAutomatism(const std::string & name, const std::string & newN
     return true;
 }
 
-gd::Automatism * Object::AddNewAutomatism(gd::Project & project, const std::string & type, const std::string & name)
+gd::Automatism * Object::AddNewAutomatism(gd::Project & project, const gd::String & type, const gd::String & name)
 {
     Automatism * automatism = project.GetCurrentPlatform().CreateAutomatism(type);
 
@@ -100,23 +100,23 @@ gd::Automatism * Object::AddNewAutomatism(gd::Project & project, const std::stri
     return automatism;
 }
 
-std::map<std::string, gd::PropertyDescriptor> Object::GetInitialInstanceProperties(const gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout)
+std::map<gd::String, gd::PropertyDescriptor> Object::GetInitialInstanceProperties(const gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout)
 {
-    std::map<std::string, gd::PropertyDescriptor> nothing;
+    std::map<gd::String, gd::PropertyDescriptor> nothing;
     return nothing;
 }
 
-gd::Automatism & Object::GetAutomatism(const std::string & name)
+gd::Automatism & Object::GetAutomatism(const gd::String & name)
 {
     return *automatisms.find(name)->second;
 }
 
-const gd::Automatism & Object::GetAutomatism(const std::string & name) const
+const gd::Automatism & Object::GetAutomatism(const gd::String & name) const
 {
     return *automatisms.find(name)->second;
 }
 
-bool Object::HasAutomatismNamed(const std::string & name) const
+bool Object::HasAutomatismNamed(const gd::String & name) const
 {
     return automatisms.find(name) != automatisms.end();
 }
@@ -149,8 +149,8 @@ void Object::UnserializeFrom(gd::Project & project, const SerializerElement & el
         {
             SerializerElement & automatismElement = element.GetChild("Automatism", i);
 
-            std::string autoType = automatismElement.GetStringAttribute("type", "", "Type");
-            std::string autoName = automatismElement.GetStringAttribute("name", "", "Name");
+            gd::String autoType = automatismElement.GetStringAttribute("type", "", "Type");
+            gd::String autoName = automatismElement.GetStringAttribute("name", "", "Name");
 
             Automatism* automatism = project.CreateAutomatism(autoType);
             if ( automatism != NULL )
@@ -172,8 +172,8 @@ void Object::UnserializeFrom(gd::Project & project, const SerializerElement & el
         {
             SerializerElement & automatismElement = automatismsElement.GetChild(i);
 
-            std::string autoType = automatismElement.GetStringAttribute("type");
-            std::string autoName = automatismElement.GetStringAttribute("name");
+            gd::String autoType = automatismElement.GetStringAttribute("type");
+            gd::String autoName = automatismElement.GetStringAttribute("name");
 
             Automatism* automatism = project.CreateAutomatism(autoType);
             if ( automatism != NULL )
@@ -199,7 +199,7 @@ void Object::SerializeTo(SerializerElement & element) const
 
     SerializerElement & automatismsElement = element.AddChild("automatisms");
     automatismsElement.ConsiderAsArrayOf("automatism");
-    std::vector < std::string > allAutomatisms = GetAllAutomatismNames();
+    std::vector < gd::String > allAutomatisms = GetAllAutomatismNames();
     for (unsigned int i = 0;i<allAutomatisms.size();++i)
     {
         SerializerElement & automatismElement = automatismsElement.AddChild("automatism");
@@ -215,7 +215,7 @@ void Object::SerializeTo(SerializerElement & element) const
 
 }
 
-gd::Object * CreateBaseObject(std::string name)
+gd::Object * CreateBaseObject(gd::String name)
 {
     return new gd::Object(name);
 }

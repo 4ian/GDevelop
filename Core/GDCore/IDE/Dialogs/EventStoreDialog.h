@@ -45,7 +45,7 @@ public:
      * \brief Update the dialog to show the specified template with the parameters
      * filled with the specified content.
      **/
-    void RefreshWith(std::string templateId, const std::vector<std::string> & parameters);
+    void RefreshWith(gd::String templateId, const std::vector<gd::String> & parameters);
 
     virtual ~EventStoreDialog();
 
@@ -68,11 +68,11 @@ protected:
 
     gd::SerializerElement loadedTemplate;
     static gd::SerializerElement * templates;
-    static const std::string host;
+    static const gd::String host;
     static const int port;
     gd::GroupEvent groupEvent; ///< The event group created from the template
 
-    sf::Http::Response::Status FetchTemplate(std::string id);
+    sf::Http::Response::Status FetchTemplate(gd::String id);
     sf::Http::Response::Status FetchTemplates(bool forceFetch = false);
     void RefreshTemplate();
     void RefreshList();

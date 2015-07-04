@@ -36,7 +36,7 @@ public:
     void SetValue(const SerializerValue & value) { valueUndefined = false; elementValue = value; }
     void SetValue(bool val) { valueUndefined = false; elementValue.SetBool(val); }
     void SetValue(std::string val) { valueUndefined = false; elementValue.SetString(val); }
-		void SetValue(const gd::String &val) { valueUndefined = false; elementValue.SetUtf8String(val); }
+	void SetValue(const gd::String &val) { valueUndefined = false; elementValue.SetString(val); }
     void SetValue(int val) { valueUndefined = false; elementValue.SetInt(val); }
     void SetValue(unsigned int val) { valueUndefined = false; elementValue.SetInt((int)val); }
     void SetValue(double val) { valueUndefined = false; elementValue.SetDouble(val); }
@@ -64,35 +64,35 @@ public:
 	 * \param name The name of the attribute.
 	 * \param value The value of the attribute.
 	 */
-	SerializerElement & SetAttribute(const std::string & name, bool value);
+	SerializerElement & SetAttribute(const gd::String & name, bool value);
 
 	/**
 	 * \brief Set the value of an attribute of the element
 	 * \param name The name of the attribute.
 	 * \param value The value of the attribute.
 	 */
-	SerializerElement & SetAttribute(const std::string & name, const std::string & value);
+	SerializerElement & SetAttribute(const gd::String & name, const gd::String & value);
 
 	/**
 	 * \brief Set the value of an attribute of the element
 	 * \param name The name of the attribute.
 	 * \param value The value of the attribute.
 	 */
-	SerializerElement & SetAttribute(const std::string & name, const char * value) { if (value) SetAttribute(name, std::string(value)); return *this; };
+	SerializerElement & SetAttribute(const gd::String & name, const char * value) { if (value) SetAttribute(name, gd::String(value)); return *this; };
 
 	/**
 	 * \brief Set the value of an attribute of the element
 	 * \param name The name of the attribute.
 	 * \param value The value of the attribute.
 	 */
-	SerializerElement & SetAttribute(const std::string & name, int value);
+	SerializerElement & SetAttribute(const gd::String & name, int value);
 
 	/**
 	 * \brief Set the value of an attribute of the element
 	 * \param name The name of the attribute.
 	 * \param value The value of the attribute.
 	 */
-	SerializerElement & SetAttribute(const std::string & name, double value);
+	SerializerElement & SetAttribute(const gd::String & name, double value);
 
 	/**
 	 * Get the value of an attribute being a boolean.
@@ -100,7 +100,7 @@ public:
 	 * \param defaultValue The value returned if the attribute is not found.
 	 * \param deprecatedName An alternative name for the attribute that will be used if the first one doesn't exists.
 	 */
-	bool GetBoolAttribute(const std::string & name, bool defaultValue = false, std::string deprecatedName = "") const;
+	bool GetBoolAttribute(const gd::String & name, bool defaultValue = false, gd::String deprecatedName = "") const;
 
 	/**
 	 * Get the value of an attribute being a string.
@@ -108,7 +108,7 @@ public:
 	 * \param defaultValue The value returned if the attribute is not found.
 	 * \param deprecatedName An alternative name for the attribute that will be used if the first one doesn't exists.
 	 */
-	std::string GetStringAttribute(const std::string & name, std::string defaultValue = "", std::string deprecatedName = "") const;
+	gd::String GetStringAttribute(const gd::String & name, gd::String defaultValue = "", gd::String deprecatedName = "") const;
 
 	/**
 	 * Get the value of an attribute being an int.
@@ -116,7 +116,7 @@ public:
 	 * \param defaultValue The value returned if the attribute is not found.
 	 * \param deprecatedName An alternative name for the attribute that will be used if the first one doesn't exists.
 	 */
-	int GetIntAttribute(const std::string & name, int defaultValue = 0, std::string deprecatedName = "") const;
+	int GetIntAttribute(const gd::String & name, int defaultValue = 0, gd::String deprecatedName = "") const;
 
 	/**
 	 * Get the value of an attribute being a double.
@@ -124,17 +124,17 @@ public:
 	 * \param defaultValue The value returned if the attribute is not found.
 	 * \param deprecatedName An alternative name for the attribute that will be used if the first one doesn't exists.
 	 */
-	double GetDoubleAttribute(const std::string & name, double defaultValue = 0.0, std::string deprecatedName = "") const;
+	double GetDoubleAttribute(const gd::String & name, double defaultValue = 0.0, gd::String deprecatedName = "") const;
 
     /**
      * \brief Return true if the specified attribute exists.
      * \param name The name of the attribute to find.
      */
-	bool HasAttribute(const std::string & name);
+	bool HasAttribute(const gd::String & name);
     /**
      * \brief Return all the children of the element.
      */
-	const std::map< std::string, SerializerValue > & GetAllAttributes() const { return attributes; };
+	const std::map< gd::String, SerializerValue > & GetAllAttributes() const { return attributes; };
     ///@}
 
     /** \name Children
@@ -149,27 +149,27 @@ public:
      *
      * \param name The name of the children.
      */
-    void ConsiderAsArrayOf(const std::string & name, const std::string & deprecatedName = "") const { arrayOf = name; deprecatedArrayOf = deprecatedName; };
+    void ConsiderAsArrayOf(const gd::String & name, const gd::String & deprecatedName = "") const { arrayOf = name; deprecatedArrayOf = deprecatedName; };
 
     /**
      * \brief Return the name of the children the element is considered an array of.
      *
      * Return an empty string if the element is not considered as an array.
      */
-    const std::string & ConsideredAsArrayOf() const { return arrayOf; };
+    const gd::String & ConsideredAsArrayOf() const { return arrayOf; };
 
     /**
      * \brief Add a child at the end of the children list with the given name and return a reference to it.
      * \param name The name of the new child.
      */
-	SerializerElement & AddChild(std::string name);
+	SerializerElement & AddChild(gd::String name);
 
     /**
      * \brief Get a child of the element using its name.
      * \param name The name of the new child.
      * \param name The index of the child
      */
-	SerializerElement & GetChild(std::string name, unsigned int index = 0, std::string deprecatedName = "") const;
+	SerializerElement & GetChild(gd::String name, unsigned int index = 0, gd::String deprecatedName = "") const;
 
     /**
      * \brief Get a child of the element using its index (when the element is considered as an array).
@@ -188,18 +188,18 @@ public:
      *
      * \see SerializerElement::ConsiderAsArrayOf
      */
-	unsigned int GetChildrenCount(std::string name = "", std::string deprecatedName = "") const;
+	unsigned int GetChildrenCount(gd::String name = "", gd::String deprecatedName = "") const;
 
     /**
      * \brief Return true if the specified child exists.
      * \param name The name of the child to find.
      */
-	bool HasChild(const std::string & name, std::string deprecatedName = "") const;
+	bool HasChild(const gd::String & name, gd::String deprecatedName = "") const;
 
     /**
      * \brief Return all the children of the element.
      */
-	const std::vector< std::pair<std::string, std::shared_ptr<SerializerElement> > > & GetAllChildren() const { return children; };
+	const std::vector< std::pair<gd::String, std::shared_ptr<SerializerElement> > > & GetAllChildren() const { return children; };
     ///@}
 
 	static SerializerElement nullElement;
@@ -208,10 +208,10 @@ private:
 	bool valueUndefined; ///< If true, the element does not have a value.
 	SerializerValue elementValue;
 
-	std::map< std::string, SerializerValue > attributes;
-	std::vector< std::pair<std::string, std::shared_ptr<SerializerElement> > > children;
-	mutable std::string arrayOf;
-	mutable std::string deprecatedArrayOf;
+	std::map< gd::String, SerializerValue > attributes;
+	std::vector< std::pair<gd::String, std::shared_ptr<SerializerElement> > > children;
+	mutable gd::String arrayOf;
+	mutable gd::String deprecatedArrayOf;
 };
 
 }

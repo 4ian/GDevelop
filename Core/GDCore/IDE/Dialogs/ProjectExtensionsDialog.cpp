@@ -315,7 +315,7 @@ void ProjectExtensionsDialog::RefreshExtensionList()
         {
             if ( find(  project.GetUsedExtensions().begin(),
                         project.GetUsedExtensions().end(),
-                        associatedData->GetData()) != project.GetUsedExtensions().end() )
+                        gd::String(associatedData->GetData())) != project.GetUsedExtensions().end() )
             {
                 ExtensionsList->Check(i, true);
             }
@@ -344,7 +344,7 @@ void ProjectExtensionsDialog::OnExtensionsListSelect(wxCommandEvent& event)
 
     for (unsigned int i = 0;i<extensionsInstalled.size();++i)
     {
-        if ( extensionsInstalled[i]->GetName() == associatedData->GetData() )
+        if ( extensionsInstalled[i]->GetName() == gd::String(associatedData->GetData()) )
         {
             infoEdit->ChangeValue(extensionsInstalled[i]->GetDescription());
             authorTxt->SetLabel(extensionsInstalled[i]->GetAuthor());
@@ -363,11 +363,11 @@ void ProjectExtensionsDialog::OnExtensionsListToggled(wxCommandEvent& event)
     wxStringClientData * associatedData = dynamic_cast<wxStringClientData*>(ExtensionsList->GetClientObject(id));
     if (associatedData == NULL) return;
 
-    std::vector<std::string>::iterator it =
-        std::find(project.GetUsedExtensions().begin(), project.GetUsedExtensions().end(), gd::ToString(associatedData->GetData()));
+    std::vector<gd::String>::iterator it =
+        std::find(project.GetUsedExtensions().begin(), project.GetUsedExtensions().end(), gd::String(associatedData->GetData()));
 
     if ( ExtensionsList->IsChecked(id) && it == project.GetUsedExtensions().end() )
-        project.GetUsedExtensions().push_back(gd::ToString(associatedData->GetData()));
+        project.GetUsedExtensions().push_back(associatedData->GetData());
     else if ( !ExtensionsList->IsChecked(id) && it != project.GetUsedExtensions().end() )
         project.GetUsedExtensions().erase(it);
 }
@@ -378,7 +378,7 @@ void ProjectExtensionsDialog::OnExtensionsListToggled(wxCommandEvent& event)
 void ProjectExtensionsDialog::OnFermerBtClick(wxCommandEvent& event)
 {
     //For sanity sake, make sure that built-in extensions are used by the project
-    std::vector<std::string> builtinExtensions = gd::PlatformExtension::GetBuiltinExtensionsNames();
+    std::vector<gd::String> builtinExtensions = gd::PlatformExtension::GetBuiltinExtensionsNames();
     for(unsigned int i = 0;i<builtinExtensions.size();++i)
     {
         if ( std::find(project.GetUsedExtensions().begin(), project.GetUsedExtensions().end(), builtinExtensions[i])
@@ -424,7 +424,7 @@ void ProjectExtensionsDialog::OnplatformListItemSelect(wxListEvent& event)
     gd::TreeItemStringData * associatedData = reinterpret_cast<gd::TreeItemStringData*>(event.GetItem().GetData());
     if ( associatedData != NULL )
     {
-        std::string chosenPlatform = associatedData->GetString();
+        gd::String chosenPlatform = associatedData->GetString();
 
         const std::vector< std::shared_ptr<gd::Platform> > & platforms = gd::PlatformManager::Get()->GetAllPlatforms();
         for (unsigned int i = 0;i<platforms.size();++i)
@@ -443,7 +443,7 @@ void ProjectExtensionsDialog::OnplatformListItemRClick(wxListEvent& event)
     gd::TreeItemStringData * associatedData = reinterpret_cast<gd::TreeItemStringData*>(event.GetItem().GetData());
     if ( associatedData != NULL )
     {
-        std::string chosenPlatform = associatedData->GetString();
+        gd::String chosenPlatform = associatedData->GetString();
 
         const std::vector< std::shared_ptr<gd::Platform> > & platforms = gd::PlatformManager::Get()->GetAllPlatforms();
         for (unsigned int i = 0;i<platforms.size();++i)

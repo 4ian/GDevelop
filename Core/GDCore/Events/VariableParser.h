@@ -6,7 +6,7 @@
 #ifndef GDCORE_VARIABLEPARSER_H
 #define GDCORE_VARIABLEPARSER_H
 
-#include <string>
+#include <GDCore/Utf8String.h>
 #include <vector>
 namespace gd { class Layout; }
 namespace gd { class Project; }
@@ -50,7 +50,7 @@ public:
      * \brief Default constructor
      * \param expressionPlainString The string representing the expression to be parsed.
      */
-    VariableParser(const std::string & expressionPlainString_) : currentPosition(0), expression(expressionPlainString_) {};
+    VariableParser(const gd::String & expressionPlainString_) : currentPosition(0), expression(expressionPlainString_) {};
     virtual ~VariableParser();
 
     /**
@@ -61,7 +61,7 @@ public:
      */
     bool Parse(VariableParserCallbacks & callbacks);
 
-    std::string firstErrorStr;
+    gd::String firstErrorStr;
     size_t firstErrorPos;
 
 private:
@@ -73,7 +73,7 @@ private:
      * \brief Skip the string expression, starting from the current position.
      * \return The string expression skipped. currentPosition is now put on the closing bracket.
      */
-    std::string SkipStringExpression();
+    gd::String SkipStringExpression();
 
     void ReadToken();
 
@@ -86,9 +86,9 @@ private:
     };
 
     TokenType currentTokenType;
-    std::string currentToken;
+    gd::String currentToken;
     size_t currentPosition;
-    std::string expression;
+    gd::String expression;
 
     VariableParserCallbacks * callbacks;
     bool rootVariableParsed;
@@ -104,13 +104,13 @@ public:
      * \brief Called when the first variable has been parsed. ( varName1 in varName1.child for example. )
      * \param variableName The variable name.
      */
-    virtual void OnRootVariable(std::string variableName) = 0;
+    virtual void OnRootVariable(gd::String variableName) = 0;
 
     /**
      * \brief Called when accessing the child of a structure variable. ( child in varName1.child for example. )
      * \param variableName The child variable name.
      */
-    virtual void OnChildVariable(std::string variableName) = 0;
+    virtual void OnChildVariable(gd::String variableName) = 0;
 
     /**
      * \brief Called when accessing the child of a structure variable using a string expression
@@ -118,7 +118,7 @@ public:
      *
      * \param variableName The expression used to access the child variable.
      */
-    virtual void OnChildSubscript(std::string stringExpression) = 0;
+    virtual void OnChildSubscript(gd::String stringExpression) = 0;
 };
 
 }

@@ -5,7 +5,7 @@
  */
 #ifndef EventsParametersLister_H
 #define EventsParametersLister_H
-#include <string>
+#include <GDCore/Utf8String.h>
 #include <vector>
 #include <map>
 #include <memory>
@@ -31,12 +31,12 @@ public:
     /**
      * Return the values of all parameters associated with the type of their parent.
      */
-    const std::map<std::string, std::string> & GetParametersAndTypes() { return parameters; }
+    const std::map<gd::String, gd::String> & GetParametersAndTypes() { return parameters; }
 
 private:
     virtual bool DoVisitInstruction(gd::Instruction & instruction, bool isCondition);
 
-    std::map<std::string, std::string> parameters;
+    std::map<gd::String, gd::String> parameters;
     gd::Project & project;
 };
 

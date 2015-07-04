@@ -5,7 +5,7 @@
  */
 #ifndef OBJECTMETADATA_H
 #define OBJECTMETADATA_H
-#include <string>
+#include <GDCore/Utf8String.h>
 #include <map>
 #include "GDCore/Events/InstructionMetadata.h"
 #include "GDCore/Events/ExpressionMetadata.h"
@@ -18,7 +18,7 @@ namespace gd { class InstructionMetadata; }
 namespace gd { class ExpressionMetadata; }
 class wxBitmap;
 
-typedef gd::Object * (*CreateFunPtr)(std::string name);
+typedef gd::Object * (*CreateFunPtr)(gd::String name);
 
 namespace gd
 {
@@ -32,11 +32,11 @@ namespace gd
 class GD_CORE_API ObjectMetadata
 {
 public:
-    ObjectMetadata(const std::string & extensionNamespace_,
-                   const std::string & name_,
-                   const std::string & fullname_,
-                   const std::string & informations_,
-                   const std::string & icon24x24_,
+    ObjectMetadata(const gd::String & extensionNamespace_,
+                   const gd::String & name_,
+                   const gd::String & fullname_,
+                   const gd::String & informations_,
+                   const gd::String & icon24x24_,
                    CreateFunPtr createFunPtrP);
     ObjectMetadata() : createFunPtr(NULL) {}
     virtual ~ObjectMetadata() {};
@@ -45,55 +45,55 @@ public:
      * \brief Declare a new condition as being part of the extension.
      * \note This method does nothing when used for GD C++ runtime.
      */
-    gd::InstructionMetadata & AddCondition(const std::string & name_,
+    gd::InstructionMetadata & AddCondition(const gd::String & name_,
                                            const gd::String & fullname_,
                                            const gd::String & description_,
-                                           const std::string & sentence_,
+                                           const gd::String & sentence_,
                                            const gd::String & group_,
-                                           const std::string & icon_,
-                                           const std::string & smallicon_);
+                                           const gd::String & icon_,
+                                           const gd::String & smallicon_);
 
     /**
      * \brief Declare a new action as being part of the extension.
      * \note This method does nothing when used for GD C++ runtime.
      */
-    gd::InstructionMetadata & AddAction(const std::string & name_,
+    gd::InstructionMetadata & AddAction(const gd::String & name_,
                                            const gd::String & fullname_,
                                            const gd::String & description_,
-                                           const std::string & sentence_,
+                                           const gd::String & sentence_,
                                            const gd::String & group_,
-                                           const std::string & icon_,
-                                           const std::string & smallicon_);
+                                           const gd::String & icon_,
+                                           const gd::String & smallicon_);
     /**
      * \brief Declare a new expression as being part of the extension.
      * \note This method does nothing when used for GD C++ runtime.
      */
-    gd::ExpressionMetadata & AddExpression(const std::string & name_,
-                                           const std::string & fullname_,
-                                           const std::string & description_,
-                                           const std::string & group_,
-                                           const std::string & smallicon_);
+    gd::ExpressionMetadata & AddExpression(const gd::String & name_,
+                                           const gd::String & fullname_,
+                                           const gd::String & description_,
+                                           const gd::String & group_,
+                                           const gd::String & smallicon_);
     /**
      * \brief Declare a new string expression as being part of the extension.
      * \note This method does nothing when used for GD C++ runtime.
      */
-    gd::ExpressionMetadata & AddStrExpression(const std::string & name_,
-                                           const std::string & fullname_,
-                                           const std::string & description_,
-                                           const std::string & group_,
-                                           const std::string & smallicon_);
+    gd::ExpressionMetadata & AddStrExpression(const gd::String & name_,
+                                           const gd::String & fullname_,
+                                           const gd::String & description_,
+                                           const gd::String & group_,
+                                           const gd::String & smallicon_);
 
     /**
      * \brief Set the name shown to the user.
      * \note This method does nothing when used for GD C++ runtime.
      */
-    ObjectMetadata & SetFullName(const std::string & fullname_);
+    ObjectMetadata & SetFullName(const gd::String & fullname_);
 
     /**
      * \brief Set the description shown to the user.
      * \note This method does nothing when used for GD C++ runtime.
      */
-    ObjectMetadata & SetDescription(const std::string & description_);
+    ObjectMetadata & SetDescription(const gd::String & description_);
 
     /**
      * Set the bitmap icon shown to the user.
@@ -101,11 +101,11 @@ public:
      */
     ObjectMetadata & SetBitmapIcon(const wxBitmap & bitmap_);
 
-    const std::string & GetName() const { return name; }
+    const gd::String & GetName() const { return name; }
 #if defined(GD_IDE_ONLY)
-    const std::string & GetFullName() const { return fullname; }
-    const std::string & GetDescription() const { return description; }
-    const std::string & GetIconFilename() const { return iconFilename; }
+    const gd::String & GetFullName() const { return fullname; }
+    const gd::String & GetDescription() const { return description; }
+    const gd::String & GetIconFilename() const { return iconFilename; }
 #if !defined(GD_NO_WX_GUI)
     const wxBitmap & GetBitmapIcon() const { return icon; }
 #endif
@@ -116,31 +116,31 @@ public:
      * \note The requirement may vary depending on the platform: Most of the time, the include
      * file contains the declaration of the object.
      */
-    ObjectMetadata & SetIncludeFile(const std::string & includeFile);
+    ObjectMetadata & SetIncludeFile(const gd::String & includeFile);
 
     /**
      * \brief Add a file to the already existing include files.
      */
-    ObjectMetadata & AddIncludeFile(const std::string & includeFile);
+    ObjectMetadata & AddIncludeFile(const gd::String & includeFile);
 
 #if defined(GD_IDE_ONLY)
-    std::map<std::string, gd::InstructionMetadata > conditionsInfos;
-    std::map<std::string, gd::InstructionMetadata > actionsInfos;
-    std::map<std::string, gd::ExpressionMetadata > expressionsInfos;
-    std::map<std::string, gd::ExpressionMetadata > strExpressionsInfos;
+    std::map<gd::String, gd::InstructionMetadata > conditionsInfos;
+    std::map<gd::String, gd::InstructionMetadata > actionsInfos;
+    std::map<gd::String, gd::ExpressionMetadata > expressionsInfos;
+    std::map<gd::String, gd::ExpressionMetadata > strExpressionsInfos;
 
-    std::vector<std::string> includeFiles;
-    std::string className;
+    std::vector<gd::String> includeFiles;
+    gd::String className;
 #endif
     CreateFunPtr createFunPtr;
 
 private:
-    std::string extensionNamespace;
-    std::string name;
+    gd::String extensionNamespace;
+    gd::String name;
 #if defined(GD_IDE_ONLY)
-    std::string fullname;
-    std::string description;
-    std::string iconFilename;
+    gd::String fullname;
+    gd::String description;
+    gd::String iconFilename;
 #if !defined(GD_NO_WX_GUI)
     wxBitmap icon;
 #endif

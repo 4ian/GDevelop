@@ -26,23 +26,23 @@ int VersionWrapper::Revision()
 {
      return AutoVersion::GDCore_REVISION;
 }
-std::string VersionWrapper::FullString()
+gd::String VersionWrapper::FullString()
 {
     return AutoVersion::GDCore_FULLVERSION_STRING;
 }
-std::string VersionWrapper::Date()
+gd::String VersionWrapper::Date()
 {
     return AutoVersion::GDCore_DATE;
 }
-std::string VersionWrapper::Month()
+gd::String VersionWrapper::Month()
 {
     return AutoVersion::GDCore_MONTH;
 }
-std::string VersionWrapper::Year()
+gd::String VersionWrapper::Year()
 {
     return AutoVersion::GDCore_YEAR;
 }
-std::string VersionWrapper::Status()
+gd::String VersionWrapper::Status()
 {
     return AutoVersion::GDCore_STATUS;
 }

@@ -9,7 +9,7 @@
 
 #include <iostream>
 #include <vector>
-#include <string>
+#include <GDCore/Utf8String.h>
 #include <memory>
 #include <memory>
 #include <SFML/System.hpp>
@@ -46,7 +46,7 @@ public:
     /**
      * \brief Get a shared pointer to an OpenGL texture. The shared pointer must be kept alive as long as the texture is used.
      */
-    std::shared_ptr<OpenGLTextureWrapper> GetOpenGLTexture(const std::string & name) const;
+    std::shared_ptr<OpenGLTextureWrapper> GetOpenGLTexture(const gd::String & name) const;
 
     /**
      * \brief Get a shared pointer to a SFML texture.  The shared pointer must be kept alive as long as the texture is used.
@@ -54,7 +54,7 @@ public:
      * For example, if the texture is used in an object, you should store the shared pointer in a member to make sure the texture
      * is available as long as the object is alive.
      */
-    std::shared_ptr<SFMLTextureWrapper> GetSFMLTexture(const std::string & name) const;
+    std::shared_ptr<SFMLTextureWrapper> GetSFMLTexture(const gd::String & name) const;
 
     /**
      * \brief Set the project associated with the image manager.
@@ -71,18 +71,18 @@ public:
      * \brief Check if a SFML texture with the specified name is available and loaded in memory.
      * \return true if the texture called \a name if available and loaded in memory.
      */
-    bool HasLoadedSFMLTexture(const std::string & name) const;
+    bool HasLoadedSFMLTexture(const gd::String & name) const;
 
     /**
      * \brief Add the SFMLTextureWrapper to loaded images ( so that it can be accessed thanks to ImageManager::GetSFMLTexture ) with the specified name and
      * mark it as permanently loaded ( so that is is unloaded only when the layout is unloaded ).
      */
-    void SetSFMLTextureAsPermanentlyLoaded(const std::string & name, std::shared_ptr<SFMLTextureWrapper> & texture) const;
+    void SetSFMLTextureAsPermanentlyLoaded(const gd::String & name, std::shared_ptr<SFMLTextureWrapper> & texture) const;
 
     /**
      * \brief Reload a single image from the game resources
      */
-    void ReloadImage(const std::string & name) const;
+    void ReloadImage(const gd::String & name) const;
 
     #if defined(GD_IDE_ONLY)
     /**
@@ -98,8 +98,8 @@ public:
     #endif
 
 private:
-    mutable std::map < std::string, std::weak_ptr<SFMLTextureWrapper> > alreadyLoadedImages; ///< Reference all images loaded in memory.
-    mutable std::map < std::string, std::shared_ptr<SFMLTextureWrapper> > permanentlyLoadedImages; ///< Contains (smart) pointers to images which should stay loaded even if they are not (currently) used.
+    mutable std::map < gd::String, std::weak_ptr<SFMLTextureWrapper> > alreadyLoadedImages; ///< Reference all images loaded in memory.
+    mutable std::map < gd::String, std::shared_ptr<SFMLTextureWrapper> > permanentlyLoadedImages; ///< Contains (smart) pointers to images which should stay loaded even if they are not (currently) used.
 
     #if defined(GD_IDE_ONLY)
 
@@ -114,7 +114,7 @@ private:
     bool preventUnloading; ///< True if no images must be currently unloaded.
     #endif
 
-    mutable std::map < std::string, std::weak_ptr<OpenGLTextureWrapper> > alreadyLoadedOpenGLTextures; ///< Reference all OpenGL textures loaded in memory.
+    mutable std::map < gd::String, std::weak_ptr<OpenGLTextureWrapper> > alreadyLoadedOpenGLTextures; ///< Reference all OpenGL textures loaded in memory.
 
     mutable std::shared_ptr<SFMLTextureWrapper> badTexture;
     mutable std::shared_ptr<OpenGLTextureWrapper> badOpenGLTexture;

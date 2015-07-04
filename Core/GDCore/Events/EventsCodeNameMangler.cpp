@@ -6,45 +6,45 @@
 #if defined(GD_IDE_ONLY)
 #include "GDCore/CommonTools.h"
 #include "EventsCodeNameMangler.h"
-#include <string>
+#include <GDCore/Utf8String.h>
 
 EventsCodeNameMangler *EventsCodeNameMangler::_singleton = NULL;
 
-std::string EventsCodeNameMangler::GetMangledObjectsListName(const std::string & originalObjectName)
+gd::String EventsCodeNameMangler::GetMangledObjectsListName(const gd::String & originalObjectName)
 {
-    std::string partiallyMangledName = originalObjectName;
-    static const std::string allowedCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    gd::String partiallyMangledName = originalObjectName;
+    static const gd::String allowedCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
     for (size_t i = 0;i<partiallyMangledName.size();++i) //Replace all unallowed letter by an underscore and the ascii number of the letter
     {
-        if ( allowedCharacters.find_first_of(partiallyMangledName[i]) == std::string::npos)
+        if ( allowedCharacters.find_first_of(std::u32string(1, partiallyMangledName[i])) == gd::String::npos)
         {
-            char unallowedChar = partiallyMangledName[i];
-            partiallyMangledName.replace(i, 1, "_"+gd::ToString(int(unallowedChar)));
+            char32_t unallowedChar = partiallyMangledName[i];
+            partiallyMangledName.replace(i, 1, "_"+gd::String::FromInt(unallowedChar));
         }
     }
 
     return "GD"+partiallyMangledName+"Objects";
 }
 
-std::string EventsCodeNameMangler::GetExternalEventsFunctionMangledName(const std::string & externalEventsName)
+gd::String EventsCodeNameMangler::GetExternalEventsFunctionMangledName(const gd::String & externalEventsName)
 {
-    std::string partiallyMangledName = externalEventsName;
-    static const std::string allowedCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    gd::String partiallyMangledName = externalEventsName;
+    static const gd::String allowedCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
     for (size_t i = 0;i<partiallyMangledName.size();++i) //Replace all unallowed letter by an underscore and the ascii number of the letter
     {
-        if ( allowedCharacters.find_first_of(partiallyMangledName[i]) == std::string::npos)
+        if ( allowedCharacters.find_first_of(std::u32string(1, partiallyMangledName[i])) == gd::String::npos)
         {
-            char unallowedChar = partiallyMangledName[i];
-            partiallyMangledName.replace(i, 1, "_"+gd::ToString(int(unallowedChar)));
+            char32_t unallowedChar = partiallyMangledName[i];
+            partiallyMangledName.replace(i, 1, "_"+gd::String::FromInt(unallowedChar));
         }
     }
 
     return "GDExternalEvents"+partiallyMangledName;
 }
 
-std::string ManObjListName(const std::string & objectName)
+gd::String ManObjListName(const gd::String & objectName)
 {
     return EventsCodeNameMangler::Get()->GetMangledObjectsListName(objectName);
 }

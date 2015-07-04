@@ -6,7 +6,7 @@
 
 #ifndef GDCORE_EXTERNALLAYOUT_H
 #define GDCORE_EXTERNALLAYOUT_H
-#include <string>
+#include <GDCore/Utf8String.h>
 #include "GDCore/PlatformDefinition/InitialInstancesContainer.h"
 #include <memory>
 namespace gd { class SerializerElement; }
@@ -34,12 +34,12 @@ public:
     /**
      * \brief Return the name of the external layout.
      */
-    const std::string & GetName() const {return name;}
+    const gd::String & GetName() const {return name;}
 
     /**
      * \brief Change the name of the external layout.
      */
-    void SetName(const std::string & name_) {name = name_;}
+    void SetName(const gd::String & name_) {name = name_;}
 
     /**
      * \brief Return the container storing initial instances.
@@ -81,7 +81,7 @@ public:
 
 private:
 
-    std::string name;
+    gd::String name;
     gd::InitialInstancesContainer instances;
     #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
     gd::LayoutEditorCanvasOptions editionSettings;
@@ -91,8 +91,8 @@ private:
 /**
  * \brief Functor testing ExternalLayout' name
  */
-struct ExternalLayoutHasName : public std::binary_function<std::shared_ptr<gd::ExternalLayout>, std::string, bool> {
-    bool operator()(const std::shared_ptr<gd::ExternalLayout> & externalLayout, std::string name) const { return externalLayout->GetName() == name; }
+struct ExternalLayoutHasName : public std::binary_function<std::shared_ptr<gd::ExternalLayout>, gd::String, bool> {
+    bool operator()(const std::shared_ptr<gd::ExternalLayout> & externalLayout, gd::String name) const { return externalLayout->GetName() == name; }
 };
 
 }

@@ -18,7 +18,7 @@ public:
     DndTextResourcesEditor(ResourcesEditor & editor_) : editor(editor_) {}
 
     /**
-     * The dropped text must be a string formatted like this (without quotes):
+     * The dropped text must be a gd::String formatted like this (without quotes):
      * "COPYANDADDRESOURCES;subfolderwherefilesshouldbeinserted;file1;file2..."
      */
     virtual bool OnDropText(wxCoord x, wxCoord y, const wxString& text);

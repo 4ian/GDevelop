@@ -42,7 +42,7 @@ class GD_CORE_API SpriteObject : public gd::Object
 {
 public :
 
-    SpriteObject(std::string name_);
+    SpriteObject(gd::String name_);
     virtual ~SpriteObject();
     virtual gd::Object * Clone() const { return new SpriteObject(*this);}
 
@@ -50,8 +50,8 @@ public :
     virtual bool GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail) const;
     virtual void ExposeResources(gd::ArbitraryResourceWorker & worker);
 
-    virtual std::map<std::string, gd::PropertyDescriptor> GetInitialInstanceProperties(const gd::InitialInstance & position, gd::Project & project, gd::Layout & scene);
-    virtual bool UpdateInitialInstanceProperty(gd::InitialInstance & position, const std::string & name, const std::string & value, gd::Project & project, gd::Layout & scene);
+    virtual std::map<gd::String, gd::PropertyDescriptor> GetInitialInstanceProperties(const gd::InitialInstance & position, gd::Project & project, gd::Layout & scene);
+    virtual bool UpdateInitialInstanceProperty(gd::InitialInstance & position, const gd::String & name, const gd::String & value, gd::Project & project, gd::Layout & scene);
     virtual void EditObject( wxWindow* parent, gd::Project & project, gd::MainFrameWrapper & mainFrameWrapper_ );
     #if !defined(EMSCRIPTEN)
     virtual void DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout);
@@ -128,7 +128,7 @@ private:
     static Animation badAnimation; //< Bad animation when an out of bound animation is requested.
 };
 
-GD_CORE_API gd::Object * CreateSpriteObject(std::string name);
+GD_CORE_API gd::Object * CreateSpriteObject(gd::String name);
 
 }
 #endif // GDCORE_SPRITEOBJECT_H

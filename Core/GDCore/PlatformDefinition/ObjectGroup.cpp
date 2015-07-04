@@ -6,7 +6,7 @@
 
 #include "ObjectGroup.h"
 #include <vector>
-#include <string>
+#include <GDCore/Utf8String.h>
 #include <algorithm>
 #include "GDCore/Serialization/SerializerElement.h"
 
@@ -15,17 +15,17 @@ using namespace std;
 namespace gd
 {
 
-bool ObjectGroup::Find(const string & name) const
+bool ObjectGroup::Find(const gd::String & name) const
 {
     return std::find(memberObjects.begin(), memberObjects.end(), name) != memberObjects.end();
 }
 
-void ObjectGroup::AddObject(const string & name)
+void ObjectGroup::AddObject(const gd::String & name)
 {
     if ( !Find(name) ) memberObjects.push_back(name);
 }
 
-void ObjectGroup::RemoveObject(const string & name)
+void ObjectGroup::RemoveObject(const gd::String & name)
 {
     memberObjects.erase(std::remove(memberObjects.begin(), memberObjects.end(), name), memberObjects.end());
     return;
@@ -42,7 +42,7 @@ void ObjectGroup::SerializeTo(const std::vector < gd::ObjectGroup > & list, Seri
 
         SerializerElement & objectsElement = groupElement.AddChild("objects");
         objectsElement.ConsiderAsArrayOf("object");
-        vector < string > allObjects = list[j].GetAllObjectsNames();
+        vector < gd::String > allObjects = list[j].GetAllObjectsNames();
         for ( unsigned int k = 0;k < allObjects.size();k++ )
             objectsElement.AddChild("object").SetAttribute( "name", allObjects[k] );
     }

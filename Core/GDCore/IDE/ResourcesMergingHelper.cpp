@@ -5,7 +5,7 @@
  */
 
 #include "ResourcesMergingHelper.h"
-#include <string>
+#include <GDCore/Utf8String.h>
 #include <iostream>
 #include "GDCore/CommonTools.h"
 #include "GDCore/Tools/Log.h"
@@ -15,11 +15,11 @@
 namespace gd
 {
 
-void ResourcesMergingHelper::ExposeFile(std::string & resourceFilename)
+void ResourcesMergingHelper::ExposeFile(gd::String & resourceFilename)
 {
     if ( resourceFilename.empty() ) return;
 
-    std::string resourceFullFilename = resourceFilename;
+    gd::String resourceFullFilename = resourceFilename;
     resourceFullFilename = gd::AbstractFileSystem::NormalizeSeparator(resourceFullFilename); //Protect against \ on Linux.
     fs.MakeAbsolute(resourceFullFilename, baseDirectory);
 
@@ -36,7 +36,7 @@ void ResourcesMergingHelper::ExposeFile(std::string & resourceFilename)
         if ( resourcesNewFilename.find(resourceFullFilename) == resourcesNewFilename.end() )
         {
             //We want to preserve the directory structure : Keep paths relative to the base directory
-            std::string relativeFilename = resourceFullFilename;
+            gd::String relativeFilename = resourceFullFilename;
             if ( fs.MakeRelative(relativeFilename, baseDirectory) )
                 resourcesNewFilename[resourceFullFilename] = relativeFilename;
             else //Unless the filename cannot be made relative. In this case:
@@ -47,11 +47,11 @@ void ResourcesMergingHelper::ExposeFile(std::string & resourceFilename)
         }
     }
 
-    std::string newResourceFilename = resourcesNewFilename[resourceFullFilename];
+    gd::String newResourceFilename = resourcesNewFilename[resourceFullFilename];
     resourceFilename = newResourceFilename;
 }
 
-void ResourcesMergingHelper::SetBaseDirectory(const std::string & baseDirectory_)
+void ResourcesMergingHelper::SetBaseDirectory(const gd::String & baseDirectory_)
 {
     baseDirectory = baseDirectory_;
 }

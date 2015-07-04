@@ -3,7 +3,7 @@
  * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the MIT License.
  */
-#include <string>
+#include <GDCore/Utf8String.h>
 #include <vector>
 #include <map>
 #include <memory>

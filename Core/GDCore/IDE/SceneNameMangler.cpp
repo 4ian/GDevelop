@@ -6,25 +6,25 @@
 
 #include "SceneNameMangler.h"
 #include "GDCore/CommonTools.h"
-#include <string>
+#include <GDCore/Utf8String.h>
 
 namespace gd
 {
 
-std::string SceneNameMangler::GetMangledSceneName(const std::string & originalSceneName)
+gd::String SceneNameMangler::GetMangledSceneName(const gd::String & originalSceneName)
 {
-    std::string partiallyMangledName = originalSceneName;
-    static const std::string allowedCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    static const std::string allowedExceptFirst = "0123456789";
+    gd::String partiallyMangledName = originalSceneName;
+    static const gd::String allowedCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    static const gd::String allowedExceptFirst = "0123456789";
 
-    for (size_t i = 0;i<partiallyMangledName.size();++i) //Replace all unallowed letters by an underscore and the ascii number of the letter
+    for (size_t i = 0;i<partiallyMangledName.size();++i) //Replace all unallowed letters by an underscore and the Unicode code point of the letter
     {
-        if ( allowedCharacters.find_first_of(partiallyMangledName[i]) == std::string::npos &&
-             (allowedExceptFirst.find_first_of(partiallyMangledName[i]) == std::string::npos ||
+        if ( allowedCharacters.find_first_of(std::u32string(1, partiallyMangledName[i])) == gd::String::npos &&
+             (allowedExceptFirst.find_first_of(std::u32string(1, partiallyMangledName[i])) == gd::String::npos ||
               i == 0) ) //Also disallow some characters to be in first position
         {
-            char unallowedChar = partiallyMangledName[i];
-            partiallyMangledName.replace(i, 1, "_"+ToString(int(unallowedChar)));
+            char32_t unallowedChar = partiallyMangledName[i];
+            partiallyMangledName.replace(i, 1, "_"+gd::String::FromInt(unallowedChar));
         }
     }
 

@@ -10,8 +10,6 @@
 #include "GDCore/PlatformDefinition/ResourcesManager.h"
 #undef LoadImage //thx windows.h
 
-using namespace std;
-
 namespace gd
 {
 
@@ -24,11 +22,11 @@ game(NULL)
     badTexture->image = badTexture->texture.copyToImage();
 }
 
-std::shared_ptr<SFMLTextureWrapper> ImageManager::GetSFMLTexture(const std::string & name) const
+std::shared_ptr<SFMLTextureWrapper> ImageManager::GetSFMLTexture(const gd::String & name) const
 {
     if ( !game )
     {
-        cout << "Image manager has no game associated with.";
+        std::cout << "Image manager has no game associated with.";
         return badTexture;
     }
 
@@ -56,12 +54,12 @@ std::shared_ptr<SFMLTextureWrapper> ImageManager::GetSFMLTexture(const std::stri
     {
     }
 
-    cout << " Resource not found." << endl;
+    std::cout << " Resource not found." << std::endl;
 
     return badTexture;
 }
 
-bool ImageManager::HasLoadedSFMLTexture(const std::string & name) const
+bool ImageManager::HasLoadedSFMLTexture(const gd::String & name) const
 {
     if ( alreadyLoadedImages.find(name) != alreadyLoadedImages.end() && !alreadyLoadedImages.find(name)->second.expired() )
         return true;
@@ -69,7 +67,7 @@ bool ImageManager::HasLoadedSFMLTexture(const std::string & name) const
     return false;
 }
 
-void ImageManager::SetSFMLTextureAsPermanentlyLoaded(const std::string & name, std::shared_ptr<SFMLTextureWrapper> & texture) const
+void ImageManager::SetSFMLTextureAsPermanentlyLoaded(const gd::String & name, std::shared_ptr<SFMLTextureWrapper> & texture) const
 {
     if ( alreadyLoadedImages.find(name) == alreadyLoadedImages.end() || alreadyLoadedImages.find(name)->second.expired() )
         alreadyLoadedImages[name] = texture;
@@ -78,11 +76,11 @@ void ImageManager::SetSFMLTextureAsPermanentlyLoaded(const std::string & name, s
         permanentlyLoadedImages[name] = texture;
 }
 
-void ImageManager::ReloadImage(const std::string & name) const
+void ImageManager::ReloadImage(const gd::String & name) const
 {
     if ( !game )
     {
-        cout << "Image manager has no game associated with.";
+        std::cout << "Image manager has no game associated with.";
         return;
     }
 
@@ -96,7 +94,7 @@ void ImageManager::ReloadImage(const std::string & name) const
     {
         ImageResource & image = dynamic_cast<ImageResource&>(game->GetResourcesManager().GetResource(name));
 
-        cout << "ImageManager: Reload " << name << endl;
+        std::cout << "ImageManager: Reload " << name << std::endl;
 
         oldTexture->texture = ResourcesLoader::Get()->LoadSFMLTexture( image.GetFile() );
         oldTexture->texture.setSmooth(image.smooth);
@@ -107,22 +105,22 @@ void ImageManager::ReloadImage(const std::string & name) const
     catch(...) { /*The ressource is not an image*/ }
 
     //Image not present anymore in image list.
-    cout << "ImageManager: " << name << " is not available anymore." << endl;
+    std::cout << "ImageManager: " << name << " is not available anymore." << std::endl;
     *oldTexture = *badTexture;
 }
 
-std::shared_ptr<OpenGLTextureWrapper> ImageManager::GetOpenGLTexture(const std::string & name) const
+std::shared_ptr<OpenGLTextureWrapper> ImageManager::GetOpenGLTexture(const gd::String & name) const
 {
     if ( !game )
     {
-        cout << "Image manager has no game associated with.";
+        std::cout << "Image manager has no game associated with.";
         return badOpenGLTexture;
     }
 
     if ( alreadyLoadedOpenGLTextures.find(name) != alreadyLoadedOpenGLTextures.end() && !alreadyLoadedOpenGLTextures.find(name)->second.expired() )
         return alreadyLoadedOpenGLTextures.find(name)->second.lock();
 
-    cout << "Load OpenGL Texture" << name << endl;
+    std::cout << "Load OpenGL Texture" << name << std::endl;
 
     std::shared_ptr<OpenGLTextureWrapper> texture = std::shared_ptr<OpenGLTextureWrapper>(new OpenGLTextureWrapper(GetSFMLTexture(name)));
     alreadyLoadedOpenGLTextures[name] = texture;
@@ -133,15 +131,15 @@ void ImageManager::LoadPermanentImages()
 {
     if ( !game )
     {
-        cout << "Image manager has no game associated with.";
+        std::cout << "Image manager has no game associated with.";
         return;
     }
 
     //Create a new list of permanently loaded images but do not delete now the old list
     //so as not to unload images that could be still present.
-    map < string, std::shared_ptr<SFMLTextureWrapper> > newPermanentlyLoadedImages;
+    std::map < gd::String, std::shared_ptr<SFMLTextureWrapper> > newPermanentlyLoadedImages;
 
-    std::vector<std::string> resources = game->GetResourcesManager().GetAllResourcesList();
+    std::vector<gd::String> resources = game->GetResourcesManager().GetAllResourcesList();
     for ( unsigned int i = 0;i <resources.size();i++ )
     {
         try
@@ -161,7 +159,7 @@ void ImageManager::LoadPermanentImages()
 void ImageManager::PreventImagesUnloading()
 {
     preventUnloading = true;
-    for (map < string, std::weak_ptr<SFMLTextureWrapper> >::const_iterator it = alreadyLoadedImages.begin();it != alreadyLoadedImages.end();++it)
+    for (auto it = alreadyLoadedImages.begin();it != alreadyLoadedImages.end();++it)
     {
         std::shared_ptr<SFMLTextureWrapper> image = (it->second).lock();
         if ( image != std::shared_ptr<SFMLTextureWrapper>() ) unloadingPreventer.push_back(image);

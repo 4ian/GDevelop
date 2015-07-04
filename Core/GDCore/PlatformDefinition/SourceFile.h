@@ -6,7 +6,7 @@
 #ifndef SOURCEFILE_H
 #define SOURCEFILE_H
 #include <ctime>
-#include <string>
+#include <GDCore/Utf8String.h>
 #include <memory>
 namespace gd { class SerializerElement; }
 class BaseEvent;
@@ -30,12 +30,12 @@ public:
     /**
      * \brief Get the filename
      */
-    std::string GetFileName() const { return filename; };
+    gd::String GetFileName() const { return filename; };
 
     /**
      * \brief Change the filename
      */
-    void SetFileName(std::string filename_) { filename = filename_; };
+    void SetFileName(gd::String filename_) { filename = filename_; };
 
     /**
      * \brief Serialize the source file.
@@ -60,18 +60,18 @@ public:
     /**
      * \brief Change the language of the source file
      */
-    void SetLanguage(std::string lang) { language = lang; }
+    void SetLanguage(gd::String lang) { language = lang; }
 
     /**
      * \brief Get the language of the source file
      */
-    const std::string & GetLanguage() const { return language; }
+    const gd::String & GetLanguage() const { return language; }
 
 private:
 
-    std::string filename; ///< Filename
+    gd::String filename; ///< Filename
     bool gdManaged; ///< True if the source file is hidden from the user point of view and is managed only by GDevelop.
-    std::string language; ///< String identifying the language of this source file (typically "C++ or "Javascript").
+    gd::String language; ///< String identifying the language of this source file (typically "C++ or "Javascript").
     std::weak_ptr<BaseEvent> associatedGdEvent; ///< When a source file is GD-managed, it is usually created for a specific event. This member is not saved: It is the event responsibility to call SetAssociatedEvent.
 };
 
@@ -80,8 +80,8 @@ private:
 /**
  * Functor testing Source Files name
  */
-struct ExternalSourceFileHasName : public std::binary_function<std::shared_ptr<SourceFile>, std::string, bool> {
-    bool operator()(const std::shared_ptr<SourceFile> & externalEvents, std::string name) const { return externalEvents->GetFileName() == name; }
+struct ExternalSourceFileHasName : public std::binary_function<std::shared_ptr<SourceFile>, gd::String, bool> {
+    bool operator()(const std::shared_ptr<SourceFile> & externalEvents, gd::String name) const { return externalEvents->GetFileName() == name; }
 };
 
 }

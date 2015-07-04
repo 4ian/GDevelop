@@ -6,7 +6,7 @@
 
 #include "Layout.h"
 #include <algorithm>
-#include <string>
+#include <GDCore/Utf8String.h>
 #include <vector>
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/PlatformDefinition/Project.h"
@@ -66,13 +66,13 @@ Layout::Layout() :
     initialLayers.push_back(layer);
 }
 
-void Layout::SetName(const std::string & name_)
+void Layout::SetName(const gd::String & name_)
 {
     name = name_;
     mangledName = gd::SceneNameMangler::GetMangledSceneName(name);
 };
 
-gd::Layer & Layout::GetLayer(const std::string & name)
+gd::Layer & Layout::GetLayer(const gd::String & name)
 {
     std::vector<gd::Layer>::iterator layer = find_if(initialLayers.begin(), initialLayers.end(), bind2nd(gd::LayerHasName(), name));
 
@@ -81,7 +81,7 @@ gd::Layer & Layout::GetLayer(const std::string & name)
 
     return badLayer;
 }
-const gd::Layer & Layout::GetLayer(const std::string & name) const
+const gd::Layer & Layout::GetLayer(const gd::String & name) const
 {
     std::vector<gd::Layer>::const_iterator layer = find_if(initialLayers.begin(), initialLayers.end(), bind2nd(gd::LayerHasName(), name));
 
@@ -104,20 +104,20 @@ unsigned int Layout::GetLayersCount() const
 }
 
 #if defined(GD_IDE_ONLY)
-bool Layout::HasLayerNamed(const std::string & name) const
+bool Layout::HasLayerNamed(const gd::String & name) const
 {
     return ( find_if(initialLayers.begin(), initialLayers.end(), bind2nd(gd::LayerHasName(), name)) != initialLayers.end() );
 }
-unsigned int Layout::GetLayerPosition(const std::string & name) const
+unsigned int Layout::GetLayerPosition(const gd::String & name) const
 {
     for (unsigned int i = 0;i<initialLayers.size();++i)
     {
         if ( initialLayers[i].GetName() == name ) return i;
     }
-    return std::string::npos;
+    return gd::String::npos;
 }
 
-void Layout::InsertNewLayer(const std::string & name, unsigned int position)
+void Layout::InsertNewLayer(const gd::String & name, unsigned int position)
 {
     gd::Layer newLayer;
     newLayer.SetName(name);
@@ -135,7 +135,7 @@ void Layout::InsertLayer(const gd::Layer & layer, unsigned int position)
         initialLayers.push_back(layer);
 }
 
-void Layout::RemoveLayer(const std::string & name)
+void Layout::RemoveLayer(const gd::String & name)
 {
     std::vector< gd::Layer >::iterator layer = find_if(initialLayers.begin(), initialLayers.end(), bind2nd(gd::LayerHasName(), name));
     if ( layer == initialLayers.end() ) return;
@@ -155,13 +155,13 @@ void Layout::SwapLayers(unsigned int firstLayerIndex, unsigned int secondLayerIn
 
 void Layout::UpdateAutomatismsSharedData(gd::Project & project)
 {
-    std::vector < std::string > allAutomatismsTypes;
-    std::vector < std::string > allAutomatismsNames;
+    std::vector < gd::String > allAutomatismsTypes;
+    std::vector < gd::String > allAutomatismsNames;
 
     //Search in objects for the type and the name of every automatisms.
     for (unsigned int i = 0;i<initialObjects.size();++i)
     {
-        std::vector < std::string > objectAutomatisms = initialObjects[i]->GetAllAutomatismNames();
+        std::vector < gd::String > objectAutomatisms = initialObjects[i]->GetAllAutomatismNames();
         for (unsigned int j = 0;j<objectAutomatisms.size();++j)
         {
             gd::Automatism & automatism = initialObjects[i]->GetAutomatism(objectAutomatisms[j]);
@@ -171,7 +171,7 @@ void Layout::UpdateAutomatismsSharedData(gd::Project & project)
     }
     for (unsigned int i = 0;i<project.GetObjectsCount();++i)
     {
-        std::vector < std::string > objectAutomatisms = project.GetObject(i).GetAllAutomatismNames();
+        std::vector < gd::String > objectAutomatisms = project.GetObject(i).GetAllAutomatismNames();
         for (unsigned int j = 0;j<objectAutomatisms.size();++j)
         {
             gd::Automatism & automatism = project.GetObject(i).GetAutomatism(objectAutomatisms[j]);
@@ -196,8 +196,8 @@ void Layout::UpdateAutomatismsSharedData(gd::Project & project)
 
     //Remove useless shared data:
     //First construct the list of existing shared data.
-    std::vector < std::string > allSharedData;
-    for (std::map < std::string, std::shared_ptr<gd::AutomatismsSharedData> >::const_iterator it = automatismsInitialSharedDatas.begin();
+    std::vector < gd::String > allSharedData;
+    for (std::map < gd::String, std::shared_ptr<gd::AutomatismsSharedData> >::const_iterator it = automatismsInitialSharedDatas.begin();
          it != automatismsInitialSharedDatas.end();++it)
     {
         allSharedData.push_back(it->first);
@@ -243,7 +243,7 @@ void Layout::SerializeTo(SerializerElement & element) const
 
     SerializerElement & automatismDatasElement = element.AddChild("automatismsSharedData");
     automatismDatasElement.ConsiderAsArrayOf("automatismSharedData");
-    for (std::map<std::string, std::shared_ptr<gd::AutomatismsSharedData> >::const_iterator it = automatismsInitialSharedDatas.begin();
+    for (std::map<gd::String, std::shared_ptr<gd::AutomatismsSharedData> >::const_iterator it = automatismsInitialSharedDatas.begin();
          it != automatismsInitialSharedDatas.end();++it)
     {
         SerializerElement & dataElement = automatismDatasElement.AddChild("automatismSharedData");
@@ -295,7 +295,7 @@ void Layout::UnserializeFrom(gd::Project & project, const SerializerElement & el
     for (unsigned int i = 0; i < automatismsDataElement.GetChildrenCount(); ++i)
     {
         SerializerElement & automatismDataElement = automatismsDataElement.GetChild(i);
-        std::string type = automatismDataElement.GetStringAttribute("type", "", "Type");
+        gd::String type = automatismDataElement.GetStringAttribute("type", "", "Type");
 
         std::shared_ptr<gd::AutomatismsSharedData> sharedData = project.CreateAutomatismSharedDatas(type);
         if ( sharedData != std::shared_ptr<gd::AutomatismsSharedData>() )
@@ -331,7 +331,7 @@ void Layout::Init(const Layout & other)
     	initialObjects.push_back( std::shared_ptr<gd::Object>(other.initialObjects[i]->Clone()) );
 
     automatismsInitialSharedDatas.clear();
-    for (std::map< std::string, std::shared_ptr<gd::AutomatismsSharedData> >::const_iterator it = other.automatismsInitialSharedDatas.begin();
+    for (std::map< gd::String, std::shared_ptr<gd::AutomatismsSharedData> >::const_iterator it = other.automatismsInitialSharedDatas.begin();
          it != other.automatismsInitialSharedDatas.end();++it)
     {
     	automatismsInitialSharedDatas[it->first] = it->second->Clone();
@@ -349,9 +349,9 @@ void Layout::Init(const Layout & other)
 }
 
 #if defined(GD_IDE_ONLY)
-std::string GD_CORE_API GetTypeOfObject(const gd::Project & project, const gd::Layout & layout, std::string name, bool searchInGroups)
+gd::String GD_CORE_API GetTypeOfObject(const gd::Project & project, const gd::Layout & layout, gd::String name, bool searchInGroups)
 {
-    std::string type;
+    gd::String type;
 
     //Search in objects
     if ( layout.HasObjectNamed(name) )
@@ -369,8 +369,8 @@ std::string GD_CORE_API GetTypeOfObject(const gd::Project & project, const gd::L
                 //A group has the name searched
                 //Verifying now that all objects have the same type.
 
-                vector < string > groupsObjects = layout.GetObjectGroups()[i].GetAllObjectsNames();
-                std::string previousType = groupsObjects.empty() ? "" : GetTypeOfObject(project, layout, groupsObjects[0], false);
+                vector < gd::String > groupsObjects = layout.GetObjectGroups()[i].GetAllObjectsNames();
+                gd::String previousType = groupsObjects.empty() ? "" : GetTypeOfObject(project, layout, groupsObjects[0], false);
 
                 for (unsigned int j = 0;j<groupsObjects.size();++j)
                 {
@@ -392,8 +392,8 @@ std::string GD_CORE_API GetTypeOfObject(const gd::Project & project, const gd::L
                 //A group has the name searched
                 //Verifying now that all objects have the same type.
 
-                vector < string > groupsObjects = project.GetObjectGroups()[i].GetAllObjectsNames();
-                std::string previousType = groupsObjects.empty() ? "" : GetTypeOfObject(project, layout, groupsObjects[0], false);
+                vector < gd::String > groupsObjects = project.GetObjectGroups()[i].GetAllObjectsNames();
+                gd::String previousType = groupsObjects.empty() ? "" : GetTypeOfObject(project, layout, groupsObjects[0], false);
 
                 for (unsigned int j = 0;j<groupsObjects.size();++j)
                 {
@@ -413,11 +413,11 @@ std::string GD_CORE_API GetTypeOfObject(const gd::Project & project, const gd::L
     return type;
 }
 
-std::string GD_CORE_API GetTypeOfAutomatism(const gd::Project & project, const gd::Layout & layout, std::string name, bool searchInGroups)
+gd::String GD_CORE_API GetTypeOfAutomatism(const gd::Project & project, const gd::Layout & layout, gd::String name, bool searchInGroups)
 {
     for (unsigned int i = 0;i<layout.GetObjectsCount();++i)
     {
-        vector < std::string > automatisms = layout.GetObject(i).GetAllAutomatismNames();
+        vector < gd::String > automatisms = layout.GetObject(i).GetAllAutomatismNames();
         for (unsigned int j = 0;j<automatisms.size();++j)
         {
             if ( layout.GetObject(i).GetAutomatism(automatisms[j]).GetName() == name )
@@ -427,7 +427,7 @@ std::string GD_CORE_API GetTypeOfAutomatism(const gd::Project & project, const g
 
     for (unsigned int i = 0;i<project.GetObjectsCount();++i)
     {
-        vector < std::string > automatisms = project.GetObject(i).GetAllAutomatismNames();
+        vector < gd::String > automatisms = project.GetObject(i).GetAllAutomatismNames();
         for (unsigned int j = 0;j<automatisms.size();++j)
         {
             if ( project.GetObject(i).GetAutomatism(automatisms[j]).GetName() == name )
@@ -438,21 +438,21 @@ std::string GD_CORE_API GetTypeOfAutomatism(const gd::Project & project, const g
     return "";
 }
 
-vector < std::string > GD_CORE_API GetAutomatismsOfObject(const gd::Project & project, const gd::Layout & layout, std::string name, bool searchInGroups)
+vector < gd::String > GD_CORE_API GetAutomatismsOfObject(const gd::Project & project, const gd::Layout & layout, gd::String name, bool searchInGroups)
 {
     bool automatismsAlreadyInserted = false;
-    vector < std::string > automatims;
+    vector < gd::String > automatims;
 
     //Search in objects
     if ( layout.HasObjectNamed(name) ) //We check first layout's objects' list.
     {
-        vector < std::string > objectAutomatisms = layout.GetObject(name).GetAllAutomatismNames();
+        vector < gd::String > objectAutomatisms = layout.GetObject(name).GetAllAutomatismNames();
         copy(objectAutomatisms.begin(), objectAutomatisms.end(), back_inserter(automatims));
         automatismsAlreadyInserted = true;
     }
     else if ( project.HasObjectNamed(name) ) //Then the global object list
     {
-        vector < std::string > objectAutomatisms = project.GetObject(name).GetAllAutomatismNames();
+        vector < gd::String > objectAutomatisms = project.GetObject(name).GetAllAutomatismNames();
         copy(objectAutomatisms.begin(), objectAutomatisms.end(), back_inserter(automatims));
         automatismsAlreadyInserted = true;
     }
@@ -467,11 +467,11 @@ vector < std::string > GD_CORE_API GetAutomatismsOfObject(const gd::Project & pr
                 //A group has the name searched
                 //Verifying now that all objects have common automatisms.
 
-                vector < string > groupsObjects = layout.GetObjectGroups()[i].GetAllObjectsNames();
+                vector < gd::String > groupsObjects = layout.GetObjectGroups()[i].GetAllObjectsNames();
                 for (unsigned int j = 0;j<groupsObjects.size();++j)
                 {
                     //Get automatisms of the object of the group and delete automatism which are not in commons.
-                	vector < std::string > objectAutomatisms = GetAutomatismsOfObject(project, layout, groupsObjects[j], false);
+                	vector < gd::String > objectAutomatisms = GetAutomatismsOfObject(project, layout, groupsObjects[j], false);
                 	if (!automatismsAlreadyInserted)
                 	{
                 	    automatismsAlreadyInserted = true;
@@ -498,11 +498,11 @@ vector < std::string > GD_CORE_API GetAutomatismsOfObject(const gd::Project & pr
                 //A group has the name searched
                 //Verifying now that all objects have common automatisms.
 
-                vector < string > groupsObjects = project.GetObjectGroups()[i].GetAllObjectsNames();
+                vector < gd::String > groupsObjects = project.GetObjectGroups()[i].GetAllObjectsNames();
                 for (unsigned int j = 0;j<groupsObjects.size();++j)
                 {
                     //Get automatisms of the object of the group and delete automatism which are not in commons.
-                	vector < std::string > objectAutomatisms = GetAutomatismsOfObject(project, layout, groupsObjects[j], false);
+                	vector < gd::String > objectAutomatisms = GetAutomatismsOfObject(project, layout, groupsObjects[j], false);
                 	if (!automatismsAlreadyInserted)
                 	{
                 	    automatismsAlreadyInserted = true;

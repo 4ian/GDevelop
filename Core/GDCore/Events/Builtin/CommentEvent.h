@@ -40,8 +40,8 @@ public:
     int textG; ///< Text color Green component
     int textB; ///< Text color Blue component
 
-    std::string com1; ///< Comment std::string
-    std::string com2; ///< Optional second comment std::string
+    gd::String com1; ///< Comment gd::String
+    gd::String com2; ///< Optional second comment gd::String
 
     /**
      * Called by event editor to draw the event.

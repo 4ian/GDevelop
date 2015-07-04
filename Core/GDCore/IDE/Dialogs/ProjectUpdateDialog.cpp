@@ -6,7 +6,7 @@
 #include "GDCore/Tools/Localization.h"
 #include <wx/string.h>
 //*)
-#include <string>
+#include <GDCore/Utf8String.h>
 
 //(*IdInit(ProjectUpdateDialog)
 const long ProjectUpdateDialog::ID_STATICTEXT1 = wxNewId();

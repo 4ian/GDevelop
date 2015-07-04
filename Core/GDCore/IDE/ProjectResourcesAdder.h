@@ -6,7 +6,7 @@
 #ifndef PROJECTRESOURCESADDER_H
 #define PROJECTRESOURCESADDER_H
 #include <vector>
-#include <string>
+#include <GDCore/Utf8String.h>
 namespace gd { class Project; }
 
 namespace gd
@@ -41,7 +41,7 @@ public:
      *
      * \return A vector containing the name of all unused resources
      */
-    static std::vector<std::string> GetAllUselessResources(gd::Project & project);
+    static std::vector<gd::String> GetAllUselessResources(gd::Project & project);
 
     /**
      * \brief Remove all resources that are not used

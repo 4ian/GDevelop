@@ -6,7 +6,7 @@
 #ifndef EVENTSCODEGENERATIONCONTEXT_H
 #define EVENTSCODEGENERATIONCONTEXT_H
 
-#include <string>
+#include <GDCore/Utf8String.h>
 #include <set>
 #include <map>
 #include <memory>
@@ -57,7 +57,7 @@ public:
     /**
      * Mark the object has being the object being handled by the instruction
      */
-    void SetCurrentObject(const std::string & objectName) { currentObject = objectName; };
+    void SetCurrentObject(const gd::String & objectName) { currentObject = objectName; };
 
     /**
      * Set that no particular object is being handled by an instruction
@@ -67,7 +67,7 @@ public:
     /**
      * Get the object being handled by the instruction
      */
-    const std::string & GetCurrentObject() const { return currentObject; };
+    const gd::String & GetCurrentObject() const { return currentObject; };
 
     /**
      * \brief Call this when an instruction in the event need an object list.
@@ -75,52 +75,52 @@ public:
      * The list will be filled with objects from the scene if it is the first time it is requested, unless there is
      * already an object list with this name ( i.e. ObjectAlreadyDeclared(objectName) returns true ).
      */
-    void ObjectsListNeeded(const std::string & objectName);
+    void ObjectsListNeeded(const gd::String & objectName);
 
     /**
      * Call this when an instruction in the event need an object list.
      * An empty event list will be declared, without filling it with objects from the scene. If there is already an object
      * list with this name, no new list will be declared again.
      */
-    void EmptyObjectsListNeeded(const std::string & objectName);
+    void EmptyObjectsListNeeded(const gd::String & objectName);
 
     /**
      * Return true if an object list has already been declared (or is going to be declared).
      */
-    bool ObjectAlreadyDeclared(const std::string & objectName) const { return (alreadyDeclaredObjectsLists.find(objectName) != alreadyDeclaredObjectsLists.end()); };
+    bool ObjectAlreadyDeclared(const gd::String & objectName) const { return (alreadyDeclaredObjectsLists.find(objectName) != alreadyDeclaredObjectsLists.end()); };
 
     /**
      * \brief Consider that \a objectName is now declared in the context.
      */
-    void SetObjectDeclared(const std::string & objectName ) { alreadyDeclaredObjectsLists.insert(objectName); }
+    void SetObjectDeclared(const gd::String & objectName ) { alreadyDeclaredObjectsLists.insert(objectName); }
 
     /**
      * Return all the objects lists which will be declared by the current context
      * ( the non empty as well as the empty objects lists )
      */
-    std::set<std::string> GetAllObjectsToBeDeclared() const;
+    std::set<gd::String> GetAllObjectsToBeDeclared() const;
 
     /**
      * Return the objects lists which will be declared by the current context
      */
-    const std::set<std::string> & GetObjectsListsToBeDeclared() const { return objectsListsToBeDeclared; };
+    const std::set<gd::String> & GetObjectsListsToBeDeclared() const { return objectsListsToBeDeclared; };
 
     /**
      * Return the objects lists which will be declared, but no filled, by the current context
      */
-    const std::set<std::string> & GetObjectsListsToBeDeclaredEmpty() const { return emptyObjectsListsToBeDeclared; };
+    const std::set<gd::String> & GetObjectsListsToBeDeclaredEmpty() const { return emptyObjectsListsToBeDeclared; };
 
     /**
      * Return the objects lists which are already declared and can be used in the current context without declaration.
      */
-    const std::set<std::string> & GetObjectsListsAlreadyDeclared() const { return alreadyDeclaredObjectsLists; };
+    const std::set<gd::String> & GetObjectsListsAlreadyDeclared() const { return alreadyDeclaredObjectsLists; };
 
     /**
      * \brief Get the depth of the context that was in effect when \a objectName was needed.
      *
      * If \a objectName is needed in this context, it will return the depth of this context.
      */
-    unsigned int GetLastDepthObjectListWasNeeded(const std::string & objectName) const;
+    unsigned int GetLastDepthObjectListWasNeeded(const gd::String & objectName) const;
 
     /**
      * \brief Called when a custom condition code is generated.
@@ -141,11 +141,11 @@ public:
     size_t GetCurrentConditionDepth() const { return customConditionDepth; }
 
 private:
-    std::set<std::string> alreadyDeclaredObjectsLists; ///< Objects lists already needed in a parent context.
-    std::set<std::string> objectsListsToBeDeclared; ///< Objects lists that will be declared in this context.
-    std::set<std::string> emptyObjectsListsToBeDeclared; ///< Objects lists that will be declared in this context, but not filled with scene's objects.
-    std::map<std::string, unsigned int> depthOfLastUse; ///< The context depth when an object was last used.
-    std::string currentObject; ///< The object being used by an action or condition.
+    std::set<gd::String> alreadyDeclaredObjectsLists; ///< Objects lists already needed in a parent context.
+    std::set<gd::String> objectsListsToBeDeclared; ///< Objects lists that will be declared in this context.
+    std::set<gd::String> emptyObjectsListsToBeDeclared; ///< Objects lists that will be declared in this context, but not filled with scene's objects.
+    std::map<gd::String, unsigned int> depthOfLastUse; ///< The context depth when an object was last used.
+    gd::String currentObject; ///< The object being used by an action or condition.
     unsigned int contextDepth; ///< The depth of the context : 0 for a newly created context, n+1 for any context inheriting from context with depth n.
     unsigned int customConditionDepth; ///< The depth of the conditions being generated.
     unsigned int * maxDepthLevel; ///< A pointer to a unsigned int updated with the maximum depth reached.

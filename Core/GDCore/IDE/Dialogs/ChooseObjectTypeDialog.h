@@ -18,7 +18,7 @@
 #include <wx/button.h>
 #include <wx/dialog.h>
 //*)
-#include <string>
+#include <GDCore/Utf8String.h>
 namespace gd { class Project; }
 
 namespace gd
@@ -45,7 +45,7 @@ public:
     /**
      * Returns the selected object type.
      */
-    const std::string & GetSelectedObjectType() const { return selectedObjectType; }
+    const gd::String & GetSelectedObjectType() const { return selectedObjectType; }
 
     //(*Declarations(ChooseObjectTypeDialog)
     wxStaticBitmap* StaticBitmap2;
@@ -93,7 +93,7 @@ private:
     void RefreshList();
 
     gd::Project & project;
-    std::string selectedObjectType;
+    gd::String selectedObjectType;
 
     DECLARE_EVENT_TABLE()
 };

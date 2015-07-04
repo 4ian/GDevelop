@@ -5,7 +5,7 @@
 
 #ifndef GDCORE_VERSIONWRAPPER_H
 #define GDCORE_VERSIONWRAPPER_H
-#include <string>
+#include "GDCore/Utf8String.h"
 
 namespace gd
 {
@@ -42,12 +42,12 @@ public:
     /**
      * \brief Get a full string containing version.
      */
-    static std::string FullString();
+    static gd::String FullString();
 
     /**
      * \brief Get GDCore status ( Alpha/Beta/Release Candidate/Release )
      */
-    static std::string Status();
+    static gd::String Status();
 
     /**
      * \brief Return true if GDCpp is compiled with edittime support.
@@ -57,17 +57,17 @@ public:
     /**
      * \brief Get Year of the release
      */
-    static std::string Year();
+    static gd::String Year();
 
     /**
      * \brief Get Month of the release
      */
-    static std::string Month();
+    static gd::String Month();
 
     /**
      * \brief Get Day of the release
      */
-    static std::string Date();
+    static gd::String Date();
 
     /**
      * \brief Return true if the first version is older
@@ -87,4 +87,3 @@ public:
 }
 
 #endif // GDCORE_VERSIONWRAPPER_H
-

@@ -437,7 +437,7 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, gd::Project & game_, Sp
     if(theme) theme->SetWindowTheme((HWND) imagesList->GetHWND(), L"EXPLORER", NULL);
     #endif
 
-    statusTxt->SetLabel(GD_T("Drag an image from the image bank to the area below to add it to the animation."));
+    statusTxt->SetLabel(_("Drag an image from the image bank to the area below to add it to the animation."));
 
     imagesList->SetDropTarget(new DndTextSpriteObjectEditor(*this));
 
@@ -527,14 +527,14 @@ void SpriteObjectEditor::RefreshAnimationTree()
     {
         Animation & animation = object.GetAnimation(i);
         wxTreeItemId animationItem = animationsTree->AppendItem(root, _("Animation ")+ToString(i), 0, -1,
-        	new gd::TreeItemStringData(ToString(i), ""));
+        	new gd::TreeItemStringData(gd::String::FromUInt(i), ""));
 
         if ( animation.useMultipleDirections )
         {
             for (unsigned int j = 0;j<animation.GetDirectionsCount();++j)
             {
-                animationsTree->AppendItem(animationItem, _("Direction ")+ToString(j), j+1, -1,
-                	new gd::TreeItemStringData(ToString(i), ToString(j)));
+                animationsTree->AppendItem(animationItem, _("Direction ")+gd::String::FromUInt(j), j+1, -1,
+                	new gd::TreeItemStringData(gd::String::FromUInt(i), gd::String::FromUInt(j)));
 
             }
         }
@@ -683,8 +683,8 @@ void SpriteObjectEditor::OnimagePanelPaint(wxPaintEvent& event)
             { pointX = sprite.GetCenter().GetX(); pointY = sprite.GetCenter().GetY(); }
             else if ( pointIndex != -1 )
             {
-                pointX = sprite.GetPoint(ToString(pointsList->GetItemText(pointIndex))).GetX();
-                pointY = sprite.GetPoint(ToString(pointsList->GetItemText(pointIndex))).GetY();
+                pointX = sprite.GetPoint(pointsList->GetItemText(pointIndex)).GetX();
+                pointY = sprite.GetPoint(pointsList->GetItemText(pointIndex)).GetY();
             }
 
             dc.DrawBitmap(gd::CommonBitmapManager::Get()->point,
@@ -769,7 +769,7 @@ void SpriteObjectEditor::RefreshPoints()
         const std::vector<Point> & points = sprite.GetAllNonDefaultPoints();
         for (unsigned int i = 0;i<points.size();++i)
         {
-            pointsList->InsertItem(pointsList->GetItemCount(), gd::utf8::ToWxString(points[i].GetName()), 0);
+            pointsList->InsertItem(pointsList->GetItemCount(), points[i].GetName(), 0);
             pointsList->SetItem(pointsList->GetItemCount()-1, 1, ToString(points[i].GetX()));
             pointsList->SetItem(pointsList->GetItemCount()-1, 2, ToString(points[i].GetY()));
         }
@@ -851,8 +851,8 @@ void SpriteObjectEditor::OnanimationsTreeSelectionChanged(wxTreeEvent& event)
 {
     if ( gd::TreeItemStringData * itemData = dynamic_cast<gd::TreeItemStringData*>(animationsTree->GetItemData(event.GetItem())) )
     {
-        unsigned int newAnimation = ToInt(itemData->GetString());
-        unsigned int newDirection = itemData->GetSecondString().empty() ? 0 : ToInt(itemData->GetSecondString());
+        unsigned int newAnimation = itemData->GetString().ToInt();
+        unsigned int newDirection = itemData->GetSecondString().empty() ? 0 : itemData->GetSecondString().ToInt();
 
         if ( newAnimation != selectedAnimation || newDirection != selectedDirection )
         {
@@ -999,7 +999,7 @@ void SpriteObjectEditor::AddImageToCurrentAnimation(wxString image, bool refresh
     {
         Direction & direction = object.GetAnimation(selectedAnimation).GetDirection(selectedDirection);
         Sprite newSprite;
-        newSprite.SetImageName(ToString(image));
+        newSprite.SetImageName(image);
 
         direction.AddSprite(newSprite);
         if ( refresh )
@@ -1012,7 +1012,8 @@ void SpriteObjectEditor::AddImageToCurrentAnimation(wxString image, bool refresh
 
 bool DndTextSpriteObjectEditor::OnDropText(wxCoord x, wxCoord y, const wxString& text)
 {
-    std::vector<std::string > command = gd::SplitString<std::string>(gd::utf8::FromWxString(text), ';');
+    gd::String fullCommand = text;
+    std::vector<gd::String> command = fullCommand.Split(U';');
 
 	//"Normal" drop of one or more images.
     if (command.size() >= 2 && command[0] == "NORMAL") {
@@ -1025,9 +1026,9 @@ bool DndTextSpriteObjectEditor::OnDropText(wxCoord x, wxCoord y, const wxString&
     	if (!editor.resourcesEditorPnl) return true;
 
     	//Add ressources dragged from the library dialog to the project.
-        std::vector<std::string > files;
+        std::vector<gd::String> files;
         for (unsigned int i = 2;i<command.size();++i) files.push_back(command[i]);
-        std::vector<std::string > names = editor.resourcesEditorPnl->CopyAndAddResources(files, command[1]);
+        std::vector<gd::String> names = editor.resourcesEditorPnl->CopyAndAddResources(files, command[1]);
 
     	//And add them as usual to the animation.
         for (unsigned int i = 0;i<names.size();++i)
@@ -1135,7 +1136,7 @@ void SpriteObjectEditor::OnmgrPaneClose(wxAuiManagerEvent& event)
         }
         else
         {
-            gd::LogMessage(GD_T("One or more polygons from the collision mask are not convex ( They have a hole ).\nPlease modify these polygons before continuing."));
+            gd::LogMessage(_("One or more polygons from the collision mask are not convex ( They have a hole ).\nPlease modify these polygons before continuing."));
             event.Veto();
         }
 
@@ -1150,19 +1151,19 @@ void SpriteObjectEditor::OnpointsListBeginLabelEdit(wxListEvent& event)
         return;
     }
 
-    renamedPointOldName = gd::utf8::FromWxString(pointsList->GetItemText(event.GetIndex()));
+    renamedPointOldName = pointsList->GetItemText(event.GetIndex());
 }
 
 void SpriteObjectEditor::OnpointsListEndLabelEdit(wxListEvent& event)
 {
     std::vector < Sprite * > sprites = GetSpritesToModify();
-    if ( sprites.empty() || sprites[0]->HasPoint(gd::utf8::FromWxString(event.GetLabel())) )
+    if ( sprites.empty() || sprites[0]->HasPoint(event.GetLabel()) )
         event.Veto();
 
     for(unsigned int i = 0;i<sprites.size();++i)
     {
-        if ( !sprites[i]->HasPoint(gd::utf8::FromWxString(event.GetLabel())) )
-            sprites[i]->GetPoint(renamedPointOldName).SetName(gd::utf8::FromWxString(event.GetLabel()));
+        if ( !sprites[i]->HasPoint(event.GetLabel()) )
+            sprites[i]->GetPoint(renamedPointOldName).SetName(event.GetLabel());
     }
 }
 
@@ -1192,7 +1193,7 @@ void SpriteObjectEditor::OnimagePanelLeftUp(wxMouseEvent& event)
             }
             else if ( pointIndex != -1 )
             {
-                std::string pointName = ToString(pointsList->GetItemText(pointIndex));
+                gd::String pointName = pointsList->GetItemText(pointIndex);
 
                 if ( !sprite.HasPoint(pointName) )
                 {
@@ -1255,7 +1256,7 @@ void SpriteObjectEditor::OnDeletePointClick(wxCommandEvent& event)
     if ( !editingPoint ) return;
 
     long pointIndex = pointsList->GetNextItem(-1,wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-    std::string pointName = ToString(pointsList->GetItemText(pointIndex));
+    gd::String pointName = pointsList->GetItemText(pointIndex);
 
     std::vector < Sprite * > sprites = GetSpritesToModify();
     for (unsigned int i = 0;i<sprites.size();++i)
@@ -1270,18 +1271,18 @@ void SpriteObjectEditor::OnAddPointClick(wxCommandEvent& event)
     if ( sprites.empty() ) return;
 
     //Find a new name for the point
-    Point point(GD_T("NewPoint"));
+    Point point(_("NewPoint"));
     unsigned int i = 2;
-    while ( sprites[0]->HasPoint(gd::utf8::FromWxString(point.GetName())) )
+    while ( sprites[0]->HasPoint(point.GetName()) )
     {
-        point.SetName(GD_T("NewPoint")+ToString(i));
+        point.SetName(_("NewPoint")+ToString(i));
         ++i;
     }
 
     //Add the point to the sprite(s)
     for (unsigned int i = 0;i<sprites.size();++i)
     {
-        if ( !sprites[i]->HasPoint(gd::utf8::FromWxString(point.GetName())) ) sprites[i]->AddPoint(point);
+        if ( !sprites[i]->HasPoint(point.GetName()) ) sprites[i]->AddPoint(point);
     }
 
     RefreshPoints();
@@ -1294,7 +1295,7 @@ void SpriteObjectEditor::OnpointsListItemActivated(wxListEvent& event)
     if ( sprites.empty() ) return;
 
     long pointIndex = pointsList->GetNextItem(-1,wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-    std::string pointName = gd::utf8::FromWxString(pointsList->GetItemText(pointIndex));
+    gd::String pointName = pointsList->GetItemText(pointIndex);
 
     if ( pointName == "Centre" ) //Center point can be automatically positioned.
     {
@@ -1311,11 +1312,11 @@ void SpriteObjectEditor::OnpointsListItemActivated(wxListEvent& event)
 
     Point & point = sprites[0]->GetPoint(pointName);
 
-    std::string x_str = ToString(wxGetTextFromUser(_("Enter the X position of the point ( regarding the image )."), "Position X du point",ToString(point.GetX())));
-    std::string y_str = ToString(wxGetTextFromUser(_("Enter the Y position of the point ( regarding the image )."), "Position Y du point",ToString(point.GetY())));
+    gd::String x_str = wxGetTextFromUser(_("Enter the X position of the point ( regarding the image )."), "Position X du point",ToString(point.GetX()));
+    gd::String y_str = wxGetTextFromUser(_("Enter the Y position of the point ( regarding the image )."), "Position Y du point",ToString(point.GetY()));
 
-    point.SetX(ToInt(x_str));
-    point.SetY(ToInt(y_str));
+    point.SetX(x_str.ToInt());
+    point.SetY(y_str.ToInt());
 
     //Apply the change to others images if needed
     for (unsigned int i = 1;i<sprites.size();++i)
@@ -1475,16 +1476,16 @@ void SpriteObjectEditor::OnmaskTreeSelectionChanged(wxTreeListEvent& event)
     {
         //A polygon is selected
         wxStringClientData * data = dynamic_cast<wxStringClientData *>(maskTree->GetItemData(selectedItem));
-        polygonEditionHelper.SetSelectedPolygon(data ? ToInt(ToString(data->GetData())) : std::string::npos);
-        polygonEditionHelper.SetSelectedPoint(std::string::npos);
+        polygonEditionHelper.SetSelectedPolygon(data ? ToInt(ToString(data->GetData())) : gd::String::npos);
+        polygonEditionHelper.SetSelectedPoint(gd::String::npos);
     }
     else
     {
         //A point is selected
         wxStringClientData * data = dynamic_cast<wxStringClientData *>(maskTree->GetItemData(selectedItem));
-        polygonEditionHelper.SetSelectedPoint(data ? ToInt(ToString(data->GetData())) : std::string::npos);
+        polygonEditionHelper.SetSelectedPoint(data ? ToInt(ToString(data->GetData())) : gd::String::npos);
         wxStringClientData * parentData = dynamic_cast<wxStringClientData *>(maskTree->GetItemData(maskTree->GetItemParent(selectedItem)));
-        polygonEditionHelper.SetSelectedPolygon(parentData ? ToInt(ToString(parentData->GetData())) : std::string::npos);
+        polygonEditionHelper.SetSelectedPolygon(parentData ? ToInt(ToString(parentData->GetData())) : gd::String::npos);
     }
 
     imagePanel->Refresh();
@@ -1663,11 +1664,11 @@ void SpriteObjectEditor::OnTimeBetweenFramesSelected(wxCommandEvent& event)
          selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsCount() )
     {
         Direction & direction = object.GetAnimation(selectedAnimation).GetDirection(selectedDirection);
-        std::string newTime = ToString(wxGetTextFromUser(_("Enter time between each image ( in seconds )"),
+        gd::String newTime = wxGetTextFromUser(_("Enter time between each image ( in seconds )"),
                                                          _("Time between each images"),
-                                                         ToString(direction.GetTimeBetweenFrames())));
+                                                         ToString(direction.GetTimeBetweenFrames()));
         if ( newTime.empty() ) return;
-        direction.SetTimeBetweenFrames(ToFloat(newTime));
+        direction.SetTimeBetweenFrames(newTime.ToFloat());
     }
 }
 
@@ -1754,9 +1755,9 @@ void SpriteObjectEditor::OnAddImageFromFileSelected(wxCommandEvent& event)
             FileDialog.GetPaths(files);
             files.Sort(); //Ensure that the order of insertion is alphabetical.
 
-            std::vector < std::string > filenames;
+            std::vector < gd::String > filenames;
             for ( unsigned int i = 0; i < files.GetCount();++i )
-                filenames.push_back(ToString(files[i]));
+                filenames.push_back(files[i]);
 
             for ( unsigned int i = 0; i < filenames.size();++i )
             {
@@ -1764,21 +1765,21 @@ void SpriteObjectEditor::OnAddImageFromFileSelected(wxCommandEvent& event)
                 if (!projectDirectory.empty())  //If game is not saved, we keep absolute filenames
                     file.MakeRelativeTo(projectDirectory);
 
-                std::string name = ToString(file.GetFullName());
+                gd::String name = file.GetFullName();
 
                 //Add the resource if it does not exist or if it is not the same resource
-                if ( !game.GetResourcesManager().HasResource(name) || !(game.GetResourcesManager().GetResource(name).GetFile() == file.GetFullPath()) )
+                if ( !game.GetResourcesManager().HasResource(name) || !(game.GetResourcesManager().GetResource(name).GetFile() == gd::String(file.GetFullPath())) )
                 {
                     //Find a new unique name for the resource
                     unsigned int uniqueID = 2;
                     while ( game.GetResourcesManager().HasResource(name) )
                     {
-                        name = ToString(file.GetFullName())+ToString(uniqueID);
+                        name = file.GetFullName()+gd::String::FromUInt(uniqueID);
                         uniqueID++;
                     }
 
                     gd::ImageResource image;
-                    image.SetFile(ToString(file.GetFullPath()));
+                    image.SetFile(file.GetFullPath());
                     image.SetName(name);
                     image.SetUserAdded(false);
 
@@ -1801,12 +1802,12 @@ void SpriteObjectEditor::OnAddImageFromFileSelected(wxCommandEvent& event)
 
 void SpriteObjectEditor::OnAddFromImageBankSelected(wxCommandEvent& event)
 {
-    gd::LogMessage(GD_T("Drag images from the image bank to add them to the animation."));
+    gd::LogMessage(_("Drag images from the image bank to add them to the animation."));
 }
 
 void SpriteObjectEditor::OnHelpClick(wxCommandEvent& event)
 {
-    gd::HelpFileAccess::Get()->OpenURL(GD_T("http://wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/built_sprite"));
+    gd::HelpFileAccess::Get()->OpenURL(_("http://wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/built_sprite"));
 }
 
 void SpriteObjectEditor::OnyScrollBarScroll(wxScrollEvent& event)

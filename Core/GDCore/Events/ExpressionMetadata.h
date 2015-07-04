@@ -6,7 +6,7 @@
 #ifndef EXPRESSIONMETADATA_H
 #define EXPRESSIONMETADATA_H
 #if defined(GD_IDE_ONLY)
-#include <string>
+#include <GDCore/Utf8String.h>
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/Events/InstructionMetadata.h"
 #include <memory>
@@ -32,7 +32,7 @@ public:
      * \brief Set the function name which will be used when generating the code.
      * \param functionName the name of the function to call
      */
-    ExpressionCodeGenerationInformation & SetFunctionName(const std::string & functionName)
+    ExpressionCodeGenerationInformation & SetFunctionName(const gd::String & functionName)
     {
         functionCallName = functionName;
         return *this;
@@ -50,7 +50,7 @@ public:
     /**
      * \brief Set that the function is located in a specific include file
      */
-    ExpressionCodeGenerationInformation & SetIncludeFile(const std::string & optionalIncludeFile_)
+    ExpressionCodeGenerationInformation & SetIncludeFile(const gd::String & optionalIncludeFile_)
     {
         optionalIncludeFile = optionalIncludeFile_;
         return *this;
@@ -61,7 +61,7 @@ public:
     class CustomCodeGenerator
     {
     public:
-        virtual std::string GenerateCode(const std::vector<gd::Expression> & parameters, gd::EventsCodeGenerator & codeGenerator_, gd::EventsCodeGenerationContext & context) {return "";};
+        virtual gd::String GenerateCode(const std::vector<gd::Expression> & parameters, gd::EventsCodeGenerator & codeGenerator_, gd::EventsCodeGenerationContext & context) {return "";};
     };
 
     /**
@@ -74,8 +74,8 @@ public:
     }
 
     bool staticFunction;
-    std::string functionCallName;
-    std::string optionalIncludeFile;
+    gd::String functionCallName;
+    gd::String optionalIncludeFile;
     std::shared_ptr<CustomCodeGenerator> optionalCustomCodeGenerator;
 };
 
@@ -88,12 +88,12 @@ class GD_CORE_API ExpressionMetadata
 {
 public:
 
-    ExpressionMetadata(const std::string & extensionNamespace,
-                        const std::string & name,
-                        const std::string & fullname,
-                        const std::string & description,
-                        const std::string & group,
-                        const std::string & smallicon);
+    ExpressionMetadata(const gd::String & extensionNamespace,
+                        const gd::String & name,
+                        const gd::String & fullname,
+                        const gd::String & description,
+                        const gd::String & group,
+                        const gd::String & smallicon);
     virtual ~ExpressionMetadata() {};
 
     /**
@@ -104,7 +104,7 @@ public:
     /**
      * \brief Set the group of the instruction in the IDE.
      */
-    ExpressionMetadata & SetGroup(const std::string & str)
+    ExpressionMetadata & SetGroup(const gd::String & str)
     {
         group = str;
         return *this;
@@ -115,19 +115,19 @@ public:
     /**
      * \see gd::InstructionMetadata::AddParameter
      */
-    gd::ExpressionMetadata & AddParameter(const std::string & type, const std::string & description, const std::string & optionalObjectType = "", bool parameterIsOptional = false);
+    gd::ExpressionMetadata & AddParameter(const gd::String & type, const gd::String & description, const gd::String & optionalObjectType = "", bool parameterIsOptional = false);
 
     /**
      * \see gd::InstructionMetadata::AddCodeOnlyParameter
      */
-    gd::ExpressionMetadata & AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation);
+    gd::ExpressionMetadata & AddCodeOnlyParameter(const gd::String & type, const gd::String & supplementaryInformation);
 
     /**
      * Set the default value used in editor (or if an optional parameter is empty during code generation) for the latest added parameter.
      *
      * \see AddParameter
      */
-    ExpressionMetadata & SetDefaultValue(std::string defaultValue_)
+    ExpressionMetadata & SetDefaultValue(gd::String defaultValue_)
     {
         if ( !parameters.empty() ) parameters.back().defaultValue = defaultValue_;
         return *this;
@@ -160,7 +160,7 @@ public:
      * \param functionName the name of the function to call
      * \note Shortcut for `codeExtraInformation.SetFunctionName`.
      */
-    ExpressionCodeGenerationInformation & SetFunctionName(const std::string & functionName)
+    ExpressionCodeGenerationInformation & SetFunctionName(const gd::String & functionName)
     {
         return codeExtraInformation.SetFunctionName(functionName);
     }
@@ -172,25 +172,25 @@ public:
     ExpressionMetadata() : shown(false) {};
 
     bool IsShown() const { return shown; }
-    const std::string & GetFullName() const { return fullname; }
-    const std::string & GetDescription() const { return description; }
-    const std::string & GetGroup() const { return group; }
-    const std::string & GetSmallIconFilename() const { return smallIconFilename; }
+    const gd::String & GetFullName() const { return fullname; }
+    const gd::String & GetDescription() const { return description; }
+    const gd::String & GetGroup() const { return group; }
+    const gd::String & GetSmallIconFilename() const { return smallIconFilename; }
 #if !defined(GD_NO_WX_GUI)
     const wxBitmap & GetBitmapIcon() const { return smallicon; }
 #endif
 
 private:
-    std::string fullname;
-    std::string description;
-    std::string group;
+    gd::String fullname;
+    gd::String description;
+    gd::String group;
     bool shown;
     
 #if !defined(GD_NO_WX_GUI)
     wxBitmap smallicon;
 #endif
-    std::string smallIconFilename;
-    std::string extensionNamespace;
+    gd::String smallIconFilename;
+    gd::String extensionNamespace;
 };
 
 }

@@ -45,18 +45,18 @@ void ObjectsPropgridHelper::RefreshFrom(const gd::Object * object, bool displaye
 
     if ( !displayedAfterInstanceProperties )
     {
-        grid->Append( new wxPropertyCategory(_("Object variables") + " (" + gd::ToString(object->GetVariables().Count()) + ")", "OBJECT_VARIABLES_CATEGORY" ) );
+        grid->Append( new wxPropertyCategory(_("Object variables") + " (" + gd::String::FromInt(object->GetVariables().Count()) + ")", "OBJECT_VARIABLES_CATEGORY" ) );
         grid->Append( new wxStringProperty(_("Variables"), wxPG_LABEL, _("Click to edit...")) );
         grid->SetPropertyCell(_("Variables"), 1, _("Click to edit..."), wxNullBitmap, wxSystemSettings::GetColour(wxSYS_COLOUR_HOTLIGHT));
         grid->SetPropertyReadOnly(_("Variables"));
     }
 
-    grid->Append( new wxPropertyCategory(_("Automatisms") + " (" + gd::ToString(object->GetAllAutomatisms().size()) + ")" , "AUTO") );
+    grid->Append( new wxPropertyCategory(_("Automatisms") + " (" + gd::String::FromInt(object->GetAllAutomatisms().size()) + ")" , "AUTO") );
     grid->Append( new wxStringProperty(_("Add automatism"), "AUTO_ADD", _("Add...")) );
     grid->SetPropertyCell("AUTO_ADD", 1, _("Add..."), wxNullBitmap, wxSystemSettings::GetColour(wxSYS_COLOUR_HOTLIGHT));
     grid->SetPropertyReadOnly("AUTO_ADD");
 
-    std::vector<std::string> automatisms = object->GetAllAutomatismNames();
+    std::vector<gd::String> automatisms = object->GetAllAutomatismNames();
     if ( !automatisms.empty() ) {
         grid->AppendIn("AUTO", new wxStringProperty("", "AUTO_REMOVE", _("Remove...")) );
         grid->SetPropertyCell("AUTO_REMOVE", 1, _("Remove..."), wxNullBitmap, wxSystemSettings::GetColour(wxSYS_COLOUR_HOTLIGHT));
@@ -66,7 +66,7 @@ void ObjectsPropgridHelper::RefreshFrom(const gd::Object * object, bool displaye
     for (unsigned int i = 0;i<automatisms.size();++i)
     {
         const gd::Automatism & automatism = object->GetAutomatism(automatisms[i]);
-        std::map<std::string, gd::PropertyDescriptor> properties = automatism.GetProperties(project);
+        std::map<gd::String, gd::PropertyDescriptor> properties = automatism.GetProperties(project);
 
         grid->AppendIn( "AUTO", new wxPropertyCategory(gd::ToString(automatism.GetName())) );
         if ( properties.empty() || properties.find("PLEASE_ALSO_SHOW_EDIT_BUTTON_THANKS") != properties.end() )
@@ -81,17 +81,17 @@ void ObjectsPropgridHelper::RefreshFrom(const gd::Object * object, bool displaye
         grid->SetPropertyReadOnly(wxString("AUTO_RENAME:"+automatisms[i]));
 
         //Add automatism custom properties
-        for (std::map<std::string, gd::PropertyDescriptor>::iterator it = properties.begin();
+        for (std::map<gd::String, gd::PropertyDescriptor>::iterator it = properties.begin();
             it != properties.end();++it)
         {
             if ( (*it).first == "PLEASE_ALSO_SHOW_EDIT_BUTTON_THANKS" ) continue; //Skip the magic property.
 
-            std::string type = (*it).second.GetType();
-            std::string value = (*it).second.GetValue();
-            std::string name = (*it).first;
+            gd::String type = (*it).second.GetType();
+            gd::String value = (*it).second.GetValue();
+            gd::String name = (*it).first;
             if ( type == "Choice" )
             {
-                const std::vector<std::string> & choices = (*it).second.GetExtraInfo();
+                const std::vector<gd::String> & choices = (*it).second.GetExtraInfo();
                 wxArrayString choicesArray;
                 for (unsigned int j = 0; j < choices.size(); ++j)
                     choicesArray.push_back(choices[j]);
@@ -172,7 +172,7 @@ bool ObjectsPropgridHelper::OnPropertySelected(gd::Object * object, gd::Layout *
             wxArrayString automatismsStr;
 
             //Fill array
-            std::vector <std::string> automatisms = object->GetAllAutomatismNames();
+            std::vector <gd::String> automatisms = object->GetAllAutomatismNames();
             for (unsigned int i = 0;i<automatisms.size();++i)
                 automatismsStr.Add(object->GetAutomatism(automatisms[i]).GetName());
 
@@ -190,12 +190,12 @@ bool ObjectsPropgridHelper::OnPropertySelected(gd::Object * object, gd::Layout *
         else if ( event.GetPropertyName().substr(0,12) == "AUTO_RENAME:" )
         {
             event.Veto();
-            std::string oldName = gd::ToString(event.GetPropertyName().substr(12));
+            gd::String oldName = event.GetPropertyName().substr(12);
             if ( !object->HasAutomatismNamed(oldName)) return true;
 
             gd::Automatism & automatism = object->GetAutomatism(oldName);
 
-            std::string newName = ToString(wxGetTextFromUser(_("Enter a new name for the automatism"), _("Rename an automatism"), automatism.GetName()));
+            gd::String newName = wxGetTextFromUser(_("Enter a new name for the automatism"), _("Rename an automatism"), automatism.GetName());
             if ( newName == automatism.GetName() || object->HasAutomatismNamed(newName) || newName.empty() ) return false;
 
             object->RenameAutomatism(oldName, newName);
@@ -209,7 +209,7 @@ bool ObjectsPropgridHelper::OnPropertySelected(gd::Object * object, gd::Layout *
         else if ( event.GetPropertyName().substr(0,5) == "AUTO:" )
         {
             event.Veto();
-            std::string autoName = gd::ToString(event.GetPropertyName().substr(5));
+            gd::String autoName = event.GetPropertyName().substr(5);
             if ( !object->HasAutomatismNamed(autoName)) return true;
 
             gd::Automatism & automatism = object->GetAutomatism(autoName);
@@ -240,8 +240,8 @@ bool ObjectsPropgridHelper::OnPropertyChanged(gd::Object * object, gd::Layout * 
 
     if ( event.GetPropertyName() == _("Object name") )
     {
-        /*std::string oldName = object->GetName();
-        std::string newName = gd::ToString(event.GetPropertyValue().GetString());
+        /*gd::String oldName = object->GetName();
+        gd::String newName = gd::ToString(event.GetPropertyValue().GetString());
 
         //Be sure the name is valid
         if ( !project.ValidateObjectName(newName) )
@@ -309,7 +309,7 @@ bool ObjectsPropgridHelper::OnPropertyChanged(gd::Object * object, gd::Layout * 
     }
     else if ( event.GetPropertyName().substr(0,10) == "AUTO_PROP:" )
     {
-        std::string autoName = gd::ToString(event.GetPropertyName().substr(10));
+        gd::String autoName = event.GetPropertyName().substr(10);
         if ( !object->HasAutomatismNamed(autoName))
         {
             event.Veto();
@@ -317,12 +317,12 @@ bool ObjectsPropgridHelper::OnPropertyChanged(gd::Object * object, gd::Layout * 
         }
 
         gd::Automatism & automatism = object->GetAutomatism(autoName);
-        std::string value = ToString(event.GetPropertyValue().GetString());
+        gd::String value = event.GetPropertyValue().GetString();
 
         //Special case for enums.
         if ( wxEnumProperty * enumProperty = dynamic_cast<wxEnumProperty*>(event.GetProperty()) ) {
-            std::map<std::string, gd::PropertyDescriptor> properties = automatism.GetProperties(project);
-            const std::vector<std::string> & choices = properties[ToString(event.GetProperty()->GetLabel())].GetExtraInfo();
+            std::map<gd::String, gd::PropertyDescriptor> properties = automatism.GetProperties(project);
+            const std::vector<gd::String> & choices = properties[event.GetProperty()->GetLabel()].GetExtraInfo();
 
             unsigned int id = event.GetPropertyValue().GetLong();
             if (id < choices.size()) {
@@ -334,7 +334,7 @@ bool ObjectsPropgridHelper::OnPropertyChanged(gd::Object * object, gd::Layout * 
         std::cout << "VALUE" << value;
 
 
-        if ( !automatism.UpdateProperty(ToString(event.GetProperty()->GetLabel()), value, project) )
+        if ( !automatism.UpdateProperty(event.GetProperty()->GetLabel(), value, project) )
         {
             event.Veto();
             return false;

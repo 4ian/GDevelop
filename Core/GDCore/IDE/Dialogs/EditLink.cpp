@@ -125,7 +125,7 @@ game(game_)
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditLink::OnAnnulerBtClick);
 	//*)
 
-	linkedNameEdit->ChangeValue(gd::utf8::ToWxString(editedEvent.GetTarget()));
+	linkedNameEdit->ChangeValue(editedEvent.GetTarget());
 	if ( !editedEvent.IncludeAllEvents() )
 	{
 	    OnlyEventsCheck->SetValue(true);
@@ -134,10 +134,10 @@ game(game_)
 	}
 
 	for (unsigned int i = 0;i<game.GetExternalEventsCount();++i)
-        linkedNameEdit->Append(gd::utf8::ToWxString(game.GetExternalEvents(i).GetName()));
+        linkedNameEdit->Append(game.GetExternalEvents(i).GetName());
 
     for (unsigned int i = 0;i<game.GetLayoutsCount();++i)
-    	linkedNameEdit->Append(gd::utf8::ToWxString(game.GetLayout(i).GetName()));
+    	linkedNameEdit->Append(game.GetLayout(i).GetName());
 }
 
 EditLink::~EditLink()
@@ -165,7 +165,7 @@ void EditLink::OnAnnulerBtClick(wxCommandEvent& event)
  */
 void EditLink::OnOkBtClick(wxCommandEvent& event)
 {
-    editedEvent.SetTarget(gd::utf8::FromWxString(linkedNameEdit->GetValue()));
+    editedEvent.SetTarget(linkedNameEdit->GetValue());
     if ( AllEventsCheck->GetValue() == true )
         editedEvent.SetIncludeAllEvents(true);
     else

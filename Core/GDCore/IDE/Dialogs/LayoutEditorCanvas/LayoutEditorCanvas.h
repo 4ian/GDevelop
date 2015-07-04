@@ -19,6 +19,7 @@
 #include <wx/gdicmn.h>
 #include <wx/panel.h>
 #include "GDCore/PlatformDefinition/LayoutEditorPreviewer.h"
+#include <GDCore/Utf8String.h>
 namespace gd { class MainFrameWrapper; }
 namespace gd { class InitialInstancesContainer; }
 namespace gd { class InitialInstance; }
@@ -53,7 +54,7 @@ public:
     LayoutEditorCanvasGuiElement() : associatedInitialInstance(NULL) {};
     virtual ~LayoutEditorCanvasGuiElement() {};
 
-    std::string name; ///< The name of the button, chosen by the editor
+    gd::String name; ///< The name of the button, chosen by the editor
     wxRect area; ///< The area where the button is displayed, in layout coordinates.
     InitialInstance * associatedInitialInstance; ///< The associated initial instance, if any.
 };
@@ -183,12 +184,12 @@ public:
     /**
      * Add an instance of the specified object at the cursor position.
      */
-    void AddObject(const std::string & objectName);
+    void AddObject(const gd::String & objectName);
 
     /**
      * Add an instance of the specified object at the specified position.
      */
-    void AddObject(const std::string & objectName, float x, float y);
+    void AddObject(const gd::String & objectName, float x, float y);
 
     /**
      * Add an instance to selection, notifying associated editors.
@@ -213,12 +214,12 @@ public:
     /**
      * Set the layer where the new instance must be added
      */
-    void SetCurrentLayer(const std::string & newLayer) { currentLayer = newLayer; }
+    void SetCurrentLayer(const gd::String & newLayer) { currentLayer = newLayer; }
 
     /**
      * Return the current layer
      */
-    const std::string & GetCurrentLayer() const { return currentLayer; }
+    const gd::String & GetCurrentLayer() const { return currentLayer; }
 
     /**
      * Return true if the editor is in editing state.
@@ -304,7 +305,7 @@ protected:
     static const long ID_CREATEOBJECTMENU;
     static const long ID_UNLOCKMENU;
     static const long ID_LOCKMENU;
-    std::map<long, std::string> idForPlatformsMenu;
+    std::map<long, gd::String> idForPlatformsMenu;
 
     //(*Handlers(LayoutEditorCanvas)
     //*)
@@ -379,7 +380,7 @@ protected:
     void RenderGrid();
     void RenderWindowMask();
     void RenderInitialWindowBorder();
-    void AddSmallButtonGuiElement(std::vector < std::shared_ptr<sf::Shape> > & target, const sf::Vector2f & position, const std::string & buttonName );
+    void AddSmallButtonGuiElement(std::vector < std::shared_ptr<sf::Shape> > & target, const sf::Vector2f & position, const gd::String & buttonName );
     void DrawSelectionRectangleGuiElement(std::vector < std::shared_ptr<sf::Shape> > & target, const sf::FloatRect & rectangle );
     void DrawAngleButtonGuiElement(std::vector < std::shared_ptr<sf::Shape> > & target, const sf::Vector2f & position, float angle );
     void DrawHighlightRectangleGuiElement(std::vector < std::shared_ptr<sf::Shape> > & target, const sf::FloatRect & rectangle );
@@ -448,13 +449,13 @@ protected:
     /**
      * Update the mouse according to the selected button
      */
-    void UpdateMouseResizeCursor(const std::string & currentDraggableBt);
+    void UpdateMouseResizeCursor(const gd::String & currentDraggableBt);
 
     void UpdateContextMenu();
     void UpdateScrollbars();
     void UpdateViewAccordingToZoomFactor();
 
-    void SendSelectionToLayer(const std::string & newLayerName);
+    void SendSelectionToLayer(const gd::String & newLayerName);
 
     gd::Project & project; ///< The project owning the layout
     gd::Layout & layout; ///< The layout being edited or used to edit the instances
@@ -462,7 +463,7 @@ protected:
     LayoutEditorCanvasOptions & options;
     gd::MainFrameWrapper & mainFrameWrapper;
     std::set<LayoutEditorCanvasAssociatedEditor*> associatedEditors;
-    std::map<std::string, std::shared_ptr<gd::LayoutEditorPreviewer> > previewers;
+    std::map<gd::String, std::shared_ptr<gd::LayoutEditorPreviewer> > previewers;
     wxWindow * parentControl; ///< The wxWidgets control owning the editor ( probably a wxPanel )
     wxAuiManager * parentAuiManager; ///< Pointer to the wxAuiManager displayed the editor. Can be NULL.
     wxScrollBar * hScrollbar;
@@ -470,7 +471,7 @@ protected:
     wxMenu undoMenu;
 
     sf::View editionView; ///< The view used for editing
-    std::string currentDraggableBt;
+    gd::String currentDraggableBt;
     std::map<gd::InitialInstance*, double> resizeOriginalWidths;
     std::map<gd::InitialInstance*, double> resizeOriginalHeights;
     sf::Vector2f resizeMouseStartPosition;
@@ -494,7 +495,7 @@ protected:
     bool isSelecting;
     wxRect selectionRectangle;
     std::map <InitialInstance*, wxRealPoint > selectedInstances;
-    std::string currentLayer; ///< The layer where the new instance must be added.
+    gd::String currentLayer; ///< The layer where the new instance must be added.
 
     std::vector < std::shared_ptr<gd::InitialInstancesContainer> > history; ///< History of changes
     std::vector < std::shared_ptr<gd::InitialInstancesContainer> > redoHistory; ///< Histoy of changes so as to "redo"

@@ -52,7 +52,7 @@ void EventsList::InsertEvent(std::shared_ptr<gd::BaseEvent> event, size_t positi
         events.push_back(event);
 }
 
-gd::BaseEvent & EventsList::InsertNewEvent(gd::Project & project, const std::string & eventType, size_t position)
+gd::BaseEvent & EventsList::InsertNewEvent(gd::Project & project, const gd::String & eventType, size_t position)
 {
     gd::BaseEventSPtr event = project.CreateEvent(eventType);
     if ( event == std::shared_ptr<gd::BaseEvent>())

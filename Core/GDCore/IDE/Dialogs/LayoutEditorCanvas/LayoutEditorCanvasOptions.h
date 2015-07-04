@@ -6,7 +6,7 @@
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #ifndef SCENECANVASSETTINGS_H
 #define SCENECANVASSETTINGS_H
-#include <string>
+#include <GDCore/Utf8String.h>
 namespace gd { class SerializerElement; }
 
 namespace gd
@@ -49,7 +49,7 @@ public:
     int gridB; ///< Grid blue color in editor
     float zoomFactor; ///< Stores the zoom factor
     bool windowMask; ///< True if window mask displayed in editor
-    std::string associatedLayout; ///< Only used for external layout: Contains the name of the layout used ( for loading objects ) when editing the external layout.
+    gd::String associatedLayout; ///< Only used for external layout: Contains the name of the layout used ( for loading objects ) when editing the external layout.
 };
 
 }

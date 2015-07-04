@@ -419,7 +419,7 @@ void LayoutEditorCanvas::OnGuiElementReleased(const gd::LayoutEditorCanvasGuiEle
 
 void LayoutEditorCanvas::OnPreviewForPlatformSelected( wxCommandEvent & event )
 {
-    std::string platformName = idForPlatformsMenu[event.GetId()];
+    gd::String platformName = idForPlatformsMenu[event.GetId()];
     currentPreviewer = previewers[platformName];
 
     wxCommandEvent useless;
@@ -581,7 +581,7 @@ void LayoutEditorCanvas::UpdateContextMenu()
     contextMenu.FindItem(ID_LAYERUPMENU)->Enable(false);
     if ( lowestLayer+1 < layout.GetLayersCount() )
     {
-        gd::String name = gd::String::FromUTF8(layout.GetLayer(lowestLayer+1).GetName());
+        gd::String name = layout.GetLayer(lowestLayer+1).GetName();
         if ( name == "" ) name = _("Base layer");
         contextMenu.FindItem(ID_LAYERUPMENU)->Enable(true);
         contextMenu.FindItem(ID_LAYERUPMENU)->SetItemLabel(_("Put the object(s) on the layer \"") + name + "\"");
@@ -598,7 +598,7 @@ void LayoutEditorCanvas::UpdateContextMenu()
     contextMenu.FindItem(ID_LAYERDOWNMENU)->Enable(false);
     if ( highestLayer >= 1 )
     {
-        gd::String name = gd::String::FromUTF8(layout.GetLayer(highestLayer-1).GetName());
+        gd::String name = layout.GetLayer(highestLayer-1).GetName();
         if ( name == "" ) name = _("Base layer");
 
         contextMenu.FindItem(ID_LAYERDOWNMENU)->Enable(true);
@@ -630,7 +630,7 @@ void LayoutEditorCanvas::OnLayerDownSelected(wxCommandEvent & event)
     if ( highestLayer >= 1 ) SendSelectionToLayer(layout.GetLayer(highestLayer-1).GetName());
 }
 
-void LayoutEditorCanvas::SendSelectionToLayer(const std::string & newLayerName)
+void LayoutEditorCanvas::SendSelectionToLayer(const gd::String & newLayerName)
 {
     for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
     {
@@ -677,12 +677,12 @@ void LayoutEditorCanvas::OnAddAutoObjSelected(wxCommandEvent & event)
         (*it)->InitialInstancesUpdated();
 }
 
-void LayoutEditorCanvas::AddObject(const std::string & objectName)
+void LayoutEditorCanvas::AddObject(const gd::String & objectName)
 {
     AddObject(objectName, GetMouseXOnLayout(), GetMouseYOnLayout());
 }
 
-void LayoutEditorCanvas::AddObject(const std::string & objectName, float x, float y)
+void LayoutEditorCanvas::AddObject(const gd::String & objectName, float x, float y)
 {
     if ( !editing || objectName.empty() ) return;
     isMovingInstance = false;
@@ -1064,8 +1064,8 @@ void LayoutEditorCanvas::OnMotion(wxMouseEvent &)
         double mouseX = GetMouseXOnLayout();
         double mouseY = GetMouseYOnLayout();
 
-        gd::LogStatus( gd::utf8::FromWxString(wxString::Format(  wxString(_( "Position %f;%f. SHIFT for multiple selection, right click for more options." )),
-            mouseX, mouseY )) );
+        gd::LogStatus( wxString::Format(  wxString(_( "Position %f;%f. SHIFT for multiple selection, right click for more options." )),
+            mouseX, mouseY ));
 
         //Check if there is a gui element hovered inside the layout
         bool hoveringSomething = false;
@@ -1432,7 +1432,7 @@ gd::Object * LayoutEditorCanvas::GetObjectLinkedToInitialInstance(gd::InitialIns
     return NULL;
 }
 
-void LayoutEditorCanvas::UpdateMouseResizeCursor(const std::string & currentDraggableBt)
+void LayoutEditorCanvas::UpdateMouseResizeCursor(const gd::String & currentDraggableBt)
 {
     if ( currentDraggableBt == "resizeUp" || currentDraggableBt == "resizeDown"  )
         SetCursor(wxCursor(wxCURSOR_SIZENS));
@@ -1461,7 +1461,7 @@ void LayoutEditorCanvas::PausePreview()
 void LayoutEditorCanvas::SetParentAuiManager(wxAuiManager * parentAuiManager_)
 {
     parentAuiManager = parentAuiManager_;
-    for(std::map<std::string, std::shared_ptr<gd::LayoutEditorPreviewer> >::iterator it = previewers.begin();
+    for(std::map<gd::String, std::shared_ptr<gd::LayoutEditorPreviewer> >::iterator it = previewers.begin();
         it != previewers.end();
         ++it)
     {

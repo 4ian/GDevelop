@@ -123,6 +123,26 @@ String String::FromInt(int value)
     return str;
 }
 
+int String::ToInt() const
+{
+    return gd::ToInt(m_string);
+}
+
+String String::FromUInt(unsigned int value)
+{
+    String str;
+    str.m_string = ToString<unsigned int>(value);
+    return str;
+}
+
+unsigned int String::ToUInt() const
+{
+    unsigned int i;
+    std::istringstream oss(m_string);
+    oss >> i;
+    return i;
+}
+
 String String::FromFloat(float value)
 {
     String str;
@@ -130,11 +150,21 @@ String String::FromFloat(float value)
     return str;
 }
 
+int String::ToFloat() const
+{
+    return gd::ToFloat(m_string);
+}
+
 String String::FromDouble(double value)
 {
     String str;
     str.m_string = ToString<double>(value);
     return str;
+}
+
+int String::ToDouble() const
+{
+    return gd::ToDouble(m_string);
 }
 
 String String::FromLocale( const std::string &localizedString )
@@ -231,6 +261,12 @@ String& String::operator+=( const char *other )
     return *this;
 }
 
+String& String::operator+=( char32_t character )
+{
+    push_back(character);
+    return *this;
+}
+
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
 String& String::operator+=( const wxString &other )
@@ -249,6 +285,17 @@ void String::push_back( String::value_type character )
 void String::pop_back()
 {
     m_string.erase((--end()).base(), end().base());
+}
+
+String& String::insert( size_type pos, const String &str )
+{
+    iterator it = begin();
+    std::advance(it, pos);
+
+    //Use the real position as bytes using the std::string::iterators
+    m_string.insert( std::distance(m_string.begin(), it.base()), str.m_string );
+
+    return *this;
 }
 
 String& String::replace( iterator i1, iterator i2, const String &str )
@@ -488,11 +535,25 @@ bool String::operator==( const String &other ) const
     return (m_string == other.m_string);
 }
 
-bool String::operator==( const char *character ) const
+bool String::operator==( const char *characters ) const
 {
-    return (m_string == std::string(character));
+    return (m_string == std::string(characters));
 }
 
+bool String::operator!=( const String &other ) const
+{
+    return (m_string != other.m_string);
+}
+
+bool String::operator!=( const char *characters ) const
+{
+    return (m_string != std::string(characters));
+}
+
+bool String::operator<( const String &other ) const
+{
+    return m_string < other.m_string;
+}
 
 String GD_CORE_API operator+(String lhs, const String &rhs)
 {

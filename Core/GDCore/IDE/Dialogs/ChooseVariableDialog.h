@@ -27,7 +27,7 @@ namespace gd { class Layout; }
 namespace gd { class Variable; }
 #include <wx/toolbar.h>
 #include <memory>
-#include <string>
+#include <GDCore/Utf8String.h>
 
 namespace gd
 {
@@ -77,7 +77,7 @@ public:
     /**
      * \brief Return the full name of the selected variable.
      */
-    std::string GetSelectedVariable() const { return selectedVariableFullName; };
+    gd::String GetSelectedVariable() const { return selectedVariableFullName; };
 
     /**
      * Destructor
@@ -150,7 +150,7 @@ private:
     void OnFindUndeclaredSelected(wxCommandEvent& event);
     void RefreshAll();
     void UpdateSelectedAndParentVariable();
-    void RefreshVariable(wxTreeListItem item, const std::string & name, const gd::Variable & variable);
+    void RefreshVariable(wxTreeListItem item, const gd::String & name, const gd::Variable & variable);
     wxTreeListItem GetPreviousSibling(wxTreeListCtrl * ctrl, wxTreeListItem item);
 
     gd::VariablesContainer & variablesContainer; ///< gd::VariablesContainer storing the variables
@@ -160,12 +160,12 @@ private:
     const gd::Layout * associatedLayout;
     const gd::Object * associatedObject;
 
-    std::string selectedVariableName; ///< Contains the name of the last selected variable.
-    std::string selectedVariableFullName; ///< Contains the full name of the last selected variable. ( full string to access to the variable )
+    gd::String selectedVariableName; ///< Contains the name of the last selected variable.
+    gd::String selectedVariableFullName; ///< Contains the full name of the last selected variable. ( full gd::String to access to the variable )
     gd::Variable * selectedVariable; ///< A pointer to the focused variable ( Can be NULL ).
     gd::Variable * parentVariable; ///< A pointer to the parent of the selected variable ( Can be NULL if not applicable ).
 
-    std::string oldName; ///< Used to remember the variable old name when renaming
+    gd::String oldName; ///< Used to remember the variable old name when renaming
     unsigned int modificationCount; ///< Track the number of modification. If the user made lots of modifications and wants to cancel, he will be warned.
 
     DECLARE_EVENT_TABLE()

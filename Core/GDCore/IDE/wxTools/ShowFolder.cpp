@@ -24,9 +24,9 @@ void GD_CORE_API ShowFolder(wxString path)
     #if defined(WINDOWS)
     wxExecute("explorer.exe \""+path+"\"");
     #elif defined(MACOS)
-    system(std::string("open \""+path+"\"").c_str());
+    system(gd::String("open \""+path+"\"").c_str());
     #elif defined(LINUX)
-    int returnCode = system(std::string("xdg-open \""+path+"\"").c_str());
+    int returnCode = system(gd::String("xdg-open \""+path+"\"").c_str());
 
     if (returnCode != 0) {
         wxString error = _("Oops, it seems that the folder couldn't be displayed. Open your file explorer and go to:\n\n");

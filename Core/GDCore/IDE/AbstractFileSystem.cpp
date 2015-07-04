@@ -4,7 +4,7 @@
  * This project is released under the MIT License.
  */
 
-#include <string>
+#include <GDCore/Utf8String.h>
 #include <algorithm>
 #include "AbstractFileSystem.h"
 #include "GDCore/CommonTools.h"
@@ -26,13 +26,13 @@ AbstractFileSystem::~AbstractFileSystem()
 {
 }
 
-std::string gd::AbstractFileSystem::NormalizeSeparator(std::string filename)
+gd::String gd::AbstractFileSystem::NormalizeSeparator(gd::String filename)
 {
-    std::string file = filename;
+    gd::String file = filename;
 
     //Convert all backslash to slashs.
-    while (file.find('\\') != std::string::npos)
-        file.replace(file.find('\\'), 1, "/");
+    while (file.find("\\") != gd::String::npos)
+        file.replace(file.find("\\"), 1, "/");
 
     return file;
 }
@@ -40,60 +40,60 @@ std::string gd::AbstractFileSystem::NormalizeSeparator(std::string filename)
 #if !defined(GD_NO_WX_GUI)
 NativeFileSystem *NativeFileSystem::singleton = NULL;
 
-std::string NativeFileSystem::FileNameFrom(const std::string & file)
+gd::String NativeFileSystem::FileNameFrom(const gd::String & file)
 {
 	wxFileName filename = wxFileName::FileName( file );
-	return ToString(filename.GetFullName());
+	return filename.GetFullName();
 }
 
-std::string NativeFileSystem::DirNameFrom(const std::string & file)
+gd::String NativeFileSystem::DirNameFrom(const gd::String & file)
 {
 	wxFileName filename = wxFileName::FileName( file );
-	return ToString(filename.GetPath());
+	return filename.GetPath();
 }
 
-bool NativeFileSystem::IsAbsolute(const std::string & filename)
+bool NativeFileSystem::IsAbsolute(const gd::String & filename)
 {
     return wxFileName::FileName(filename).IsAbsolute();
 }
 
-bool NativeFileSystem::MakeAbsolute(std::string & fn, const std::string & baseDirectory)
+bool NativeFileSystem::MakeAbsolute(gd::String & fn, const gd::String & baseDirectory)
 {
     wxFileName filename = wxFileName::FileName(fn);
     bool success = filename.MakeAbsolute(baseDirectory);
-    fn = ToString(filename.GetFullPath());
+    fn = filename.GetFullPath();
     return success;
 }
 
-bool NativeFileSystem::MakeRelative(std::string & fn, const std::string & baseDirectory)
+bool NativeFileSystem::MakeRelative(gd::String & fn, const gd::String & baseDirectory)
 {
     wxFileName filename = wxFileName::FileName(fn);
     bool success = filename.MakeRelativeTo(baseDirectory);
     if (success)
     {
-    	fn = ToString(filename.GetFullPath(wxPATH_UNIX));
+    	fn = filename.GetFullPath(wxPATH_UNIX);
     	return true;
     }
 
     return false;
 }
 
-bool NativeFileSystem::DirExists(const std::string & path)
+bool NativeFileSystem::DirExists(const gd::String & path)
 {
 	return wxDirExists(path);
 }
 
-bool NativeFileSystem::FileExists(const std::string & path)
+bool NativeFileSystem::FileExists(const gd::String & path)
 {
     return wxFileExists(path);
 }
 
-void NativeFileSystem::MkDir(const std::string & directory)
+void NativeFileSystem::MkDir(const gd::String & directory)
 {
 	RecursiveMkDir::MkDir(directory);
 }
 
-bool NativeFileSystem::ClearDir(const std::string & directory)
+bool NativeFileSystem::ClearDir(const gd::String & directory)
 {
     wxString file = wxFindFirstFile( directory + "/*" );
     while ( !file.empty() )
@@ -105,12 +105,12 @@ bool NativeFileSystem::ClearDir(const std::string & directory)
     return true;
 }
 
-std::string NativeFileSystem::GetTempDir()
+gd::String NativeFileSystem::GetTempDir()
 {
-    return gd::ToString(wxFileName::GetTempDir());
+    return wxFileName::GetTempDir();
 }
 
-bool NativeFileSystem::WriteToFile(const std::string & filename, const std::string & content)
+bool NativeFileSystem::WriteToFile(const gd::String & filename, const gd::String & content)
 {
     std::ofstream file( filename.c_str() );
     if ( file.is_open() ) {
@@ -122,25 +122,25 @@ bool NativeFileSystem::WriteToFile(const std::string & filename, const std::stri
     return false;
 }
 
-std::string NativeFileSystem::ReadFile(const std::string & file)
+gd::String NativeFileSystem::ReadFile(const gd::String & file)
 {
     std::ifstream t(file.c_str());
     std::stringstream buffer;
     buffer << t.rdbuf();
-    return buffer.str();
+    return gd::String::FromUTF8(buffer.str());
 }
 
 
-std::vector<std::string> NativeFileSystem::ReadDir(const std::string & path, const std::string & extension)
+std::vector<gd::String> NativeFileSystem::ReadDir(const gd::String & path, const gd::String & extension)
 {
-    std::vector<std::string> results;
+    std::vector<gd::String> results;
     wxString upperExt = wxString(extension).Upper();
 
     wxString file = wxFindFirstFile( path + "/*" );
     while ( !file.empty() )
     {
         if ( upperExt.empty() || file.Upper().EndsWith(upperExt) )
-            results.push_back(gd::ToString(file));
+            results.push_back(file);
 
         file = wxFindNextFile();
     }
@@ -148,7 +148,7 @@ std::vector<std::string> NativeFileSystem::ReadDir(const std::string & path, con
     return results;
 }
 
-bool NativeFileSystem::CopyFile(const std::string & file, const std::string & destination)
+bool NativeFileSystem::CopyFile(const gd::String & file, const gd::String & destination)
 {
     wxLogNull noLogPlease;
     return wxCopyFile( file, destination, true );

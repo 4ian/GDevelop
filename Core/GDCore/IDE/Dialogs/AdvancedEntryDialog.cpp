@@ -34,7 +34,7 @@ BEGIN_EVENT_TABLE(AdvancedTextEntryDialog,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-AdvancedTextEntryDialog::AdvancedTextEntryDialog(wxWindow* parent, std::string caption, std::string description, std::string defaultText, MoreButtonType moreButtonType_, gd::Project * project_, gd::Layout * layout_ ):
+AdvancedTextEntryDialog::AdvancedTextEntryDialog(wxWindow* parent, gd::String caption, gd::String description, gd::String defaultText, MoreButtonType moreButtonType_, gd::Project * project_, gd::Layout * layout_ ):
     moreButtonType(moreButtonType_),
     project(project_),
     layout(layout_)
@@ -73,9 +73,9 @@ AdvancedTextEntryDialog::AdvancedTextEntryDialog(wxWindow* parent, std::string c
 	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&AdvancedTextEntryDialog::OnokBtClick);
 	//*)
 
-	SetTitle(gd::utf8::ToWxString(caption));
-	descriptionTxt->SetLabel(gd::utf8::ToWxString(description));
-	textEdit->SetValue(gd::utf8::ToWxString(defaultText));
+	SetTitle(caption);
+	descriptionTxt->SetLabel(description);
+	textEdit->SetValue(defaultText);
 	if ( moreButtonType == None )
         moreBt->Show(false);
     else if ( moreButtonType == MathExpression )
@@ -94,19 +94,19 @@ void AdvancedTextEntryDialog::OnmoreBtClick(wxCommandEvent& event)
 {
     if ( moreButtonType == MathExpression && project && layout)
     {
-        EditExpressionDialog dialog(this, gd::utf8::FromWxString( textEdit->GetValue() ), *project, *layout);
-        if ( dialog.ShowModal() == 1 ) textEdit->ChangeValue(gd::utf8::ToWxString(dialog.GetExpression()));
+        EditExpressionDialog dialog(this, textEdit->GetValue(), *project, *layout);
+        if ( dialog.ShowModal() == 1 ) textEdit->ChangeValue(dialog.GetExpression());
     }
     else if ( moreButtonType == TextExpression && project && layout)
     {
-        EditStrExpressionDialog dialog(this, gd::utf8::FromWxString( textEdit->GetValue() ), *project, *layout);
-        if ( dialog.ShowModal() == 1 ) textEdit->ChangeValue(gd::utf8::ToWxString(dialog.GetExpression()));
+        EditStrExpressionDialog dialog(this, textEdit->GetValue(), *project, *layout);
+        if ( dialog.ShowModal() == 1 ) textEdit->ChangeValue(dialog.GetExpression());
     }
 }
 
 void AdvancedTextEntryDialog::OnokBtClick(wxCommandEvent& event)
 {
-    text = gd::utf8::FromWxString( textEdit->GetValue() );
+    text = textEdit->GetValue();
 
     EndModal(wxOK);
 }

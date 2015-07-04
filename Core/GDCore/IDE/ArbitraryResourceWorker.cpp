@@ -25,7 +25,7 @@ void ArbitraryResourceWorker::ExposeResource(gd::Resource & resource)
 {
     if (!resource.UseFile()) return;
 
-    std::string file = resource.GetFile();
+    gd::String file = resource.GetFile();
     ExposeFile(file);
     if (file != resource.GetFile())
         resource.SetFile(file);
@@ -40,7 +40,7 @@ void LaunchResourceWorkerOnEvents(const gd::Project & project, gd::EventsList & 
 {
     //Get all extensions used
     std::vector< std::shared_ptr<gd::PlatformExtension> > allGameExtensions;
-    std::vector<std::string> usedExtensions = project.GetUsedExtensions();
+    std::vector<gd::String> usedExtensions = project.GetUsedExtensions();
     for (unsigned int i = 0;i<usedExtensions.size();++i)
     {
         std::shared_ptr<gd::PlatformExtension> extension = project.GetCurrentPlatform().GetExtension(usedExtensions[i]);
@@ -56,27 +56,27 @@ void LaunchResourceWorkerOnEvents(const gd::Project & project, gd::EventsList & 
         {
             for ( unsigned int k = 0;k < allActionsVectors[i]->size() ;k++ )
             {
-                std::string type = allActionsVectors[i]->Get( k ).GetType();
+                gd::String type = allActionsVectors[i]->Get( k ).GetType();
                 for (unsigned int e = 0;e<allGameExtensions.size();++e)
                 {
                     bool extensionHasAction = false;
 
-                    const std::map<string, gd::InstructionMetadata> & allActions = allGameExtensions[e]->GetAllActions();
+                    const std::map<gd::String, gd::InstructionMetadata> & allActions = allGameExtensions[e]->GetAllActions();
                     if ( allActions.find(type) != allActions.end() )
                         extensionHasAction = true;
 
-                    const vector < string > & objects = allGameExtensions[e]->GetExtensionObjectsTypes();
+                    const vector < gd::String > & objects = allGameExtensions[e]->GetExtensionObjectsTypes();
                     for (unsigned int o = 0;o<objects.size();++o)
                     {
-                        const std::map<string, gd::InstructionMetadata> & allObjectsActions = allGameExtensions[e]->GetAllActionsForObject(objects[o]);
+                        const std::map<gd::String, gd::InstructionMetadata> & allObjectsActions = allGameExtensions[e]->GetAllActionsForObject(objects[o]);
                         if ( allObjectsActions.find(type) != allObjectsActions.end() )
                             extensionHasAction = true;
                     }
 
-                    const vector < string > & autos = allGameExtensions[e]->GetAutomatismsTypes();
+                    const vector < gd::String > & autos = allGameExtensions[e]->GetAutomatismsTypes();
                     for (unsigned int a = 0;a<autos.size();++a)
                     {
-                        const std::map<string, gd::InstructionMetadata> & allAutosActions = allGameExtensions[e]->GetAllActionsForAutomatism(autos[a]);
+                        const std::map<gd::String, gd::InstructionMetadata> & allAutosActions = allGameExtensions[e]->GetAllActionsForAutomatism(autos[a]);
                         if ( allAutosActions.find(type) != allAutosActions.end() )
                             extensionHasAction = true;
                     }
@@ -96,27 +96,27 @@ void LaunchResourceWorkerOnEvents(const gd::Project & project, gd::EventsList & 
         {
             for ( unsigned int k = 0;k < allConditionsVector[i]->size() ;k++ )
             {
-                std::string type = allConditionsVector[i]->Get( k ).GetType();
+                gd::String type = allConditionsVector[i]->Get( k ).GetType();
                 for (unsigned int e = 0;e<allGameExtensions.size();++e)
                 {
                     bool extensionHasCondition = false;
 
-                    const std::map<string, gd::InstructionMetadata> & allConditions = allGameExtensions[e]->GetAllConditions();
+                    const std::map<gd::String, gd::InstructionMetadata> & allConditions = allGameExtensions[e]->GetAllConditions();
                     if ( allConditions.find(type) != allConditions.end() )
                         extensionHasCondition = true;
 
-                    const vector < string > & objects = allGameExtensions[e]->GetExtensionObjectsTypes();
+                    const vector < gd::String > & objects = allGameExtensions[e]->GetExtensionObjectsTypes();
                     for (unsigned int j = 0;j<objects.size();++j)
                     {
-                        const std::map<string, gd::InstructionMetadata> & allObjectsConditions = allGameExtensions[e]->GetAllConditionsForObject(objects[j]);
+                        const std::map<gd::String, gd::InstructionMetadata> & allObjectsConditions = allGameExtensions[e]->GetAllConditionsForObject(objects[j]);
                         if ( allObjectsConditions.find(type) != allObjectsConditions.end() )
                             extensionHasCondition = true;
                     }
 
-                    const vector < string > & autos = allGameExtensions[e]->GetAutomatismsTypes();
+                    const vector < gd::String > & autos = allGameExtensions[e]->GetAutomatismsTypes();
                     for (unsigned int j = 0;j<autos.size();++j)
                     {
-                        const std::map<string, gd::InstructionMetadata> & allAutosConditions = allGameExtensions[e]->GetAllConditionsForAutomatism(autos[j]);
+                        const std::map<gd::String, gd::InstructionMetadata> & allAutosConditions = allGameExtensions[e]->GetAllConditionsForAutomatism(autos[j]);
                         if ( allAutosConditions.find(type) != allAutosConditions.end() )
                             extensionHasCondition = true;
                     }

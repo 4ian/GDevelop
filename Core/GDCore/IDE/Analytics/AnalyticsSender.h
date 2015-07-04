@@ -3,7 +3,7 @@
  * Copyright 2008-2015 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the MIT License.
  */
-#include <string>
+#include <GDCore/Utf8String.h>
 namespace gd { class SerializerElement; }
 
 namespace gd
@@ -17,7 +17,7 @@ class GD_CORE_API AnalyticsSender
 {
 public:
 	void SendProgramOpening();
-	void SendNewGameCreated(std::string platformName, std::string templateName);
+	void SendNewGameCreated(gd::String platformName, gd::String templateName);
 
     static AnalyticsSender *Get();
     static void DestroySingleton();
@@ -25,10 +25,10 @@ public:
 private:
     AnalyticsSender();
     virtual ~AnalyticsSender() {};
-	void SendData(std::string collection, gd::SerializerElement & data);
+	void SendData(gd::String collection, gd::SerializerElement & data);
 
-    const std::string projectId;
-    const std::string writeKey;
+    const gd::String projectId;
+    const gd::String writeKey;
     static AnalyticsSender *_singleton;
 };
 

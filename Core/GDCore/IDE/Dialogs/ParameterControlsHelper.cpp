@@ -6,7 +6,7 @@
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/wx.h>
 #include <vector>
-#include <string>
+#include <GDCore/Utf8String.h>
 #include <iostream>
 #include "GDCore/CommonTools.h"
 #include "GDCore/Utf8Tools.h"
@@ -39,15 +39,15 @@ void ParameterControlsHelper::UpdateControls(unsigned int count)
     paramMetadata.resize(count);
     while ( paramEdits.size() < count )
     {
-        const string num = gd::ToString( paramEdits.size() );
+        const gd::String num = gd::String::FromUInt( paramEdits.size() );
         long id = wxNewId(); //Bitmap buttons want an unique id so as to be displayed properly
 
         //Addings controls
         paramCheckboxes.push_back(new wxCheckBox(window, ID_CHECKARRAY, "", wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, num));
-        paramTexts.push_back(new wxStaticText(window, ID_TEXTARRAY, _("Parameter:"), wxDefaultPosition, wxDefaultSize, 0, _T( "TxtPara" + num )));
+        paramTexts.push_back(new wxStaticText(window, ID_TEXTARRAY, _("Parameter:"), wxDefaultPosition, wxDefaultSize, 0, "TxtPara" + num ));
         paramSpacers1.push_back(new wxPanel(window));
         paramSpacers2.push_back(new wxPanel(window));
-        paramEdits.push_back(new wxTextCtrl( window, ID_EDITARRAY, "", wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T( "EditPara" + num )));
+        paramEdits.push_back(new wxTextCtrl( window, ID_EDITARRAY, "", wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, "EditPara" + num ));
         paramBmpBts.push_back(new wxBitmapButton( window, id, gd::CommonBitmapManager::Get()->expressionBt, wxDefaultPosition, wxSize(32,-1), wxBU_AUTODRAW, wxDefaultValidator, num));
 
         //Connecting events
@@ -84,7 +84,7 @@ void ParameterControlsHelper::UpdateControls(unsigned int count)
     window->Layout(); //Ensure widgets just added are properly rendered.
 }
 
-void ParameterControlsHelper::UpdateParameterContent(unsigned int i, const ParameterMetadata & metadata, std::string content)
+void ParameterControlsHelper::UpdateParameterContent(unsigned int i, const ParameterMetadata & metadata, gd::String content)
 {
     if (i >= paramEdits.size()) return;
     paramMetadata[i] = metadata;
@@ -98,17 +98,17 @@ void ParameterControlsHelper::UpdateParameterContent(unsigned int i, const Param
         return;
     }
 
-    const std::string & type = metadata.GetType();
+    const gd::String & type = metadata.GetType();
     paramCheckboxes.at(i)->Show(metadata.IsOptional());
     paramTexts.at(i)->Show();
     paramBmpBts.at(i)->Show(!type.empty());
     paramEdits.at(i)->Show();
 
     paramCheckboxes.at(i)->SetValue(!paramEdits.at(i)->GetValue().empty());
-    paramTexts.at(i)->SetLabel( gd::utf8::ToWxString(metadata.GetDescription()) + _(":") );
-    paramBmpBts.at(i)->SetBitmapLabel( gd::InstructionSentenceFormatter::Get()->BitmapFromType(type));
-    paramBmpBts.at(i)->SetToolTip( gd::utf8::ToWxString(gd::InstructionSentenceFormatter::Get()->LabelFromType(type)) );
-    paramEdits.at(i)->SetValue( gd::utf8::ToWxString(content) );
+    paramTexts.at(i)->SetLabel(metadata.GetDescription() + _(":"));
+    paramBmpBts.at(i)->SetBitmapLabel(gd::InstructionSentenceFormatter::Get()->BitmapFromType(type));
+    paramBmpBts.at(i)->SetToolTip(gd::InstructionSentenceFormatter::Get()->LabelFromType(type));
+    paramEdits.at(i)->SetValue(content);
 
     //De/activate widgets if parameter is optional
     bool disable = metadata.IsOptional() && !paramCheckboxes.at(i)->GetValue() && paramEdits.at(i)->GetValue().empty();

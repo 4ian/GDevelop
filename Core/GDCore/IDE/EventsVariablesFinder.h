@@ -5,7 +5,7 @@
  */
 #ifndef EVENTSVARIABLESFINDER_H
 #define EVENTSVARIABLESFINDER_H
-#include <string>
+#include <GDCore/Utf8String.h>
 #include <vector>
 #include <set>
 #include "GDCore/Events/Event.h"
@@ -33,7 +33,7 @@ public:
      * \param project The project to be scanned
      * \return A std::set containing the names of all global variables used
      */
-    static std::set < std::string > FindAllGlobalVariables(const gd::Platform & platform,
+    static std::set < gd::String > FindAllGlobalVariables(const gd::Platform & platform,
         const gd::Project & project);
 
     /**
@@ -42,7 +42,7 @@ public:
      * \param layout The layout to be scanned
      * \return A std::set containing the names of all layout variables used
      */
-    static std::set < std::string > FindAllLayoutVariables(const gd::Platform & platform,
+    static std::set < gd::String > FindAllLayoutVariables(const gd::Platform & platform,
         const gd::Project & project, const gd::Layout & layout);
 
     /**
@@ -52,7 +52,7 @@ public:
      * \param object The object to be scanned
      * \return A std::set containing the names of all object variables used
      */
-    static std::set < std::string > FindAllObjectVariables(const gd::Platform & platform,
+    static std::set < gd::String > FindAllObjectVariables(const gd::Platform & platform,
         const gd::Project & project, const gd::Layout & layout, const gd::Object & object);
 
 private:
@@ -68,10 +68,10 @@ private:
      *
      * \return A std::set filled with the values used for all parameters of the specified type
      */
-    static std::set < std::string > FindArgumentsInInstructions(const gd::Platform & platform,
+    static std::set < gd::String > FindArgumentsInInstructions(const gd::Platform & platform,
         const gd::Project & project, const gd::Layout & layout,
         const gd::InstructionsList & instructions, bool instructionsAreConditions,
-        const std::string & parameterType, const std::string & objectName = "");
+        const gd::String & parameterType, const gd::String & objectName = "");
 
     /**
      * Construct a list of the value of the arguments for parameters of type @ parameterType
@@ -83,9 +83,9 @@ private:
      *
      * \return A std::set filled with the values used for all parameters of the specified type
      */
-    static std::set < std::string > FindArgumentsInEvents(const gd::Platform & platform,
+    static std::set < gd::String > FindArgumentsInEvents(const gd::Platform & platform,
         const gd::Project & project, const gd::Layout & layout, const gd::EventsList & events,
-        const std::string & parameterType, const std::string & objectName = "");
+        const gd::String & parameterType, const gd::String & objectName = "");
 
     EventsVariablesFinder() {};
     virtual ~EventsVariablesFinder() {};

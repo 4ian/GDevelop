@@ -13,8 +13,8 @@ namespace gd
 void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(gd::PlatformExtension & extension)
 {
     extension.SetExtensionInformation("BuiltinAdvanced",
-                          GD_T("Advanced control features"),
-                          GD_T("Built-in extension providing advanced control features."),
+                          _("Advanced control features"),
+                          _("Built-in extension providing advanced control features."),
                           "Florian Rival",
                           "Open source (MIT License)");
 
@@ -22,7 +22,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(gd::P
     extension.AddCondition("Toujours",
                  _("Always"),
                  _("This condition returns always true ( and always false if contrary is checked )."),
-                 GD_T("Always"),
+                 _("Always"),
                  _("Other"),
                  "res/conditions/toujours24.png",
                  "res/conditions/toujours.png")

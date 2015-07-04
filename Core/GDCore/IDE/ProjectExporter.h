@@ -5,7 +5,7 @@
  */
 #ifndef GDCORE_PROJECTEXPORTER_H
 #define GDCORE_PROJECTEXPORTER_H
-#include <string>
+#include <GDCore/Utf8String.h>
 namespace gd { class Project; }
 
 namespace gd
@@ -34,7 +34,7 @@ public:
      *
      * \note If nothing is returned ( Default implementation ), no button will be shown.
      */
-    virtual std::string GetProjectExportButtonLabel() { return ""; }
+    virtual gd::String GetProjectExportButtonLabel() { return ""; }
 };
 
 }

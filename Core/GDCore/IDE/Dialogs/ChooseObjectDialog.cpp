@@ -41,7 +41,7 @@ BEGIN_EVENT_TABLE(ChooseObjectDialog,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-ChooseObjectDialog::ChooseObjectDialog(wxWindow* parent, Project & project_, gd::Layout & layout_, bool canSelectGroup_, std::string onlyObjectOfType_, bool allowMultipleSelection_) :
+ChooseObjectDialog::ChooseObjectDialog(wxWindow* parent, Project & project_, gd::Layout & layout_, bool canSelectGroup_, gd::String onlyObjectOfType_, bool allowMultipleSelection_) :
 project(project_),
 layout(layout_),
 onlyObjectOfType(onlyObjectOfType_),
@@ -128,7 +128,7 @@ ChooseObjectDialog::~ChooseObjectDialog()
 void ChooseObjectDialog::Refresh()
 {
     ObjectListDialogsHelper objectListsHelper(project, layout);
-    objectListsHelper.SetSearchText(ToString(searchCtrl->GetValue()));
+    objectListsHelper.SetSearchText(searchCtrl->GetValue());
     objectListsHelper.SetAllowedObjectType(onlyObjectOfType);
     objectListsHelper.SetGroupsAllowed(canSelectGroup);
     objectListsHelper.RefreshList(objectsList);
@@ -139,7 +139,7 @@ void ChooseObjectDialog::OnChoisirBtClick(wxCommandEvent& event)
     wxArrayTreeItemIds selectionIds;
     unsigned int count = objectsList->GetSelections(selectionIds);
     for (unsigned int i = 0;i<count;++i)
-        objectsChosen.push_back(ToString(objectsList->GetItemText( selectionIds.Item(i) )));
+        objectsChosen.push_back(objectsList->GetItemText( selectionIds.Item(i) ));
 
     objectChosen = !objectsChosen.empty() ? objectsChosen[0] : "";
     EndModal(1);

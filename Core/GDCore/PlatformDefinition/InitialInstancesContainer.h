@@ -6,7 +6,7 @@
 
 #ifndef GDCORE_INITIALINSTANCESCONTAINER_H
 #define GDCORE_INITIALINSTANCESCONTAINER_H
-#include <string>
+#include <GDCore/Utf8String.h>
 #include <list>
 #include "GDCore/PlatformDefinition/InitialInstance.h"
 namespace gd { class InitialInstanceFunctor; }
@@ -89,7 +89,7 @@ public:
      *
      * \see InitialInstanceFunctor
      */
-    void IterateOverInstancesWithZOrdering(InitialInstanceFunctor & func, const std::string & layer);
+    void IterateOverInstancesWithZOrdering(InitialInstanceFunctor & func, const gd::String & layer);
 
     #if defined(GD_IDE_ONLY)
     /**
@@ -112,27 +112,27 @@ public:
     /**
      * \brief Remove all instances from layer \a layerName.
      */
-    void RemoveAllInstancesOnLayer(const std::string & layerName);
+    void RemoveAllInstancesOnLayer(const gd::String & layerName);
 
     /**
      * \brief Move the instances on layer \a fromLayer to layer \a toLayer.
      */
-    void MoveInstancesToLayer(const std::string & fromLayer, const std::string & toLayer);
+    void MoveInstancesToLayer(const gd::String & fromLayer, const gd::String & toLayer);
 
     /**
      * \brief Remove instances of object named \a objectName
      */
-    void RemoveInitialInstancesOfObject(const std::string & objectName);
+    void RemoveInitialInstancesOfObject(const gd::String & objectName);
 
     /**
      * \brief Change instances with object's name \a oldName to \a newName
      */
-    void RenameInstancesOfObject(const std::string & oldName, const std::string & newName);
+    void RenameInstancesOfObject(const gd::String & oldName, const gd::String & newName);
 
     /**
      * \brief Return true if there is at least one instance on the layer named \a layerName.
      */
-    bool SomeInstancesAreOnLayer(const std::string & layerName);
+    bool SomeInstancesAreOnLayer(const gd::String & layerName);
     #endif
     ///@}
 
@@ -191,7 +191,7 @@ public:
     /**
      * \brief Restrict to instances on the specified layer.
      */
-    void RestrictSearchToLayer(const std::string & layerName_) { layerName = layerName_; layerRestricted = true; };
+    void RestrictSearchToLayer(const gd::String & layerName_) { layerName = layerName_; layerRestricted = true; };
 
     /**
      * \brief After calling the instances container iterate method with this functor,
@@ -211,7 +211,7 @@ private:
     bool firstCall;
 
     bool layerRestricted; ///< If true, the search is restricted to the layer called \a layerName.
-    std::string layerName;
+    gd::String layerName;
 };
 
 }

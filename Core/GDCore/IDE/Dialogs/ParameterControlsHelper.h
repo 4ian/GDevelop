@@ -82,7 +82,7 @@ public:
      * and the metadata provided.
      * \note A copy of the metadata is stored.
      */
-    void UpdateParameterContent(unsigned int i, const ParameterMetadata & metadata, std::string content);
+    void UpdateParameterContent(unsigned int i, const ParameterMetadata & metadata, gd::String content);
 
     /**
      * \brief The prototype of the function that can be called

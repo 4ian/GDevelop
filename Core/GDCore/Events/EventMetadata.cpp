@@ -11,11 +11,11 @@
 namespace gd
 {
 
-EventMetadata::EventMetadata(const std::string & name_,
-                             const std::string & fullname_,
-                             const std::string & description_,
-                             const std::string & group_,
-                             const std::string & smallicon_,
+EventMetadata::EventMetadata(const gd::String & name_,
+                             const gd::String & fullname_,
+                             const gd::String & description_,
+                             const gd::String & group_,
+                             const gd::String & smallicon_,
                              std::shared_ptr<gd::BaseEvent> instance_) :
 fullname(fullname_),
 description(description_),
@@ -25,7 +25,7 @@ instance(instance_)
     if ( instance ) instance->SetType(name_);
 }
 
-std::string EventMetadata::CodeGenerator::Generate(gd::BaseEvent & event, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
+gd::String EventMetadata::CodeGenerator::Generate(gd::BaseEvent & event, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
 {
     return "";
 }

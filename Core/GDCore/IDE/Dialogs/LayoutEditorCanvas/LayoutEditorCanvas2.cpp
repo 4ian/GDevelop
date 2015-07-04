@@ -141,7 +141,7 @@ void LayoutEditorCanvas::DrawHighlightRectangleGuiElement(std::vector < std::sha
     target.push_back(highlight);
 }
 
-void LayoutEditorCanvas::AddSmallButtonGuiElement(std::vector < std::shared_ptr<sf::Shape> > & target, const sf::Vector2f & position, const std::string & buttonName )
+void LayoutEditorCanvas::AddSmallButtonGuiElement(std::vector < std::shared_ptr<sf::Shape> > & target, const sf::Vector2f & position, const gd::String & buttonName )
 {
     //Declare the button as a gui element
     gd::LayoutEditorCanvasGuiElement guiElement;
@@ -425,7 +425,7 @@ void LayoutEditorCanvas::OnCreateObjectSelected(wxCommandEvent & event)
         return;
 
     //Find a new unique name for the object
-    std::string name = GD_T("NewObject");
+    gd::String name = GD_T("NewObject");
     for (unsigned int i = 2;layout.HasObjectNamed(name);++i)
         name =  GD_T("NewObject")+ToString(i);
 

@@ -20,12 +20,12 @@
 class ArbitraryResourceWorkerTest : public gd::ArbitraryResourceWorker
 {
 public:
-    virtual void ExposeFile(std::string & file) { files.push_back(file); };
-    virtual void ExposeImage(std::string & imageName) {images.push_back(imageName); };
-    virtual void ExposeShader(std::string & shaderName) {}
+    virtual void ExposeFile(gd::String & file) { files.push_back(file); };
+    virtual void ExposeImage(gd::String & imageName) {images.push_back(imageName); };
+    virtual void ExposeShader(gd::String & shaderName) {}
 
-    std::vector<std::string> files;
-    std::vector<std::string> images;
+    std::vector<gd::String> files;
+    std::vector<gd::String> images;
 };
 
 TEST_CASE( "Resources", "[common][resources]" ) {
@@ -76,13 +76,13 @@ TEST_CASE( "Resources", "[common][resources]" ) {
             REQUIRE(worker.images[0] == "res1");
 
             SECTION("ProjectResourcesAdder") {
-                std::vector<std::string> uselessResources =
+                std::vector<gd::String> uselessResources =
                     gd::ProjectResourcesAdder::GetAllUselessResources(project);
 
                 REQUIRE(uselessResources.size() == 2);
 
                 gd::ProjectResourcesAdder::RemoveAllUselessResources(project);
-                std::vector<std::string> remainingResources =
+                std::vector<gd::String> remainingResources =
                     project.GetResourcesManager().GetAllResourcesList();
                 REQUIRE(remainingResources.size() == 1);
                 REQUIRE(remainingResources[0] == "res1");

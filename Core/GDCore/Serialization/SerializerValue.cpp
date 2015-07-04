@@ -8,7 +8,6 @@ SerializerValue::SerializerValue() :
 	isUnknown(true),
 	isBoolean(false),
 	isString(false),
-	isUtf8String(false),
 	isInt(false),
 	isDouble(false),
 	booleanValue(false),
@@ -21,7 +20,6 @@ SerializerValue::SerializerValue(bool val) :
 	isUnknown(true),
 	isBoolean(false),
 	isString(false),
-	isUtf8String(false),
 	isInt(false),
 	isDouble(false),
 	booleanValue(false),
@@ -34,7 +32,6 @@ SerializerValue::SerializerValue(std::string val) :
 	isUnknown(true),
 	isBoolean(false),
 	isString(false),
-	isUtf8String(false),
 	isInt(false),
 	isDouble(false),
 	booleanValue(false),
@@ -47,20 +44,18 @@ SerializerValue::SerializerValue(const gd::String &val) :
 	isUnknown(true),
 	isBoolean(false),
 	isString(false),
-	isUtf8String(false),
 	isInt(false),
 	isDouble(false),
 	booleanValue(false),
 	intValue(0),
 	doubleValue(0)
 {
-	SetUtf8String(val);
+	SetString(val);
 }
 SerializerValue::SerializerValue(int val) :
 	isUnknown(true),
 	isBoolean(false),
 	isString(false),
-	isUtf8String(false),
 	isInt(false),
 	isDouble(false),
 	booleanValue(false),
@@ -73,7 +68,6 @@ SerializerValue::SerializerValue(double val) :
 	isUnknown(true),
 	isBoolean(false),
 	isString(false),
-	isUtf8String(false),
 	isInt(false),
 	isDouble(false),
 	booleanValue(false),
@@ -95,19 +89,7 @@ bool SerializerValue::GetBool() const
 	return booleanValue;
 }
 
-std::string SerializerValue::GetString() const
-{
-	if (isBoolean)
-		return booleanValue ? "true" : "false";
-	else if (isInt)
-		return gd::ToString(intValue);
-	else if (isDouble)
-		return gd::ToString(doubleValue);
-
-	return stringValue;
-}
-
-gd::String SerializerValue::GetUtf8String() const
+gd::String SerializerValue::GetString() const
 {
 	if (isBoolean)
 		return booleanValue ? gd::String("true") : gd::String("false");
@@ -115,8 +97,10 @@ gd::String SerializerValue::GetUtf8String() const
 		return gd::String::FromInt(intValue);
 	else if (isDouble)
 		return gd::String::FromDouble(doubleValue);
+	else if (isUnknown)
+		return stringValue;
 
-	return utf8StringValue;
+	return stringValue;
 }
 
 int SerializerValue::GetInt() const
@@ -124,7 +108,7 @@ int SerializerValue::GetInt() const
 	if (isBoolean)
 		return booleanValue ? 1 : 0;
 	else if (isString || isUnknown)
-		return gd::ToInt(stringValue);
+		return stringValue.ToInt();
 	else if (isDouble)
 		return doubleValue;
 
@@ -136,7 +120,7 @@ double SerializerValue::GetDouble() const
 	if (isBoolean)
 		return booleanValue ? 1 : 0;
 	else if (isString || isUnknown)
-		return gd::ToDouble(stringValue);
+		return stringValue.ToDouble();
 	else if (isInt)
 		return intValue;
 
@@ -149,7 +133,6 @@ void SerializerValue::Set(const std::string & val)
 	isUnknown = true;
 	isBoolean = false;
 	isString = false;
-	isUtf8String = false;
 	isInt = false;
 	isDouble = false;
 
@@ -161,7 +144,6 @@ void SerializerValue::SetBool(bool val)
 	isUnknown = false;
 	isBoolean = true;
 	isString = false;
-	isUtf8String = false;
 	isInt = false;
 	isDouble = false;
 
@@ -173,23 +155,21 @@ void SerializerValue::SetString(const std::string & val)
 	isUnknown = false;
 	isBoolean = false;
 	isString = true;
-	isUtf8String = false;
+	isInt = false;
+	isDouble = false;
+
+	stringValue = gd::String::FromUTF8(val);
+}
+
+void SerializerValue::SetString(const gd::String & val)
+{
+	isUnknown = false;
+	isBoolean = false;
+	isString = true;
 	isInt = false;
 	isDouble = false;
 
 	stringValue = val;
-}
-
-void SerializerValue::SetUtf8String(const gd::String & val)
-{
-	isUnknown = false;
-	isBoolean = false;
-	isString = false;
-	isUtf8String = true;
-	isInt = false;
-	isDouble = false;
-
-	utf8StringValue = val;
 }
 
 void SerializerValue::SetInt(int val)
@@ -197,7 +177,6 @@ void SerializerValue::SetInt(int val)
 	isUnknown = false;
 	isBoolean = false;
 	isString = false;
-	isUtf8String = false;
 	isInt = true;
 	isDouble = false;
 
@@ -209,7 +188,6 @@ void SerializerValue::SetDouble(double val)
 	isUnknown = false;
 	isBoolean = false;
 	isString = false;
-	isUtf8String = false;
 	isInt = false;
 	isDouble = true;
 

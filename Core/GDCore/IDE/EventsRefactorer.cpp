@@ -24,19 +24,19 @@ class CallbacksForRenamingObject : public gd::ParserCallbacks
 {
     public:
 
-    CallbacksForRenamingObject(std::string & plainExpression_, std::string oldName_, std::string newName_) :
+    CallbacksForRenamingObject(gd::String & plainExpression_, gd::String oldName_, gd::String newName_) :
     plainExpression(plainExpression_),
     newName(newName_),
     oldName(oldName_)
     {};
     virtual ~CallbacksForRenamingObject() {};
 
-    virtual void OnConstantToken(std::string text)
+    virtual void OnConstantToken(gd::String text)
     {
         plainExpression += text;
     };
 
-    virtual void OnStaticFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo)
+    virtual void OnStaticFunction(gd::String functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo)
     {
         //Special case : Function without name is a litteral string.
         if ( functionName.empty() )
@@ -47,7 +47,7 @@ class CallbacksForRenamingObject : public gd::ParserCallbacks
             return;
         }
 
-        std::string parametersStr;
+        gd::String parametersStr;
         for (unsigned int i = 0;i<parameters.size();++i)
         {
             if ( i < expressionInfo.parameters.size() && expressionInfo.parameters[i].codeOnly )
@@ -59,11 +59,11 @@ class CallbacksForRenamingObject : public gd::ParserCallbacks
         plainExpression += functionName+"("+parametersStr+")";
     };
 
-    virtual void OnObjectFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo)
+    virtual void OnObjectFunction(gd::String functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo)
     {
         if ( parameters.empty() ) return;
 
-        std::string parametersStr;
+        gd::String parametersStr;
         for (unsigned int i = 1;i<parameters.size();++i)
         {
             if ( i < expressionInfo.parameters.size() && expressionInfo.parameters[i].codeOnly )
@@ -76,11 +76,11 @@ class CallbacksForRenamingObject : public gd::ParserCallbacks
                                +"."+functionName+"("+parametersStr+")";
     };
 
-    virtual void OnObjectAutomatismFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo)
+    virtual void OnObjectAutomatismFunction(gd::String functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo)
     {
         if ( parameters.size() < 2 ) return;
 
-        std::string parametersStr;
+        gd::String parametersStr;
         for (unsigned int i = 2;i<parameters.size();++i)
         {
             if ( i < expressionInfo.parameters.size() && expressionInfo.parameters[i].codeOnly )
@@ -95,7 +95,7 @@ class CallbacksForRenamingObject : public gd::ParserCallbacks
 
     virtual bool OnSubMathExpression(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, gd::Expression & expression)
     {
-        std::string newExpression;
+        gd::String newExpression;
 
         CallbacksForRenamingObject callbacks(newExpression, oldName, newName);
 
@@ -109,7 +109,7 @@ class CallbacksForRenamingObject : public gd::ParserCallbacks
 
     virtual bool OnSubTextExpression(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, gd::Expression & expression)
     {
-        std::string newExpression;
+        gd::String newExpression;
 
         CallbacksForRenamingObject callbacks(newExpression, oldName, newName);
 
@@ -123,16 +123,16 @@ class CallbacksForRenamingObject : public gd::ParserCallbacks
 
 
 private:
-    std::string & plainExpression;
-    std::string newName;
-    std::string oldName;
+    gd::String & plainExpression;
+    gd::String newName;
+    gd::String oldName;
 };
 
 class CallbacksForRemovingObject : public gd::ParserCallbacks
 {
     public:
 
-    CallbacksForRemovingObject(std::string name_) :
+    CallbacksForRemovingObject(gd::String name_) :
     objectPresent(false),
     name(name_)
     {};
@@ -140,20 +140,20 @@ class CallbacksForRemovingObject : public gd::ParserCallbacks
 
     bool objectPresent; //True if the object is present in the expression
 
-    virtual void OnConstantToken(std::string text){};
+    virtual void OnConstantToken(gd::String text){};
 
-    virtual void OnStaticFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo)
+    virtual void OnStaticFunction(gd::String functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo)
     {
     };
 
-    virtual void OnObjectFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo)
+    virtual void OnObjectFunction(gd::String functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo)
     {
         if ( parameters.empty() ) return;
 
         if ( parameters[0].GetPlainString() == name ) objectPresent = true;
     };
 
-    virtual void OnObjectAutomatismFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo)
+    virtual void OnObjectAutomatismFunction(gd::String functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo)
     {
         if ( parameters.empty() ) return;
 
@@ -186,10 +186,10 @@ class CallbacksForRemovingObject : public gd::ParserCallbacks
 
 
 private:
-    std::string name;
+    gd::String name;
 };
 
-bool EventsRefactorer::RenameObjectInActions(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, gd::InstructionsList & actions, std::string oldName, std::string newName)
+bool EventsRefactorer::RenameObjectInActions(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, gd::InstructionsList & actions, gd::String oldName, gd::String newName)
 {
     bool somethingModified = false;
 
@@ -204,8 +204,8 @@ bool EventsRefactorer::RenameObjectInActions(const gd::Platform & platform, gd::
             //Replace object's name in expressions
             else if (instrInfos.parameters[pNb].type == "expression")
             {
-                std::string newExpression;
-                std::string oldExpression = actions[aId].GetParameter(pNb).GetPlainString();
+                gd::String newExpression;
+                gd::String oldExpression = actions[aId].GetParameter(pNb).GetPlainString();
 
                 CallbacksForRenamingObject callbacks(newExpression, oldName, newName);
 
@@ -219,8 +219,8 @@ bool EventsRefactorer::RenameObjectInActions(const gd::Platform & platform, gd::
             //Replace object's name in text expressions
             else if (instrInfos.parameters[pNb].type == "string"||instrInfos.parameters[pNb].type == "file" ||instrInfos.parameters[pNb].type == "joyaxis" ||instrInfos.parameters[pNb].type == "color"||instrInfos.parameters[pNb].type == "layer")
             {
-                std::string newExpression;
-                std::string oldExpression = actions[aId].GetParameter(pNb).GetPlainString();
+                gd::String newExpression;
+                gd::String oldExpression = actions[aId].GetParameter(pNb).GetPlainString();
 
                 CallbacksForRenamingObject callbacks(newExpression, oldName, newName);
 
@@ -240,7 +240,7 @@ bool EventsRefactorer::RenameObjectInActions(const gd::Platform & platform, gd::
     return somethingModified;
 }
 
-bool EventsRefactorer::RenameObjectInConditions(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, gd::InstructionsList & conditions, std::string oldName, std::string newName)
+bool EventsRefactorer::RenameObjectInConditions(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, gd::InstructionsList & conditions, gd::String oldName, gd::String newName)
 {
     bool somethingModified = false;
 
@@ -255,8 +255,8 @@ bool EventsRefactorer::RenameObjectInConditions(const gd::Platform & platform, g
             //Replace object's name in expressions
             else if (instrInfos.parameters[pNb].type == "expression")
             {
-                std::string newExpression;
-                std::string oldExpression = conditions[cId].GetParameter(pNb).GetPlainString();
+                gd::String newExpression;
+                gd::String oldExpression = conditions[cId].GetParameter(pNb).GetPlainString();
 
                 CallbacksForRenamingObject callbacks(newExpression, oldName, newName);
 
@@ -270,8 +270,8 @@ bool EventsRefactorer::RenameObjectInConditions(const gd::Platform & platform, g
             //Replace object's name in text expressions
             else if (instrInfos.parameters[pNb].type == "string" ||instrInfos.parameters[pNb].type == "file" ||instrInfos.parameters[pNb].type == "joyaxis" ||instrInfos.parameters[pNb].type == "color"||instrInfos.parameters[pNb].type == "layer")
             {
-                std::string newExpression;
-                std::string oldExpression = conditions[cId].GetParameter(pNb).GetPlainString();
+                gd::String newExpression;
+                gd::String oldExpression = conditions[cId].GetParameter(pNb).GetPlainString();
 
                 CallbacksForRenamingObject callbacks(newExpression, oldName, newName);
 
@@ -291,7 +291,7 @@ bool EventsRefactorer::RenameObjectInConditions(const gd::Platform & platform, g
     return somethingModified;
 }
 
-void EventsRefactorer::RenameObjectInEvents(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, gd::EventsList & events, std::string oldName, std::string newName)
+void EventsRefactorer::RenameObjectInEvents(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, gd::EventsList & events, gd::String oldName, gd::String newName)
 {
     for (unsigned int i = 0;i<events.size();++i)
     {
@@ -317,7 +317,7 @@ void EventsRefactorer::RenameObjectInEvents(const gd::Platform & platform, gd::P
     }
 }
 
-bool EventsRefactorer::RemoveObjectInActions(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, gd::InstructionsList & actions, std::string name)
+bool EventsRefactorer::RemoveObjectInActions(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, gd::InstructionsList & actions, gd::String name)
 {
     bool somethingModified = false;
 
@@ -373,7 +373,7 @@ bool EventsRefactorer::RemoveObjectInActions(const gd::Platform & platform, gd::
     return somethingModified;
 }
 
-bool EventsRefactorer::RemoveObjectInConditions(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, gd::InstructionsList & conditions, std::string name)
+bool EventsRefactorer::RemoveObjectInConditions(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, gd::InstructionsList & conditions, gd::String name)
 {
     bool somethingModified = false;
 
@@ -427,7 +427,7 @@ bool EventsRefactorer::RemoveObjectInConditions(const gd::Platform & platform, g
     return somethingModified;
 }
 
-void EventsRefactorer::RemoveObjectInEvents(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, gd::EventsList & events, std::string name)
+void EventsRefactorer::RemoveObjectInEvents(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, gd::EventsList & events, gd::String name)
 {
     for (unsigned int i = 0;i<events.size();++i)
     {
@@ -454,8 +454,8 @@ void EventsRefactorer::RemoveObjectInEvents(const gd::Platform & platform, gd::P
 }
 
 void EventsRefactorer::ReplaceStringInEvents(gd::Project & project, gd::Layout & layout, gd::EventsList & events,
-                                              std::string toReplace,
-                                              std::string newString,
+                                              gd::String toReplace,
+                                              gd::String newString,
                                               bool matchCase,
                                               bool inConditions,
                                               bool inActions)
@@ -490,7 +490,7 @@ void EventsRefactorer::ReplaceStringInEvents(gd::Project & project, gd::Layout &
     }
 }
 
-std::string ReplaceAllOccurences(string context, const string& from, const string& to)
+gd::String ReplaceAllOccurences(gd::String context, const gd::String& from, const gd::String& to)
 {
     size_t lookHere = 0;
     size_t foundHere;
@@ -503,13 +503,13 @@ std::string ReplaceAllOccurences(string context, const string& from, const strin
     return context;
 }
 
-std::string ReplaceAllOccurencesCaseUnsensitive(string context, string from, const string& to)
+gd::String ReplaceAllOccurencesCaseUnsensitive(gd::String context, gd::String from, const gd::String& to)
 {
-    from = gd::StrUppercase(from);
+    from = from.ToUpperCase();
 
     size_t lookHere = 0;
     size_t foundHere;
-    while((foundHere = gd::StrUppercase(context).find(from, lookHere)) != string::npos)
+    while((foundHere = context.ToUpperCase().find(from, lookHere)) != string::npos)
     {
           context.replace(foundHere, from.size(), to);
           lookHere = foundHere + to.size();
@@ -518,7 +518,7 @@ std::string ReplaceAllOccurencesCaseUnsensitive(string context, string from, con
     return context;
 }
 
-bool EventsRefactorer::ReplaceStringInActions(gd::Project & project, gd::Layout & layout, gd::InstructionsList & actions, std::string toReplace, std::string newString, bool matchCase)
+bool EventsRefactorer::ReplaceStringInActions(gd::Project & project, gd::Layout & layout, gd::InstructionsList & actions, gd::String toReplace, gd::String newString, bool matchCase)
 {
     bool somethingModified = false;
 
@@ -526,7 +526,7 @@ bool EventsRefactorer::ReplaceStringInActions(gd::Project & project, gd::Layout 
     {
         for (unsigned int pNb = 0;pNb < actions[aId].GetParameters().size();++pNb)
         {
-            std::string newParameter = matchCase ? ReplaceAllOccurences(actions[aId].GetParameter(pNb).GetPlainString(), toReplace, newString)
+            gd::String newParameter = matchCase ? ReplaceAllOccurences(actions[aId].GetParameter(pNb).GetPlainString(), toReplace, newString)
                                                  : ReplaceAllOccurencesCaseUnsensitive(actions[aId].GetParameter(pNb).GetPlainString(), toReplace, newString);
 
             if ( newParameter != actions[aId].GetParameter(pNb).GetPlainString())
@@ -545,7 +545,7 @@ bool EventsRefactorer::ReplaceStringInActions(gd::Project & project, gd::Layout 
     return somethingModified;
 }
 
-bool EventsRefactorer::ReplaceStringInConditions(gd::Project & project, gd::Layout & layout, gd::InstructionsList & conditions, std::string toReplace, std::string newString, bool matchCase)
+bool EventsRefactorer::ReplaceStringInConditions(gd::Project & project, gd::Layout & layout, gd::InstructionsList & conditions, gd::String toReplace, gd::String newString, bool matchCase)
 {
     bool somethingModified = false;
 
@@ -553,7 +553,7 @@ bool EventsRefactorer::ReplaceStringInConditions(gd::Project & project, gd::Layo
     {
         for (unsigned int pNb = 0;pNb < conditions[cId].GetParameters().size();++pNb)
         {
-            std::string newParameter = matchCase ? ReplaceAllOccurences(conditions[cId].GetParameter(pNb).GetPlainString(), toReplace, newString)
+            gd::String newParameter = matchCase ? ReplaceAllOccurences(conditions[cId].GetParameter(pNb).GetPlainString(), toReplace, newString)
                                                  : ReplaceAllOccurencesCaseUnsensitive(conditions[cId].GetParameter(pNb).GetPlainString(), toReplace, newString);
 
             if ( newParameter != conditions[cId].GetParameter(pNb).GetPlainString())
@@ -573,7 +573,7 @@ bool EventsRefactorer::ReplaceStringInConditions(gd::Project & project, gd::Layo
 }
 
 vector < EventsSearchResult > EventsRefactorer::SearchInEvents(gd::Project & project, gd::Layout & layout, gd::EventsList & events,
-                                  std::string search,
+                                  gd::String search,
                                   bool matchCase,
                                   bool inConditions,
                                   bool inActions)
@@ -618,18 +618,18 @@ vector < EventsSearchResult > EventsRefactorer::SearchInEvents(gd::Project & pro
     return results;
 }
 
-bool EventsRefactorer::SearchStringInActions(gd::Project & project, gd::Layout & layout, gd::InstructionsList & actions, std::string search, bool matchCase)
+bool EventsRefactorer::SearchStringInActions(gd::Project & project, gd::Layout & layout, gd::InstructionsList & actions, gd::String search, bool matchCase)
 {
-    if ( !matchCase ) search = gd::StrUppercase(search);
+    if ( !matchCase ) search = search.ToUpperCase();
 
     for (unsigned int aId = 0;aId < actions.size();++aId)
     {
         for (unsigned int pNb = 0;pNb < actions[aId].GetParameters().size();++pNb)
         {
             size_t foundPosition = matchCase ? actions[aId].GetParameter(pNb).GetPlainString().find(search) :
-                                     gd::StrUppercase(actions[aId].GetParameter(pNb).GetPlainString()).find(search);
+                                     actions[aId].GetParameter(pNb).GetPlainString().ToUpperCase().find(search);
 
-            if ( foundPosition != std::string::npos ) return true;
+            if ( foundPosition != gd::String::npos ) return true;
         }
 
         if ( !actions[aId].GetSubInstructions().empty() && SearchStringInActions(project, layout, actions[aId].GetSubInstructions(), search, matchCase) )
@@ -639,18 +639,18 @@ bool EventsRefactorer::SearchStringInActions(gd::Project & project, gd::Layout &
     return false;
 }
 
-bool EventsRefactorer::SearchStringInConditions(gd::Project & project, gd::Layout & layout, gd::InstructionsList & conditions, std::string search, bool matchCase)
+bool EventsRefactorer::SearchStringInConditions(gd::Project & project, gd::Layout & layout, gd::InstructionsList & conditions, gd::String search, bool matchCase)
 {
-    if ( !matchCase ) search = gd::StrUppercase(search);
+    if ( !matchCase ) search = search.ToUpperCase();
 
     for (unsigned int cId = 0;cId < conditions.size();++cId)
     {
         for (unsigned int pNb = 0;pNb < conditions[cId].GetParameters().size();++pNb)
         {
             size_t foundPosition = matchCase ? conditions[cId].GetParameter(pNb).GetPlainString().find(search) :
-                                     gd::StrUppercase(conditions[cId].GetParameter(pNb).GetPlainString()).find(search);
+                                     conditions[cId].GetParameter(pNb).GetPlainString().ToUpperCase().find(search);
 
-            if ( foundPosition != std::string::npos ) return true;
+            if ( foundPosition != gd::String::npos ) return true;
         }
 
         if ( !conditions[cId].GetSubInstructions().empty() && SearchStringInConditions(project, layout, conditions[cId].GetSubInstructions(), search, matchCase) )

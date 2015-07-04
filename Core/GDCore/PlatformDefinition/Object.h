@@ -6,7 +6,7 @@
 #ifndef GDCORE_OBJECT_H
 #define GDCORE_OBJECT_H
 #include <memory>
-#include <string>
+#include <GDCore/Utf8String.h>
 #include <vector>
 #include <map>
 #include "GDCore/PlatformDefinition/VariablesContainer.h"
@@ -38,7 +38,7 @@ public:
      * Create a new object with the name passed as argument.
      * \param name Object's name
      */
-    Object(const std::string & name);
+    Object(const gd::String & name);
 
     /**
      * Copy constructor. Calls Init().
@@ -71,19 +71,19 @@ public:
 
     /** \brief Change the name of the object with the name passed as parameter.
      */
-    void SetName(const std::string & name_) { name = name_; };
+    void SetName(const gd::String & name_) { name = name_; };
 
     /** \brief Return the name of the object.
      */
-    const std::string & GetName() const { return name; };
+    const gd::String & GetName() const { return name; };
 
     /** \brief Change the type of the object.
      */
-    void SetType(const std::string & type_) { type = type_; }
+    void SetType(const gd::String & type_) { type = type_; }
 
     /** \brief Return the type of the object.
      */
-    const std::string & GetType() const { return type; }
+    const gd::String & GetType() const { return type; }
     ///@}
 
     #if defined(GD_IDE_ONLY)
@@ -119,7 +119,7 @@ public:
      * \return a std::map with properties names as key and values.
      * \see gd::InitialInstance
      */
-    virtual std::map<std::string, gd::PropertyDescriptor> GetInitialInstanceProperties(const gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout);
+    virtual std::map<gd::String, gd::PropertyDescriptor> GetInitialInstanceProperties(const gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout);
 
     /**
      * \brief Called when the IDE wants to update a custom property of an initial instance of this object.
@@ -127,7 +127,7 @@ public:
      * \return false if the new value cannot be set
      * \see gd::InitialInstance
      */
-    virtual bool UpdateInitialInstanceProperty(gd::InitialInstance & instance, const std::string & name, const std::string & value, gd::Project & project, gd::Layout & layout) {return false;};
+    virtual bool UpdateInitialInstanceProperty(gd::InitialInstance & instance, const gd::String & name, const gd::String & value, gd::Project & project, gd::Layout & layout) {return false;};
 
     /**
      * \brief Called when the IDE wants to draw an initial instance of the object on the layout editor.
@@ -186,33 +186,33 @@ public:
     /**
      * \brief Return a vector containing the names of all the automatisms used by the object
      */
-    std::vector < std::string > GetAllAutomatismNames() const;
+    std::vector < gd::String > GetAllAutomatismNames() const;
 
     /**
      * \brief Return a reference to the automatism called \a name.
      */
-    Automatism & GetAutomatism(const std::string & name);
+    Automatism & GetAutomatism(const gd::String & name);
 
     /**
      * \brief Return a reference to the automatism called \a name.
      */
-    const Automatism & GetAutomatism(const std::string & name) const;
+    const Automatism & GetAutomatism(const gd::String & name) const;
 
     /**
      * \brief Return true if object has an automatism called \a name.
      */
-    bool HasAutomatismNamed(const std::string & name) const;
+    bool HasAutomatismNamed(const gd::String & name) const;
 
     /**
      * \brief Remove automatism called \a name
      */
-    void RemoveAutomatism(const std::string & name);
+    void RemoveAutomatism(const gd::String & name);
 
     /**
      * \brief Change the name of automatism called name to newName.
      * \return true if name was successfully changed
      */
-    bool RenameAutomatism(const std::string & name, const std::string & newName);
+    bool RenameAutomatism(const gd::String & name, const gd::String & newName);
 
     /**
      * \brief Add the automatism of the specified \a type with the specified \a name.
@@ -221,13 +221,13 @@ public:
      *
      * \return A pointer to the newly added automatism. NULL if the creation failed.
      */
-    gd::Automatism * AddNewAutomatism(gd::Project & project, const std::string & type, const std::string & name);
+    gd::Automatism * AddNewAutomatism(gd::Project & project, const gd::String & type, const gd::String & name);
     #endif
 
     /**
      * \brief Get a read-only access to the map containing the automatisms.
      */
-    const std::map<std::string, gd::Automatism* > & GetAllAutomatisms() const {return automatisms;};
+    const std::map<gd::String, gd::Automatism* > & GetAllAutomatisms() const {return automatisms;};
     ///@}
 
     /** \name Variable management
@@ -265,9 +265,9 @@ public:
     ///@}
 
 protected:
-    std::string                             name; ///< The full name of the object
-    std::string                             type; ///< Which type is the object. ( To test if we can do something reserved to some objects with it )
-    std::map<std::string, gd::Automatism* > automatisms; ///<Contains all automatisms of the object. Automatisms are the ownership of the object
+    gd::String                             name; ///< The full name of the object
+    gd::String                             type; ///< Which type is the object. ( To test if we can do something reserved to some objects with it )
+    std::map<gd::String, gd::Automatism* > automatisms; ///<Contains all automatisms of the object. Automatisms are the ownership of the object
     gd::VariablesContainer                  objectVariables; ///<List of the variables of the object
 
     /**
@@ -294,8 +294,8 @@ protected:
  *
  * \see gd::Object
  */
-struct ObjectHasName : public std::binary_function<std::shared_ptr<gd::Object>, std::string, bool> {
-    bool operator()(const std::shared_ptr<gd::Object> & object, const std::string & name) const { return object->GetName() == name; }
+struct ObjectHasName : public std::binary_function<std::shared_ptr<gd::Object>, gd::String, bool> {
+    bool operator()(const std::shared_ptr<gd::Object> & object, const gd::String & name) const { return object->GetName() == name; }
 };
 
 }
@@ -310,6 +310,6 @@ typedef std::vector < std::shared_ptr<gd::Object> > ObjList;
  */
 typedef std::shared_ptr<gd::Object> ObjSPtr;
 
-gd::Object * GD_CORE_API CreateBaseObject(std::string name);
+gd::Object * GD_CORE_API CreateBaseObject(gd::String name);
 
 #endif // GDCORE_OBJECT_H

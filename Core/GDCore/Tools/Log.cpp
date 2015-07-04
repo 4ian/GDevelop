@@ -6,10 +6,10 @@
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/log.h>
 #include "GDCore/Utf8Tools.h"
-#include "GDCore/Utf8String.h"
 #else
 #include <iostream>
 #endif
+#include "GDCore/Utf8String.h"
 
 namespace gd {
 

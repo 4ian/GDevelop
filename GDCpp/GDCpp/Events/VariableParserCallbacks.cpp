@@ -87,7 +87,7 @@ void VariableCodeGenerationCallbacks::OnRootVariable(gd::String variableName)
 		unsigned int index = variables->GetPosition(variableName);
 		if ( index < variables->Count() )
 		{
-			output += ".Get("+ToString(index)+")";
+			output += ".Get("+gd::String::FromUInt(index)+")";
 			return;
 		}
 	}

@@ -475,7 +475,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                         for (unsigned int j = 0;j<=i;++j)
                         {
                             if (j!=0) count+= "+";
-                            count += "forEachCount"+ToString(j);
+                            count += "forEachCount"+gd::String::FromUInt(j);
                         }
 
                         if ( i != 0 ) outputCode += "else ";

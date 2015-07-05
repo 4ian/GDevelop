@@ -14,7 +14,7 @@ bool GD_API JoystickButtonDown( RuntimeScene & scene, unsigned int joystick, uns
     return sf::Joystick::isButtonPressed(joystick, button);
 }
 
-double GD_API GetJoystickAxisValue( RuntimeScene & scene, unsigned int joystick, const std::string & axisStr )
+double GD_API GetJoystickAxisValue( RuntimeScene & scene, unsigned int joystick, const gd::String & axisStr )
 {
     sf::Joystick::Axis axis;
     if ( axisStr == "AxisX" ) axis = sf::Joystick::X;
@@ -31,7 +31,7 @@ double GD_API GetJoystickAxisValue( RuntimeScene & scene, unsigned int joystick,
     return sf::Joystick::getAxisPosition(joystick, axis);
 }
 
-void GD_API JoystickAxisValueToVariable( RuntimeScene & scene, unsigned int joystick, const std::string & axisStr, gd::Variable & variable )
+void GD_API JoystickAxisValueToVariable( RuntimeScene & scene, unsigned int joystick, const gd::String & axisStr, gd::Variable & variable )
 {
     //Obtain axis and joystick
     sf::Joystick::Axis axis;

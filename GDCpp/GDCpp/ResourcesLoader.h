@@ -17,6 +17,7 @@ class Music;
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 #include <string>
+#include "GDCpp/Utf8String.h"
 #undef LoadImage //Undef macro from windows.h
 
 namespace gd
@@ -36,21 +37,21 @@ public:
      * \brief Set the name of the resource file to be open.
      * \return true if file was successfully opened.
      */
-    bool SetResourceFile( const string & filename );
+    bool SetResourceFile( const gd::String & filename );
 
-    sf::Texture LoadSFMLTexture( const std::string & filename );
+    sf::Texture LoadSFMLTexture( const gd::String & filename );
 
-    std::pair<sf::Font *, char *> LoadFont( const std::string & filename );
+    std::pair<sf::Font *, char *> LoadFont( const gd::String & filename );
 
-    sf::SoundBuffer LoadSoundBuffer( const std::string & filename );
+    sf::SoundBuffer LoadSoundBuffer( const gd::String & filename );
 
-    std::string LoadPlainText( const std::string & filename );
+    gd::String LoadPlainText( const gd::String & filename );
 
-    char* LoadBinaryFile( const std::string & filename );
+    char* LoadBinaryFile( const gd::String & filename );
 
-    long int GetBinaryFileSize( const std::string & filename);
+    long int GetBinaryFileSize( const gd::String & filename);
 
-    bool HasFile(const std::string & filename);
+    bool HasFile(const gd::String & filename);
 
     static ResourcesLoader *Get()
     {

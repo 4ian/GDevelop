@@ -38,15 +38,15 @@
 
 using namespace std;
 
-std::string GetCurrentWorkingDirectory();
-int AbortWithMessage(const std::string & message);
+gd::String GetCurrentWorkingDirectory();
+int AbortWithMessage(const gd::String & message);
 
 int main( int argc, char *p_argv[] )
 {
     GDLogBanner();
 
     //Get executable location
-    string fullExecutablePath;
+    gd::String fullExecutablePath;
     if ( *p_argv[0] != '/' )
     {
         fullExecutablePath += GetCurrentWorkingDirectory();
@@ -55,17 +55,17 @@ int main( int argc, char *p_argv[] )
     #ifndef WINDOWS
     fullExecutablePath += p_argv[0];
     #endif
-    std::string executablePath = fullExecutablePath.substr( 0, fullExecutablePath.find_last_of( "/" ) );
-    std::string executableFilename = fullExecutablePath.find_last_of( "/" ) < fullExecutablePath.length() ? fullExecutablePath.substr( fullExecutablePath.find_last_of( "/" ), fullExecutablePath.length() ) : "";
-    std::string executableNameOnly = executableFilename.substr(0, executableFilename.length()-4);
+    gd::String executablePath = fullExecutablePath.substr( 0, fullExecutablePath.find_last_of( "/" ) );
+    gd::String executableFilename = fullExecutablePath.find_last_of( "/" ) < fullExecutablePath.length() ? fullExecutablePath.substr( fullExecutablePath.find_last_of( "/" ), fullExecutablePath.length() ) : "";
+    gd::String executableNameOnly = executableFilename.substr(0, executableFilename.length()-4);
 
     #ifdef WINDOWS
-        std::string codeFileExtension = "dll";
+        gd::String codeFileExtension = "dll";
     #elif defined(LINUX)
-        std::string codeFileExtension = "so";
+        gd::String codeFileExtension = "so";
         chdir( executablePath.c_str() ); //For linux, make the executable dir the current working directory
     #elif defined(MACOS)
-        std::string codeFileExtension = "dylib";
+        gd::String codeFileExtension = "dylib";
     #else
         #error Please update this part to support your target system.
     #endif
@@ -108,12 +108,12 @@ int main( int argc, char *p_argv[] )
         aes_cbc_decrypt(reinterpret_cast<const unsigned char*>(ibuffer), reinterpret_cast<unsigned char*>(obuffer),
             (uint8_t*)iv, size/AES_BLOCK_SIZE, &keySetting);
 
-        string uncryptedSrc = obuffer;
+        gd::String uncryptedSrc = obuffer;
         delete [] obuffer;
 
         cout << "Loading game data..." << endl;
         TiXmlDocument doc;
-        if ( !doc.Parse(uncryptedSrc.c_str()) )
+        if ( !doc.Parse(uncryptedSrc.ToLocale().c_str()) )
         {
             return AbortWithMessage("Unable to parse game data. Aborting.");
         }
@@ -128,12 +128,12 @@ int main( int argc, char *p_argv[] )
         return AbortWithMessage("No scene to be loaded. Aborting.");
 
     //Loading the code
-    std::string codeLibraryName = executablePath+"/"+executableNameOnly+"."+codeFileExtension;
-    Handle codeLibrary = gd::OpenLibrary(codeLibraryName.c_str());
+    gd::String codeLibraryName = executablePath+"/"+executableNameOnly+"."+codeFileExtension;
+    Handle codeLibrary = gd::OpenLibrary(codeLibraryName.ToLocale().c_str());
     if ( codeLibrary == NULL )
     {
         codeLibraryName = executablePath+"/Code."+codeFileExtension;
-        Handle codeLibrary = gd::OpenLibrary(codeLibraryName.c_str());
+        Handle codeLibrary = gd::OpenLibrary(codeLibraryName.ToLocale().c_str());
         if ( codeLibrary == NULL )
         {
             return AbortWithMessage("Unable to load the execution engine for game. Aborting.");
@@ -142,11 +142,11 @@ int main( int argc, char *p_argv[] )
 
     #if defined(WINDOWS)
     //Handle special argument to change working directory
-    if ( argc >= 2 && std::string(p_argv[1]).size() > 5 && std::string(p_argv[1]).substr(0, 5) == "-cwd=" )
+    if ( argc >= 2 && gd::String(p_argv[1]).size() > 5 && gd::String(p_argv[1]).substr(0, 5) == "-cwd=" )
     {
-        std::string newWorkingDir = std::string(p_argv[1]).substr(5, std::string::npos);
+        gd::String newWorkingDir = gd::String(p_argv[1]).substr(5, gd::String::npos);
         cout << "Changing working directory to " << newWorkingDir << endl;
-        chdir(newWorkingDir.c_str());
+        chdir(newWorkingDir.ToLocale().c_str());
     }
     #endif
 
@@ -211,7 +211,7 @@ int main( int argc, char *p_argv[] )
 /**
  * Retrieve current working directory
  */
-std::string GetCurrentWorkingDirectory()
+gd::String GetCurrentWorkingDirectory()
 {
     char path[2048];
     getcwd(path, 2048);
@@ -224,7 +224,7 @@ std::string GetCurrentWorkingDirectory()
 #include <windows.h>
 #include <Commdlg.h>
 #endif
-int AbortWithMessage(const std::string & message)
+int AbortWithMessage(const gd::String & message)
 {
     std::cout << message;
     #if defined(WINDOWS)

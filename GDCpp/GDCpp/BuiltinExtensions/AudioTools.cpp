@@ -71,7 +71,7 @@ bool GD_API SoundStopped( RuntimeScene & scene, unsigned int channel )
     return (SoundManager::Get()->GetSoundOnChannel(channel)->GetStatus() == sf::Sound::Stopped);
 }
 
-void GD_API PlaySoundOnChannel( RuntimeScene & scene, const std::string & file, unsigned int channel, bool repeat, float volume, float pitch )
+void GD_API PlaySoundOnChannel( RuntimeScene & scene, const gd::String & file, unsigned int channel, bool repeat, float volume, float pitch )
 {
     sf::Clock latency;
 
@@ -90,7 +90,7 @@ void GD_API PlaySoundOnChannel( RuntimeScene & scene, const std::string & file, 
     scene.NotifyPauseWasMade(latency.getElapsedTime().asMicroseconds());
 }
 
-void GD_API PlaySound( RuntimeScene & scene, const std::string & file, bool repeat, float volume, float pitch )
+void GD_API PlaySound( RuntimeScene & scene, const gd::String & file, bool repeat, float volume, float pitch )
 {
     sf::Clock latency;
 
@@ -125,7 +125,7 @@ void GD_API RePlaySoundOnChannel( RuntimeScene & scene, unsigned int channel )
     SoundManager::Get()->GetSoundOnChannel(channel)->sound.play();
 }
 
-void GD_API PlayMusic( RuntimeScene & scene, const std::string & file, bool repeat, float volume, float pitch )
+void GD_API PlayMusic( RuntimeScene & scene, const gd::String & file, bool repeat, float volume, float pitch )
 {
     SoundManager * soundManager = SoundManager::Get();
 
@@ -152,7 +152,7 @@ void GD_API PlayMusic( RuntimeScene & scene, const std::string & file, bool repe
     music->SetPitch(pitch);
 }
 
-void GD_API PlayMusicOnChannel( RuntimeScene & scene, const std::string & file, unsigned int channel , bool repeat, float volume, float pitch )
+void GD_API PlayMusicOnChannel( RuntimeScene & scene, const gd::String & file, unsigned int channel , bool repeat, float volume, float pitch )
 {
     SoundManager * soundManager = SoundManager::Get();
 

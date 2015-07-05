@@ -29,11 +29,11 @@ class GD_API CppPlatform : public gd::Platform
 {
 public:
 
-    virtual std::string GetName() const { return "GDevelop C++ platform"; }
+    virtual gd::String GetName() const { return "GDevelop C++ platform"; }
     #if defined(GD_IDE_ONLY)
-    virtual std::string GetFullName() const { return GD_T("Native (Windows or Linux games)"); }
-    virtual std::string GetSubtitle() const { return GD_T("C++ and OpenGL based games for Windows or Linux."); }
-    virtual std::string GetDescription() const;
+    virtual gd::String GetFullName() const { return GD_T("Native (Windows or Linux games)"); }
+    virtual gd::String GetSubtitle() const { return GD_T("C++ and OpenGL based games for Windows or Linux."); }
+    virtual gd::String GetDescription() const;
     #endif
 
     /**
@@ -52,10 +52,10 @@ public:
 
     /** \brief The name of the function searched in an extension file to create the extension
      */
-    virtual std::string GetExtensionCreateFunctionName() { return "CreateGDExtension"; }
+    virtual gd::String GetExtensionCreateFunctionName() { return "CreateGDExtension"; }
 
 #if defined(GD_IDE_ONLY)
-    virtual std::string GetIcon() const { return "CppPlatform/icon32.png"; }
+    virtual gd::String GetIcon() const { return "CppPlatform/icon32.png"; }
 
     /**
      * \brief We provide a specific ChangesNotifier to ensure that compilation jobs are done properly.
@@ -96,7 +96,7 @@ public:
     virtual ~CppPlatform() {};
 private:
 
-    std::map < std::string, CreateRuntimeObjectFunPtr > runtimeObjCreationFunctionTable; ///< The C++ Platform also need to store functions to create runtime objects.
+    std::map < gd::String, CreateRuntimeObjectFunPtr > runtimeObjCreationFunctionTable; ///< The C++ Platform also need to store functions to create runtime objects.
 #if defined(GD_IDE_ONLY)
     static ChangesNotifier changesNotifier;
 #if !defined(GD_NO_WX_GUI)

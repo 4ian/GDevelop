@@ -8,14 +8,17 @@
 
 #ifndef CODECOMPILER_H
 #define CODECOMPILER_H
+
 #include <string>
 #include <vector>
 #include <set>
 #include <SFML/System.hpp>
 #include <memory>
+#include "GDCpp/Utf8String.h"
 #include <wx/event.h>
 #include <wx/process.h>
 #include <wx/thread.h>
+
 class CodeCompilerExtraWork;
 namespace gd { class Layout; }
 class CodeCompilerThreadStateNotifier;
@@ -37,19 +40,19 @@ public:
     /**
      * Return the full command line that must be executed by the compiler
      */
-    std::string GetFullCall() const;
+    gd::String GetFullCall() const;
 
-    const std::string & GetCompilerExecutable() const { return compilerExecutable; }
-    void SetCompilerExecutable(const std::string & compilerExecutableFullPath) { compilerExecutable = compilerExecutableFullPath; }
+    const gd::String & GetCompilerExecutable() const { return compilerExecutable; }
+    void SetCompilerExecutable(const gd::String & compilerExecutableFullPath) { compilerExecutable = compilerExecutableFullPath; }
 
     bool link; ///< If set to true, the task must be to link the inputFile and extraInputFiles.
-    std::string inputFile; ///< The input file ( i.e. Source file if link == false, Object file if link == true )
-    std::string outputFile; ///< The output file ( i.e. Object file if link == false, shared library if link == true )
+    gd::String inputFile; ///< The input file ( i.e. Source file if link == false, Object file if link == true )
+    gd::String outputFile; ///< The output file ( i.e. Object file if link == false, shared library if link == true )
 
-    std::vector<std::string> extraObjectFiles; ///< Additional object files to be linked ( Only relevant when link is set to true )
-    std::vector<std::string> extraLibFiles; ///< Additional libraries files to be used ( Only relevant when link is set to true )
-    std::vector<std::string> extraHeaderDirectories; ///< Extra directories used when searching for includes.  ( Only relevant when link is set to false )
-    std::vector<std::string> extraOptions; ///< Extra options that will be added raw as the end of the command line.
+    std::vector<gd::String> extraObjectFiles; ///< Additional object files to be linked ( Only relevant when link is set to true )
+    std::vector<gd::String> extraLibFiles; ///< Additional libraries files to be used ( Only relevant when link is set to true )
+    std::vector<gd::String> extraHeaderDirectories; ///< Extra directories used when searching for includes.  ( Only relevant when link is set to false )
+    std::vector<gd::String> extraOptions; ///< Extra options that will be added raw as the end of the command line.
 
     bool optimize; ///< Activate optimization flag if set to true
     bool compilationForRuntime; ///< Automatically define GD_IDE_ONLY if set to true
@@ -65,7 +68,7 @@ public:
 
 private:
 
-    std::string compilerExecutable; ///< Automatically set up to the default compiler by the default constructor.
+    gd::String compilerExecutable; ///< Automatically set up to the default compiler by the default constructor.
 };
 
 /**
@@ -85,7 +88,7 @@ public:
     std::shared_ptr<CodeCompilerExtraWork> preWork;  ///< Pre work that will be launched before the compilation of the task is launched
     CodeCompilerCall compilerCall; ///< The main work to be executed
 
-    std::string userFriendlyName; ///< Task name displayed to the user
+    gd::String userFriendlyName; ///< Task name displayed to the user
     gd::Layout * scene; ///< Optional pointer to a scene to specify that the task work is related to this scene.
 
     /**
@@ -128,8 +131,8 @@ public:
     CodeCompilerProcess(wxEvtHandler * parent);
     virtual ~CodeCompilerProcess() {};
 
-    std::vector<std::string> output; ///< The output of the compiler. Must be filled thanks to a OutputReadingThread.
-    std::vector<std::string> outputErrors; ///< The error output of the compiler. Must be filled thanks to a OutputReadingThread.
+    std::vector<gd::String> output; ///< The output of the compiler. Must be filled thanks to a OutputReadingThread.
+    std::vector<gd::String> outputErrors; ///< The error output of the compiler. Must be filled thanks to a OutputReadingThread.
     wxEvtHandler * parent;
     int exitCode; ///< Available when the process has terminated.
 
@@ -204,12 +207,12 @@ public:
      * The directory is relative to the base directory ( which is by default the IDE directory. See CodeCompiler::SetBaseDirectory )
      * The directory can be absolute ( "C:\...", "/usr/..." ) even if it is not recommended.
      */
-    void AddHeaderDirectory(const std::string & dir);
+    void AddHeaderDirectory(const gd::String & dir);
 
     /**
      * Return a read-only reference to the vector containing the common headers directories
      */
-    const std::set<std::string> & GetAllHeadersDirectories() const { return headersDirectories; }
+    const std::set<gd::String> & GetAllHeadersDirectories() const { return headersDirectories; }
 
     /**
      * Add a (wxWidgets) control to the list of objects notified when progress has been made
@@ -229,7 +232,7 @@ public:
     /**
      * Get the output of the compiler for the last task.
      */
-    const std::string & GetLastTaskMessages() { return lastTaskMessages; };
+    const gd::String & GetLastTaskMessages() { return lastTaskMessages; };
 
     /**
      * Set if code compiler must delete temporaries files
@@ -245,23 +248,23 @@ public:
      * Set the directory used as the base directory for includes.
      * \note If the base directory does not end with a slash ( / ) or a backslash ( \ ), a slash is added at the end.
      */
-    void SetBaseDirectory(std::string baseDir_);
+    void SetBaseDirectory(gd::String baseDir_);
 
     /**
      * Return the directory used as the base directory for includes.
      */
-    const std::string & GetBaseDirectory() const { return baseDir; };
+    const gd::String & GetBaseDirectory() const { return baseDir; };
 
     /**
      * Set the directory used as temporary directory for output files.
      * \note If the base directory does not end with a slash ( / ) or a backslash ( \ ), a slash is added at the end.
      */
-    void SetOutputDirectory(std::string outputDir_);
+    void SetOutputDirectory(gd::String outputDir_);
 
     /**
      * Return the directory used as temporary directory for output files.
      */
-    const std::string & GetOutputDirectory() const { return outputDir; };
+    const gd::String & GetOutputDirectory() const { return outputDir; };
 
     /**
      * Erase all files in the output directory ( Even if MustDeleteTemporaries() == false ).
@@ -332,14 +335,14 @@ private:
     std::vector < gd::Layout* > compilationDisallowed; ///< List of scenes which disallow their events to be compiled. (However, if a compilation is being made, it will not be stopped)
 
     //Global compiler configuration
-    std::string baseDir; ///< The directory used as the base directory for searching for includes files.
-    std::string outputDir; ///< The directory where temporary files are created
-    std::set < std::string > headersDirectories; ///< List of headers that should be used for every compilation task
+    gd::String baseDir; ///< The directory used as the base directory for searching for includes files.
+    gd::String outputDir; ///< The directory where temporary files are created
+    std::set < gd::String > headersDirectories; ///< List of headers that should be used for every compilation task
     bool mustDeleteTemporaries; ///< True if temporary must be deleted
 
     //Gui related
     std::set<wxEvtHandler*> notifiedControls; ///< List of wxWidgets controls to be notified when some progress has been made.
-    std::string lastTaskMessages;  ///< String containing the messages emitted by the compiler for the latest task.
+    gd::String lastTaskMessages;  ///< String containing the messages emitted by the compiler for the latest task.
     bool lastTaskFailed; ///< Set to true when a task fail.
 
     CodeCompiler();

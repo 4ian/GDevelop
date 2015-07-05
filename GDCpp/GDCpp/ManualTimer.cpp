@@ -7,7 +7,7 @@ isPaused(false)
     //ctor
 }
 
-ManualTimer::ManualTimer(std::string name_) :
+ManualTimer::ManualTimer(gd::String name_) :
 name(name_),
 time(0),
 isPaused(false)

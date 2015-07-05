@@ -13,7 +13,7 @@ void ObjInstancesHolder::AddObject(const RuntimeObjSPtr & object)
     objectsRawPointersInstances[object->GetName()].push_back(object.get());
 }
 
-std::vector<RuntimeObject*> ObjInstancesHolder::GetObjectsRawPointers(const std::string & name)
+std::vector<RuntimeObject*> ObjInstancesHolder::GetObjectsRawPointers(const gd::String & name)
 {
     return objectsRawPointersInstances[name];
 }
@@ -23,7 +23,7 @@ void ObjInstancesHolder::ObjectNameHasChanged(RuntimeObject * object)
     std::shared_ptr<RuntimeObject> theObject; //We need the object to keep alive.
 
     //Find and erase the object from the object lists.
-    for (std::unordered_map<std::string, RuntimeObjList>::iterator it = objectsInstances.begin() ; it != objectsInstances.end(); ++it )
+    for (std::unordered_map<gd::String, RuntimeObjList>::iterator it = objectsInstances.begin() ; it != objectsInstances.end(); ++it )
     {
         RuntimeObjList & list = it->second;
         for (unsigned int i = 0;i<list.size();++i)
@@ -37,7 +37,7 @@ void ObjInstancesHolder::ObjectNameHasChanged(RuntimeObject * object)
         }
     }
     //Find and erase the object from the object raw pointers lists.
-    for (std::unordered_map<std::string, std::vector<RuntimeObject*> >::iterator it = objectsRawPointersInstances.begin() ; it != objectsRawPointersInstances.end(); ++it )
+    for (std::unordered_map<gd::String, std::vector<RuntimeObject*> >::iterator it = objectsRawPointersInstances.begin() ; it != objectsRawPointersInstances.end(); ++it )
     {
         std::vector<RuntimeObject*> & associatedList = it->second;
         associatedList.erase(std::remove(associatedList.begin(), associatedList.end(), object), associatedList.end());
@@ -50,7 +50,7 @@ void ObjInstancesHolder::Init(const ObjInstancesHolder & other)
 {
     objectsInstances.clear();
     objectsRawPointersInstances.clear();
-    for (std::unordered_map<std::string, RuntimeObjList>::const_iterator it = other.objectsInstances.begin() ;
+    for (std::unordered_map<gd::String, RuntimeObjList>::const_iterator it = other.objectsInstances.begin() ;
         it != other.objectsInstances.end(); ++it )
     {
         for (unsigned int i = 0;i<it->second.size();++i) //We need to really copy the objects

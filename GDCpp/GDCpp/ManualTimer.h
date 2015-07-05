@@ -6,6 +6,7 @@
 #ifndef MANUALTIMER_H
 #define MANUALTIMER_H
 #include <string>
+#include "GDCpp/Utf8String.h"
 
 /**
  * \brief Manual timer updated using ManualTimer::UpdateTime member function.
@@ -24,7 +25,7 @@ class GD_API ManualTimer
          * Constructor
          * \param name_ The name of the timer
          */
-        ManualTimer(std::string name_);
+        ManualTimer(gd::String name_);
 
         virtual ~ManualTimer();
 
@@ -32,7 +33,7 @@ class GD_API ManualTimer
          * Get the name of the timer
          * @return Timer's name
          */
-        inline std::string GetName() { return name; };
+        inline gd::String GetName() { return name; };
 
         /**
          * Update the time of the timer
@@ -72,10 +73,9 @@ class GD_API ManualTimer
 
     private:
 
-        std::string name; ///< The name of the timer
+        gd::String name; ///< The name of the timer
         signed long long time; ///< Time elapsed in microseconds
         bool isPaused; ///< True if timer is paused
 };
 
 #endif // MANUALTIMER_H
-

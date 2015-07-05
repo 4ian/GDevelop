@@ -59,8 +59,8 @@ public :
     virtual bool Draw(sf::RenderTarget & renderTarget);
 
     #if defined(GD_IDE_ONLY)
-    virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
-    virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
+    virtual void GetPropertyForDebugger (unsigned int propertyNb, gd::String & name, gd::String & value) const;
+    virtual bool ChangeProperty(unsigned int propertyNb, gd::String newValue);
     virtual unsigned int GetNumberOfProperties() const;
     #endif
 
@@ -80,8 +80,8 @@ public :
     virtual float GetCenterX() const;
     virtual float GetCenterY() const;
 
-    float GetPointX(const std::string & point) const;
-    float GetPointY(const std::string & point) const;
+    float GetPointX(const gd::String & point) const;
+    float GetPointY(const gd::String & point) const;
 
     void UpdateCurrentSprite() const;
     const sf::Sprite & GetCurrentSFMLSprite() const;
@@ -150,15 +150,15 @@ public :
     /**
      * Only used internally by GD events generated code: Prefer using (Get/Set)Scale(X/Y).
      */
-    void ChangeScale(const std::string & operatorStr, double newValue);
+    void ChangeScale(const gd::String & operatorStr, double newValue);
 
     /**
      * Only used internally by GD events generated code: Prefer using original SetColor.
      */
-    void SetColor(const std::string & colorStr);
+    void SetColor(const gd::String & colorStr);
 
-    void CopyImageOnImageOfCurrentSprite(RuntimeScene & scene, const std::string & imageName, float xPosition, float yPosition, bool useTransparency);
-    void MakeColorTransparent( const std::string & colorStr );
+    void CopyImageOnImageOfCurrentSprite(RuntimeScene & scene, const gd::String & imageName, float xPosition, float yPosition, bool useTransparency);
+    void MakeColorTransparent( const gd::String & colorStr );
 
 private:
 

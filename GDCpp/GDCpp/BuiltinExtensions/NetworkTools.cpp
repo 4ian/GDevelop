@@ -23,25 +23,25 @@ using namespace std;
  * Php web page has to known the same password, and will applied md5 ont on the data+the password to
  * be sure data were not modified.
 */
-void GD_API SendDataToPhpWebPage(const std::string & webpageurl,
-    const std::string & password,
-    const std::string & data1,
-    const std::string & data2,
-    const std::string & data3,
-    const std::string & data4,
-    const std::string & data5,
-    const std::string & data6)
+void GD_API SendDataToPhpWebPage(const gd::String & webpageurl,
+    const gd::String & password,
+    const gd::String & data1,
+    const gd::String & data2,
+    const gd::String & data3,
+    const gd::String & data4,
+    const gd::String & data5,
+    const gd::String & data6)
 {
-    string data1md5 = md5(data1+password); //On leur ajoute le mot de passe
-    string data2md5 = md5(data2+password); //Et on effectue la somme de contrôle
-    string data3md5 = md5(data3+password);
-    string data4md5 = md5(data4+password);
-    string data5md5 = md5(data5+password);
-    string data6md5 = md5(data6+password);
+    gd::String data1md5 = md5(data1+password); //On leur ajoute le mot de passe
+    gd::String data2md5 = md5(data2+password); //Et on effectue la somme de contrï¿½le
+    gd::String data3md5 = md5(data3+password);
+    gd::String data4md5 = md5(data4+password);
+    gd::String data5md5 = md5(data5+password);
+    gd::String data6md5 = md5(data6+password);
 
 #ifdef WINDOWS
-    //Création de l'adresse internet à lancer
-    string call = "start \"\" \""+webpageurl+
+    //Crï¿½ation de l'adresse internet ï¿½ lancer
+    gd::String call = "start \"\" \""+webpageurl+
                    "?data1="+data1+"&check1="+data1md5+
                    "&data2="+data2+"&check2="+data2md5+
                    "&data3="+data3+"&check3="+data3md5+
@@ -49,10 +49,10 @@ void GD_API SendDataToPhpWebPage(const std::string & webpageurl,
                    "&data5="+data5+"&check5="+data5md5+
                    "&data6="+data6+"&check6="+data6md5+"\"";
 
-    system(call.c_str());
+    system(call.ToLocale().c_str());
 #elif defined(LINUX)
-    //Nécessite le paquet xdg-utils
-    string call = "xdg-open \""+webpageurl+
+    //Nï¿½cessite le paquet xdg-utils
+    gd::String call = "xdg-open \""+webpageurl+
                    "?data1="+data1+"&check1="+data1md5+
                    "&data2="+data2+"&check2="+data2md5+
                    "&data3="+data3+"&check3="+data3md5+
@@ -60,9 +60,9 @@ void GD_API SendDataToPhpWebPage(const std::string & webpageurl,
                    "&data5="+data5+"&check5="+data5md5+
                    "&data6="+data6+"&check6="+data6md5+"\"";
 
-    system(call.c_str());
+    system(call.ToLocale().c_str());
 #elif defined(MACOS)
-    string call = "open \""+webpageurl+
+    gd::String call = "open \""+webpageurl+
                    "?data1="+data1+"&check1="+data1md5+
                    "&data2="+data2+"&check2="+data2md5+
                    "&data3="+data3+"&check3="+data3md5+
@@ -70,51 +70,51 @@ void GD_API SendDataToPhpWebPage(const std::string & webpageurl,
                    "&data5="+data5+"&check5="+data5md5+
                    "&data6="+data6+"&check6="+data6md5+"\"";
 
-    system(call.c_str());
+    system(call.ToLocale().c_str());
 #endif
 
     return;
 }
 
-void GD_API SendHttpRequest(const std::string & host, const std::string & uri, const std::string & body,
-    const std::string & method, const std::string & contentType, gd::Variable & responseVar)
+void GD_API SendHttpRequest(const gd::String & host, const gd::String & uri, const gd::String & body,
+    const gd::String & method, const gd::String & contentType, gd::Variable & responseVar)
 {
     // Create Http
     sf::Http Http;
-    Http.setHost(host);
+    Http.setHost(host.ToUTF8());
 
     // Create request
     sf::Http::Request request;
     request.setMethod(method == "POST" ? sf::Http::Request::Post : sf::Http::Request::Get);
-    request.setField("Content-Type", contentType.empty() ? "application/x-www-form-urlencoded" : contentType);
-    request.setUri(uri);
-    request.setBody(body);
+    request.setField("Content-Type", contentType.empty() ? "application/x-www-form-urlencoded" : contentType.ToUTF8());
+    request.setUri(uri.ToUTF8());
+    request.setBody(body.ToUTF8());
 
     // Send request & Get response
     sf::Http::Response response = Http.sendRequest(request);
 
     if (response.getStatus() == sf::Http::Response::Ok)
     {
-        responseVar.SetString(response.getBody());
+        responseVar.SetString(gd::String::FromUTF8(response.getBody()));
     }
     //else request failed.
 }
 
-void GD_API DownloadFile( const std::string & host, const std::string & uri, const std::string & outputfilename )
+void GD_API DownloadFile( const gd::String & host, const gd::String & uri, const gd::String & outputfilename )
 {
     // Create Http
     sf::Http Http;
-    Http.setHost(host);
+    Http.setHost(host.ToUTF8());
 
     // Create request
     sf::Http::Request Request;
     Request.setMethod(sf::Http::Request::Get);
-    Request.setUri(uri);
+    Request.setUri(uri.ToUTF8());
 
     // Send request & Get response
     sf::Http::Response datas = Http.sendRequest(Request);
 
-    ofstream ofile(outputfilename.c_str(), ios_base::binary);
+    ofstream ofile(outputfilename.ToLocale().c_str(), ios_base::binary);
     if ( ofile.is_open() )
     {
         ofile.write(datas.getBody().c_str(),datas.getBody().size());
@@ -222,22 +222,22 @@ namespace
     }
 }
 
-std::string GD_API VariableStructureToJSON(const gd::Variable & variable)
+gd::String GD_API VariableStructureToJSON(const gd::Variable & variable)
 {
     if ( !variable.IsStructure() ) {
         if ( variable.IsNumber() )
-            return ToString(variable.GetValue());
+            return gd::String::FromDouble(variable.GetValue());
         else
-            return StringToQuotedJSONString(variable.GetString().c_str());
+            return gd::String::FromUTF8(StringToQuotedJSONString(variable.GetString().c_str()));
     }
 
-    std::string str = "{";
+    gd::String str = "{";
     bool firstChild = true;
-    for(std::map<std::string, gd::Variable>::const_iterator i = variable.GetAllChildren().begin();
+    for(std::map<gd::String, gd::Variable>::const_iterator i = variable.GetAllChildren().begin();
         i != variable.GetAllChildren().end();++i)
     {
         if ( !firstChild ) str += ",";
-        str += StringToQuotedJSONString(i->first.c_str())+": "+VariableStructureToJSON(i->second);
+        str += gd::String::FromUTF8(StringToQuotedJSONString(i->first.c_str()))+": "+VariableStructureToJSON(i->second);
 
         firstChild = false;
     }
@@ -384,7 +384,7 @@ namespace
                 if ( pos >= jsonStr.length() || jsonStr[pos] != ':' ) return std::string::npos;
 
                 pos++;
-                pos = ::ParseJSONObject(jsonStr, pos, variable.GetChild(childName));
+                pos = ::ParseJSONObject(jsonStr, pos, variable.GetChild(gd::String::FromUTF8(childName)));
 
                 pos = SkipBlankChar(jsonStr, pos);
                 if ( pos >= jsonStr.length()) return std::string::npos;
@@ -404,7 +404,7 @@ namespace
             {
                 pos++;
                 if (pos < jsonStr.length() && jsonStr[pos] == ']' ) break;
-                pos = ::ParseJSONObject(jsonStr, pos, variable.GetChild(ToString(index)));
+                pos = ::ParseJSONObject(jsonStr, pos, variable.GetChild(gd::String::FromUInt(index)));
 
                 pos = SkipBlankChar(jsonStr, pos);
                 if ( pos >= jsonStr.length()) {
@@ -429,7 +429,7 @@ namespace
                 return std::string::npos;
             }
 
-            variable.SetString(str);
+            variable.SetString(gd::String::FromUTF8(str));
             return pos+1;
         }
         else
@@ -453,8 +453,8 @@ namespace
     }
 }
 
-void GD_API JSONToVariableStructure(const std::string & jsonStr, gd::Variable & variable)
+void GD_API JSONToVariableStructure(const gd::String & jsonStr, gd::Variable & variable)
 {
     if ( jsonStr.empty() ) return;
-    ::ParseJSONObject(jsonStr, 0, variable);
+    ::ParseJSONObject(jsonStr.c_str(), 0, variable);
 }

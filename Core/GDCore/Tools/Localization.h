@@ -19,7 +19,7 @@
     #define GD_T(s) gd::String(wxGetTranslation(u8##s))
 #else
     //Ensure the internationalization macro is still defined as code rely on it:
-    #define GD_T(x) gd::String(u8##s)
+    #define GD_T(s) gd::String(u8##s)
 
     //Create a new macro to return UTF8 gd::String from a translation
  	#if defined(_)

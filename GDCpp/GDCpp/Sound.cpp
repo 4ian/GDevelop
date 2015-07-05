@@ -13,7 +13,7 @@
 
 using namespace std;
 
-Sound::Sound(string pFile) :
+Sound::Sound(gd::String pFile) :
 file(pFile),
 volume(100)
 {

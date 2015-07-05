@@ -33,16 +33,16 @@ SceneExtension::SceneExtension()
     {
         class CodeGenerator : public gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator
         {
-            virtual std::string GenerateCode(gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
+            virtual gd::String GenerateCode(gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
             {
-                std::string value1Code;
+                gd::String value1Code;
                 {
                     gd::CallbacksForGeneratingExpressionCode callbacks(value1Code, codeGenerator, context);
                     gd::ExpressionParser parser(instruction.GetParameters()[0].GetPlainString());
                     if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || value1Code.empty()) value1Code = "0";
                 }
 
-                std::string value2Code;
+                gd::String value2Code;
                 {
                     gd::CallbacksForGeneratingExpressionCode callbacks(value2Code, codeGenerator, context);
                     gd::ExpressionParser parser(instruction.GetParameters()[2].GetPlainString());

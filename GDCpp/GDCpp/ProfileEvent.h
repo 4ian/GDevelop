@@ -27,7 +27,7 @@ public:
     void SetPreviousProfileEvent( std::shared_ptr<ProfileEvent> previousProfileEvent_ ) { previousProfileEvent = previousProfileEvent_; }
 
     virtual bool IsExecutable() const {return true;}
-    virtual std::string GenerateEventCode(gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context);
+    virtual gd::String GenerateEventCode(gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context);
 
     unsigned int index;
 

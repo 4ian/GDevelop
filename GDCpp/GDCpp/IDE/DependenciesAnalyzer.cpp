@@ -59,7 +59,7 @@ bool DependenciesAnalyzer::Analyze(gd::EventsList & events, bool isOnTopLevel)
 
             DependenciesAnalyzer analyzer(*this);
 
-            std::string linked = linkEvent.GetTarget();
+            gd::String linked = linkEvent.GetTarget();
             if ( project.HasExternalEventsNamed(linked) )
             {
                 if ( std::find(parentExternalEvents.begin(), parentExternalEvents.end(), linked) != parentExternalEvents.end() )
@@ -101,7 +101,7 @@ bool DependenciesAnalyzer::Analyze(gd::EventsList & events, bool isOnTopLevel)
         try {
             CppCodeEvent & cppCodeEvent = dynamic_cast<CppCodeEvent &>(events[i]);
 
-            const std::vector<std::string> & dependencies = cppCodeEvent.GetDependencies();
+            const std::vector<gd::String> & dependencies = cppCodeEvent.GetDependencies();
             sourceFilesDependencies.insert(dependencies.begin(), dependencies.end());
             sourceFilesDependencies.insert(cppCodeEvent.GetAssociatedGDManagedSourceFile(project));
         } catch(...) {}
@@ -116,7 +116,7 @@ bool DependenciesAnalyzer::Analyze(gd::EventsList & events, bool isOnTopLevel)
     return true;
 }
 
-std::string DependenciesAnalyzer::ExternalEventsCanBeCompiledForAScene()
+gd::String DependenciesAnalyzer::ExternalEventsCanBeCompiledForAScene()
 {
     if ( !externalEvents )
     {
@@ -124,14 +124,14 @@ std::string DependenciesAnalyzer::ExternalEventsCanBeCompiledForAScene()
         return "";
     }
 
-    std::string sceneName;
+    gd::String sceneName;
     for (unsigned int i = 0;i<project.GetLayoutsCount();++i)
     {
         //For each layout, compute the dependencies and the dependencies which are not coming from a top level event.
         DependenciesAnalyzer analyzer(project, project.GetLayout(i));
         if ( !analyzer.Analyze() ) continue; //Analyze failed -> Cyclic dependencies
-        const std::set <std::string > & dependencies = analyzer.GetExternalEventsDependencies();
-        const std::set <std::string > & notTopLevelDependencies = analyzer.GetNotTopLevelExternalEventsDependencies();
+        const std::set <gd::String > & dependencies = analyzer.GetExternalEventsDependencies();
+        const std::set <gd::String > & notTopLevelDependencies = analyzer.GetNotTopLevelExternalEventsDependencies();
 
         //Check if the external events is a dependency, and that is is only present as a link on the top level.
         if ( dependencies.find(externalEvents->GetName()) != dependencies.end() &&

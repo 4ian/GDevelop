@@ -13,7 +13,7 @@ DatFile::~DatFile (void)
     if (m_buffer!=NULL)
         delete (m_buffer);
 }
-bool DatFile::Create (std::vector<std::string> files, std::string directory, std::string destination)
+bool DatFile::Create (std::vector<gd::String> files, gd::String directory, gd::String destination)
 {
     //An file entry in order to push it in the object's std::vector
     sFileEntry entry;
@@ -37,8 +37,8 @@ bool DatFile::Create (std::vector<std::string> files, std::string directory, std
     //Next, we open each file in orderto create the File Entries Table
     for (unsigned int i = 0; i<files.size(); i++)
     {
-        string fileToOpen = directory + "/" + files[i];
-        file.open (fileToOpen.c_str(), std::ifstream::in | std::ifstream::binary);
+        gd::String fileToOpen = directory + "/" + files[i];
+        file.open (fileToOpen.ToLocale().c_str(), std::ifstream::in | std::ifstream::binary);
         if (file.is_open())
         {
             //Filling the FileEntry with 0
@@ -75,7 +75,7 @@ bool DatFile::Create (std::vector<std::string> files, std::string directory, std
     }
 
     //And finally, we are writing the DAT file
-    datfile.open (destination.c_str(), std::ofstream::out | std::ofstream::binary);
+    datfile.open (destination.ToLocale().c_str(), std::ofstream::out | std::ofstream::binary);
 
     //First, we write the header
     datfile.write ((char*)&m_header, sizeof(sDATHeader) );
@@ -89,8 +89,8 @@ bool DatFile::Create (std::vector<std::string> files, std::string directory, std
     //Finally, we write each file
     for (unsigned int i = 0; i<m_entries.size(); i++)
     {
-        string fileToOpen = directory + "/" + files[i];
-        file.open (fileToOpen.c_str(), std::ifstream::in | std::ifstream::binary);
+        gd::String fileToOpen = directory + "/" + files[i];
+        file.open (fileToOpen.ToLocale().c_str(), std::ifstream::in | std::ifstream::binary);
         if (file.is_open())
         {
             file.seekg (0, std::ios::beg);
@@ -110,7 +110,7 @@ bool DatFile::Create (std::vector<std::string> files, std::string directory, std
 /**
 * Load the DatFile from a file. Return true on success
 */
-bool DatFile::Read (std::string source)
+bool DatFile::Read (gd::String source)
 {
     bool success = false;
 
@@ -122,7 +122,7 @@ bool DatFile::Read (std::string source)
     //Filling the header with 0
     memset (&m_header, 0, sizeof(m_header));
     //We open the DAT file to read it
-    datfile.open (source.c_str(), std::ifstream::in | std::ifstream::binary);
+    datfile.open (source.ToLocale().c_str(), std::ifstream::in | std::ifstream::binary);
     if (datfile.is_open())
     {
         //Getting to the Header position
@@ -149,21 +149,21 @@ bool DatFile::Read (std::string source)
 ////////////////////////////////////////////////////////////
 /// Check if the DatFile contains a file
 ////////////////////////////////////////////////////////////
-bool DatFile::ContainsFile(const std::string & filename)
+bool DatFile::ContainsFile(const gd::String & filename)
 {
     if ( m_header.nb_files != m_entries.size() )
         return false;
 
     for (unsigned int i=0; i<m_header.nb_files;i++)
     {
-        if (m_entries[i].name == filename)
+        if (m_entries[i].name == filename.c_str())
             return true;
     }
 
     return false;
 }
 
-char* DatFile::GetFile (std::string filename)
+char* DatFile::GetFile (gd::String filename)
 {
     //The input file stream from which we want information
     std::ifstream datfile;
@@ -179,7 +179,7 @@ char* DatFile::GetFile (std::string filename)
     for (unsigned int i=0; i<m_header.nb_files;i++)
     {
         //If we found it
-        if (m_entries[i].name == filename)
+        if (m_entries[i].name == filename.c_str())
         {
             //We are allocating memory to the buffer
             m_buffer = new char[(m_entries[i].size)];
@@ -191,7 +191,7 @@ char* DatFile::GetFile (std::string filename)
             }
 
             //Opening the DAT file ot read the file datas needed
-            datfile.open (m_datfile.c_str(), std::ifstream::in | std::ifstream::binary);
+            datfile.open (m_datfile.ToLocale().c_str(), std::ifstream::in | std::ifstream::binary);
             if (datfile.is_open())
             {
                 //Going to the right position
@@ -211,13 +211,13 @@ char* DatFile::GetFile (std::string filename)
     return (NULL);
 }
 
-long int DatFile::GetFileSize (std::string filename)
+long int DatFile::GetFileSize (gd::String filename)
 {
     //First, we have to find the file needed
     for (unsigned int i=0; i<m_header.nb_files;i++)
     {
         //If we found it
-        if (m_entries[i].name == filename)
+        if (m_entries[i].name == filename.c_str())
         {
             //Returning the size of the file found
             return (m_entries[i].size);
@@ -225,4 +225,3 @@ long int DatFile::GetFileSize (std::string filename)
     }
     return (0);
 }
-

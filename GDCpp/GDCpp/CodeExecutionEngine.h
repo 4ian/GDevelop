@@ -75,16 +75,16 @@ public:
      *
      * \return true if the CodeExecutionEngine is successfully initialized and Execute() can be called.
      */
-    bool LoadFromDynamicLibrary(const std::string & filename, const std::string & mainFunctionName);
+    bool LoadFromDynamicLibrary(const gd::String & filename, const gd::String & mainFunctionName);
 
     RuntimeContext runtimeContext; ///< The object passed as parameter to the function of the dynamic library.
 
 private:
 
     bool loaded; ///< True if a dynamic library is loaded and a function is ready to be executed.
-    std::string dynamicLibraryFilename; ///< The filename of the dynamic library loaded in memory.
+    gd::String dynamicLibraryFilename; ///< The filename of the dynamic library loaded in memory.
     Handle dynamicLibrary; ///< The dynamic library loaded in memory.
-    std::string functionName; ///< The name of the function of the dynamic library to be executed.
+    gd::String functionName; ///< The name of the function of the dynamic library to be executed.
     void * function; ///< Pointer to function to be executed.
 
     void Init(const CodeExecutionEngine & other);

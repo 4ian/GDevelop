@@ -5,6 +5,8 @@
 #define EXECUTABLEICONCHANGER_H
 
 #include <string>
+#include "GDCpp/Utf8String.h"
+
 #if defined(WINDOWS)
 struct ICONHEADER;
 struct ICONIMAGE;
@@ -15,11 +17,11 @@ struct GRPICONHEADER;
 class GD_API ExecutableIconChanger
 {
     public:
-        static bool ChangeWindowsExecutableIcon(std::string exeFile, std::string iconFile);
+        static bool ChangeWindowsExecutableIcon(gd::String exeFile, gd::String iconFile);
 
     private:
         #if defined(WINDOWS)
-        static bool LoadIcon(std::string iconFile, ICONHEADER*& pHeader, ICONIMAGE**& pIcons, GRPICONHEADER*& pGrpHeader);
+        static bool LoadIcon(gd::String iconFile, ICONHEADER*& pHeader, ICONIMAGE**& pIcons, GRPICONHEADER*& pGrpHeader);
         #endif
 };
 

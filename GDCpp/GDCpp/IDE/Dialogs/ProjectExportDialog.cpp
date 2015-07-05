@@ -213,10 +213,10 @@ public:
         staticText1->SetLabel(_("Compilation finished")); staticText2->SetLabel(_("Compiled project is now available in the export folder."));
         if ( wxMessageBox(_("Compilation achieved. Do you want to open the folder where the project has been compiled\?"), _("Compilation finished"), wxYES_NO) == wxYES )
         {
-            gd::ShowFolder(gd::ToString(destinationDirectory));
+            gd::ShowFolder(destinationDirectory);
         }
     }
-    virtual void OnMessage(std::string message, std::string message2) { staticText1->SetLabel(message); staticText2->SetLabel(message2); };
+    virtual void OnMessage(gd::String message, gd::String message2) { staticText1->SetLabel(message); staticText2->SetLabel(message2); };
     virtual void OnPercentUpdate(float percents) { gauge->SetValue(percents); };
 
     wxStaticText * staticText1;
@@ -239,15 +239,15 @@ void ProjectExportDialog::OnCompilBtClick( wxCommandEvent& event )
         return;
     }
 
-    gameToCompile.SetLastCompilationDirectory(ToString(dirEdit->GetValue()));
+    gameToCompile.SetLastCompilationDirectory(dirEdit->GetValue());
 
     wxString tempDir;
     wxConfigBase::Get()->Read( _T( "/Dossier/Compilation" ), &tempDir );
 
     FullProjectCompilerDialogDiagnosticManager diagnosticManager(statusTxt, status2Txt, AvancementGauge, dirEdit->GetValue());
-    GDpriv::FullProjectCompiler compilationManager(gameToCompile, diagnosticManager, ToString(dirEdit->GetValue()));
+    GDpriv::FullProjectCompiler compilationManager(gameToCompile, diagnosticManager, dirEdit->GetValue());
 
-    compilationManager.SetForcedTempDir(ToString(tempDir));
+    compilationManager.SetForcedTempDir(tempDir);
     compilationManager.CompressIfPossible(compressCheck->GetValue());
     compilationManager.Optimize(optimizationCheck->GetValue());
 

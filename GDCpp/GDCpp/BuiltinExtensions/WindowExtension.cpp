@@ -42,13 +42,13 @@ void WindowExtension::ExposeActionsResources(gd::Instruction & action, gd::Arbit
 {
     if ( action.GetType() == "EcrireTexte" && !action.GetParameter( 6 ).GetPlainString().empty() )
     {
-        std::string parameter = action.GetParameter(6).GetPlainString();
+        gd::String parameter = action.GetParameter(6).GetPlainString();
         worker.ExposeFile(parameter);
         action.SetParameter(6, parameter);
     }
     if ( action.GetType() == "SetWindowIcon" && !action.GetParameter( 1 ).GetPlainString().empty() )
     {
-        std::string parameter = action.GetParameter(1).GetPlainString();
+        gd::String parameter = action.GetParameter(1).GetPlainString();
         worker.ExposeImage(parameter);
         action.SetParameter(1, parameter);
     }

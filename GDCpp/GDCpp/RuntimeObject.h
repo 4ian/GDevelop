@@ -11,6 +11,7 @@
 #include <map>
 #include "GDCpp/RuntimeVariablesContainer.h"
 #include "GDCpp/Force.h"
+#include "GDCpp/Utf8String.h"
 namespace gd { class Automatism; }
 namespace gd { class InitialInstance; }
 namespace gd { class Object; }
@@ -126,28 +127,28 @@ public:
     /**
      * Only used by GD events generated code
      */
-    gd::Automatism* GetAutomatismRawPointer(const std::string & name);
+    gd::Automatism* GetAutomatismRawPointer(const gd::String & name);
 
     /**
      * Only used by GD events generated code
      */
-    gd::Automatism* GetAutomatismRawPointer(const std::string & name) const;
+    gd::Automatism* GetAutomatismRawPointer(const gd::String & name) const;
 
     /**
      * \brief Return true if the object has the automatism with the specified name.
      */
-    virtual bool HasAutomatismNamed(const std::string & name) const { return automatisms.find(name) != automatisms.end(); };
+    virtual bool HasAutomatismNamed(const gd::String & name) const { return automatisms.find(name) != automatisms.end(); };
     ///@}
 
     /**
      * \brief Get the name of the object
      */
-    inline const std::string & GetName() const { return name; };
+    inline const gd::String & GetName() const { return name; };
 
     /**
      * \brief Get the type of the object
      */
-    inline const std::string & GetType() const { return type; };
+    inline const gd::String & GetType() const { return type; };
 
     /**
      * \brief Query the Z order of the object
@@ -177,17 +178,17 @@ public:
     /**
      * \brief Change the layer of the object
      */
-    inline void SetLayer(const std::string & layer_) { layer = layer_;}
+    inline void SetLayer(const gd::String & layer_) { layer = layer_;}
 
     /**
      * \brief Get the layer of the object
      */
-    inline const std::string & GetLayer() const { return layer; }
+    inline const gd::String & GetLayer() const { return layer; }
 
     /**
      * \brief Check if the object is on a layer.
      */
-    inline bool IsOnLayer(const std::string & layer_) const { return layer == layer_; }
+    inline bool IsOnLayer(const gd::String & layer_) const { return layer == layer_; }
 
     /**
      * \brief Get the object hitbox(es)
@@ -363,7 +364,7 @@ public:
      * else if ( propertyNb == 1 ) {name = _("AnotherProperty");       value = GetAnotherPropety();}
      * \endcode
      */
-    virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
+    virtual void GetPropertyForDebugger (unsigned int propertyNb, gd::String & name, gd::String & value) const;
 
     /**
      * \brief Called by the debugger so as to update a property
@@ -377,7 +378,7 @@ public:
      * else if ( propertyNb == 1 ) {return false;} //Changing property is not allowed: returning false.
      * \endcode
      */
-    virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
+    virtual bool ChangeProperty(unsigned int propertyNb, gd::String newValue);
 
     /**
      * \brief Must return the number of available properties for the debugger.
@@ -404,17 +405,17 @@ public:
     void Rotate(float speed, RuntimeScene & scene);
 
     static gd::Variable & ReturnVariable(gd::Variable & variable) { return variable; };
-    bool VariableExists(const std::string & variable);
+    bool VariableExists(const gd::String & variable);
     static double GetVariableValue(const gd::Variable & variable) { return variable.GetValue(); };
-    static const std::string& GetVariableString(const gd::Variable & variable) { return variable.GetString(); };
-    static bool VariableChildExists(const gd::Variable & variable, const std::string & childName);
-    static void VariableRemoveChild(gd::Variable & variable, const std::string & childName);
+    static const gd::String& GetVariableString(const gd::Variable & variable) { return variable.GetString(); };
+    static bool VariableChildExists(const gd::Variable & variable, const gd::String & childName);
+    static void VariableRemoveChild(gd::Variable & variable, const gd::String & childName);
 
     void SetXY( const char* xOperator, float xValue, const char* yOperator, float yValue );
 
-    void Duplicate( RuntimeScene & scene, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists );
-    void ActivateAutomatism( const std::string & automatismName, bool activate = true );
-    bool AutomatismActivated( const std::string & automatismName );
+    void Duplicate( RuntimeScene & scene, std::map <gd::String, std::vector<RuntimeObject*> *> pickedObjectLists );
+    void ActivateAutomatism( const gd::String & automatismName, bool activate = true );
+    bool AutomatismActivated( const gd::String & automatismName );
 
     bool IsStopped();
     bool TestAngleOfDisplacement( float angle, float tolerance );
@@ -422,27 +423,27 @@ public:
     double GetSqDistanceWithObject( RuntimeObject * other );
     double GetDistanceWithObject( RuntimeObject * other );
 
-    bool SeparateFromObjects( std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists);
+    bool SeparateFromObjects( std::map <gd::String, std::vector<RuntimeObject*> *> pickedObjectLists);
 
     /** \deprecated
      */
-    void SeparateObjectsWithoutForces( std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists);
+    void SeparateObjectsWithoutForces( std::map <gd::String, std::vector<RuntimeObject*> *> pickedObjectLists);
 
     /** \deprecated
      */
-    void SeparateObjectsWithForces( std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists);
+    void SeparateObjectsWithForces( std::map <gd::String, std::vector<RuntimeObject*> *> pickedObjectLists);
     ///@}
 
 protected:
 
-    std::string                                             name; ///< The full name of the object
-    std::string                                             type; ///< Which type is the object. ( To test if we can do something reserved to some objects with it )
+    gd::String                                             name; ///< The full name of the object
+    gd::String                                             type; ///< Which type is the object. ( To test if we can do something reserved to some objects with it )
     float                                                   X; ///<X position on the scene
     float                                                   Y; ///<Y position on the scene
     int                                                     zOrder; ///<Z order on the scene, to choose if an object is displayed before another object.
     bool                                                    hidden; ///<True to prevent the object from being rendered.
-    std::string                                             layer; ///<Name of the layer on which the object is.
-    std::map<std::string, gd::Automatism* >                 automatisms; ///<Contains all automatisms of the object. Automatisms are the ownership of the object
+    gd::String                                             layer; ///<Name of the layer on which the object is.
+    std::map<gd::String, gd::Automatism* >                 automatisms; ///<Contains all automatisms of the object. Automatisms are the ownership of the object
     RuntimeVariablesContainer                               objectVariables; ///<List of the variables of the object
     std::vector < Force >                                   forces; ///< Forces applied to the object
 

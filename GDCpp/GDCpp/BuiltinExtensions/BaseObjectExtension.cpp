@@ -15,10 +15,10 @@ BaseObjectExtension::BaseObjectExtension()
     AddRuntimeObject(obj, "", &CreateBaseRuntimeObject);
 
     #if defined(GD_IDE_ONLY)
-    std::map<std::string, gd::InstructionMetadata > & objectActions = GetAllActionsForObject("");
-    std::map<std::string, gd::InstructionMetadata > & objectConditions = GetAllConditionsForObject("");
-    std::map<std::string, gd::ExpressionMetadata > & objectExpressions = GetAllExpressionsForObject("");
-    std::map<std::string, gd::ExpressionMetadata > & objectStrExpressions = GetAllStrExpressionsForObject("");
+    std::map<gd::String, gd::InstructionMetadata > & objectActions = GetAllActionsForObject("");
+    std::map<gd::String, gd::InstructionMetadata > & objectConditions = GetAllConditionsForObject("");
+    std::map<gd::String, gd::ExpressionMetadata > & objectExpressions = GetAllExpressionsForObject("");
+    std::map<gd::String, gd::ExpressionMetadata > & objectStrExpressions = GetAllStrExpressionsForObject("");
 
     objectConditions["PosX"].SetFunctionName("GetX").SetManipulatedType("number");
     objectActions["MettreX"].SetFunctionName("SetX").SetManipulatedType("number").SetGetter("GetX");

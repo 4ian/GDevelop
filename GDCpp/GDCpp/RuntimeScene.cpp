@@ -354,7 +354,7 @@ void RuntimeScene::DisplayText(Text & text)
     legacyTexts.push_back(text);
 }
 
-bool RuntimeScene::DisplayLegacyTexts(string layer)
+bool RuntimeScene::DisplayLegacyTexts(gd::String layer)
 {
     if (!renderWindow) return false;
 
@@ -367,7 +367,7 @@ bool RuntimeScene::DisplayLegacyTexts(string layer)
     return true;
 }
 
-RuntimeLayer & RuntimeScene::GetRuntimeLayer(const std::string & name)
+RuntimeLayer & RuntimeScene::GetRuntimeLayer(const gd::String & name)
 {
     for (unsigned int i = 0;i<layers.size();++i)
     {

@@ -79,7 +79,7 @@ DebuggerGUI::DebuggerGUI(wxWindow* parent, RuntimeScene &scene_)
 
     m_objectsTree->AddRoot(_("Objects"));
 
-    std::set<std::string> alreadyCreatedPanels; //Just to be sure not to create a panel twice ( extensionsUsed can contains the same extension name twice )
+    std::set<gd::String> alreadyCreatedPanels; //Just to be sure not to create a panel twice ( extensionsUsed can contains the same extension name twice )
     for (unsigned int i = 0;i<scene.game->GetUsedExtensions().size();++i)
     {
         std::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(scene.game->GetUsedExtensions()[i]);
@@ -155,13 +155,13 @@ void DebuggerGUI::UpdateGUI()
         return;
 
     //General tab
-    m_generalList->SetItem(0, 1, ToString(1000000.0/static_cast<double>(scene.GetElapsedTime()))+_(" fps"));
-    m_generalList->SetItem(1, 1, ToString(static_cast<double>(scene.GetElapsedTime())/1000.0)+"ms");
-    m_generalList->SetItem(2, 1, ToString(scene.objectsInstances.GetAllObjects().size()));
+    m_generalList->SetItem(0, 1, gd::String::FromDouble(1000000.0/static_cast<double>(scene.GetElapsedTime()))+_(" fps"));
+    m_generalList->SetItem(1, 1, gd::String::FromDouble(static_cast<double>(scene.GetElapsedTime())/1000.0)+"ms");
+    m_generalList->SetItem(2, 1, gd::String::FromDouble(scene.objectsInstances.GetAllObjects().size()));
     //TODO //m_generalList->SetItem(3, 1, ToString(scene.game->resourcesManager.resources.size()));
-    m_generalList->SetItem(4, 1, ToString(scene.game->GetMainWindowDefaultWidth())+"*"+ToString(scene.game->GetMainWindowDefaultHeight()));
-    m_generalList->SetItem(5, 1, ToString(scene.GetInputManager().GetMousePosition().x)+";"+ToString(scene.GetInputManager().GetMousePosition().y));
-    m_generalList->SetItem(6, 1, ToString(static_cast<double>(scene.GetTimeFromStart())/1000000.0)+"s");
+    m_generalList->SetItem(4, 1, gd::String::FromDouble(scene.game->GetMainWindowDefaultWidth())+"*"+gd::String::FromDouble(scene.game->GetMainWindowDefaultHeight()));
+    m_generalList->SetItem(5, 1, gd::String::FromDouble(scene.GetInputManager().GetMousePosition().x)+";"+gd::String::FromDouble(scene.GetInputManager().GetMousePosition().y));
+    m_generalList->SetItem(6, 1, gd::String::FromDouble(static_cast<double>(scene.GetTimeFromStart())/1000000.0)+"s");
 
     //Suppression des lignes en trop pour les variables
     while(static_cast<unsigned int>(m_generalList->GetItemCount()) > generalBaseItemCount + scene.GetVariables().Count() + scene.game->GetVariables().Count()+2)
@@ -173,12 +173,12 @@ void DebuggerGUI::UpdateGUI()
 
     //Update scene variables
     unsigned int i = 0;
-    const std::map < std::string, gd::Variable* > & sceneVariables = scene.GetVariables().DumpAllVariables();
-    for (std::map < std::string, gd::Variable* >::const_iterator it = sceneVariables.begin();
+    const std::map < gd::String, gd::Variable* > & sceneVariables = scene.GetVariables().DumpAllVariables();
+    for (std::map < gd::String, gd::Variable* >::const_iterator it = sceneVariables.begin();
         it!=sceneVariables.end();++it, ++i)
     {
-        m_generalList->SetItem(generalBaseItemCount+i, 0, gd::utf8::ToWxString(it->first));
-        m_generalList->SetItem(generalBaseItemCount+i, 1, it->second->IsStructure() ? _("(Structure)") : gd::String::FromUTF8(it->second->GetString()));
+        m_generalList->SetItem(generalBaseItemCount+i, 0, it->first);
+        m_generalList->SetItem(generalBaseItemCount+i, 1, it->second->IsStructure() ? _("(Structure)") : it->second->GetString());
         m_generalList->SetItemFont(generalBaseItemCount+i, *wxNORMAL_FONT);
     }
 
@@ -194,12 +194,12 @@ void DebuggerGUI::UpdateGUI()
 
     //Update global variables
     i = 0;
-    const std::map < std::string, gd::Variable* > & gameVariables = scene.game->GetVariables().DumpAllVariables();
-    for (std::map < std::string, gd::Variable* >::const_iterator it = gameVariables.begin();
+    const std::map < gd::String, gd::Variable* > & gameVariables = scene.game->GetVariables().DumpAllVariables();
+    for (std::map < gd::String, gd::Variable* >::const_iterator it = gameVariables.begin();
         it!=gameVariables.end();++it, ++i)
     {
-        m_generalList->SetItem(generalBaseAndVariablesItemCount+i, 0, gd::utf8::ToWxString(it->first));
-        m_generalList->SetItem(generalBaseAndVariablesItemCount+i, 1, it->second->IsStructure() ? _("(Structure)") : gd::String::FromUTF8(it->second->GetString()));
+        m_generalList->SetItem(generalBaseAndVariablesItemCount+i, 0, it->first);
+        m_generalList->SetItem(generalBaseAndVariablesItemCount+i, 1, it->second->IsStructure() ? _("(Structure)") : it->second->GetString());
         m_generalList->SetItemFont(generalBaseAndVariablesItemCount+i, *wxNORMAL_FONT);
     }
 
@@ -221,7 +221,7 @@ void DebuggerGUI::UpdateGUI()
             //Update properties
             for (unsigned int propertyNb = 0;propertyNb<extension->GetNumberOfProperties(scene);++propertyNb)
             {
-                std::string name, value;
+                gd::String name, value;
                 extension->GetPropertyForDebugger(scene, propertyNb, name, value);
                 extensionsListCtrls[extListCtrlId]->SetItem(propertyNb, 0, name);
                 extensionsListCtrls[extListCtrlId]->SetItem(propertyNb, 1, value);
@@ -269,7 +269,7 @@ void DebuggerGUI::UpdateGUI()
             snprintf(str, 24, "%p", allObjects[i].get());
 
             wxTreeItemId objectItem = m_objectsTree->AppendItem(initialObjects[allObjects[i]->GetName()], str);
-            objectsInTree[weakPtrToObject] = std::pair<std::string, wxTreeItemId>(allObjects[i]->GetName(), objectItem);
+            objectsInTree[weakPtrToObject] = std::pair<gd::String, wxTreeItemId>(allObjects[i]->GetName(), objectItem);
         }
         else
         {
@@ -278,14 +278,14 @@ void DebuggerGUI::UpdateGUI()
             {
                 m_objectsTree->Delete(objectsInTree[weakPtrToObject].second);
                 wxTreeItemId objectItem = m_objectsTree->AppendItem(initialObjects[allObjects[i]->GetName()], ToString(i));
-                objectsInTree[weakPtrToObject] = std::pair<std::string, wxTreeItemId>(allObjects[i]->GetName(), objectItem);
+                objectsInTree[weakPtrToObject] = std::pair<gd::String, wxTreeItemId>(allObjects[i]->GetName(), objectItem);
             }
         }
     }
 
     //Suppression des éléments en trop
-    std::map < std::weak_ptr<RuntimeObject>, std::pair<std::string, wxTreeItemId> >::iterator objectsInTreeIter = objectsInTree.begin();
-    std::map < std::weak_ptr<RuntimeObject>, std::pair<std::string, wxTreeItemId> >::const_iterator objectsInTreeEnd = objectsInTree.end();
+    std::map < std::weak_ptr<RuntimeObject>, std::pair<gd::String, wxTreeItemId> >::iterator objectsInTreeIter = objectsInTree.begin();
+    std::map < std::weak_ptr<RuntimeObject>, std::pair<gd::String, wxTreeItemId> >::const_iterator objectsInTreeEnd = objectsInTree.end();
 
     while(objectsInTreeIter != objectsInTreeEnd)
     {
@@ -304,8 +304,8 @@ void DebuggerGUI::UpdateGUI()
         return;
 
     RuntimeObjSPtr object = std::shared_ptr<RuntimeObject>();
-    std::map < std::weak_ptr<RuntimeObject>, std::pair<std::string, wxTreeItemId> >::const_iterator end = objectsInTree.end();
-    for (std::map < std::weak_ptr<RuntimeObject>, std::pair<std::string, wxTreeItemId> >::iterator i = objectsInTree.begin();i != end;++i)
+    std::map < std::weak_ptr<RuntimeObject>, std::pair<gd::String, wxTreeItemId> >::const_iterator end = objectsInTree.end();
+    for (std::map < std::weak_ptr<RuntimeObject>, std::pair<gd::String, wxTreeItemId> >::iterator i = objectsInTree.begin();i != end;++i)
     {
         if ( i->second.second == m_objectsTree->GetSelection() && !i->first.expired())
         {
@@ -323,14 +323,14 @@ void DebuggerGUI::UpdateGUI()
     if ( objectChanged )
         RecreateListForObject(object);
 
-    std::string value, uselessName;
+    gd::String value, uselessName;
     unsigned int currentLine = 1; //We start a the second line, after "General"
 
     //Properties of base object
     for (unsigned int i = 0;i<object->RuntimeObject::GetNumberOfProperties();++i)
     {
         object->RuntimeObject::GetPropertyForDebugger(i, uselessName, value);
-        m_objectList->SetItem(currentLine, 1, gd::utf8::ToWxString(value));
+        m_objectList->SetItem(currentLine, 1, value);
 
         currentLine++;
     }
@@ -341,7 +341,7 @@ void DebuggerGUI::UpdateGUI()
     for (unsigned int i = 0;i<object->GetNumberOfProperties();++i)
     {
         object->GetPropertyForDebugger(i, uselessName, value);
-        m_objectList->SetItem(currentLine, 1, gd::utf8::ToWxString(value));
+        m_objectList->SetItem(currentLine, 1, value);
 
         currentLine++;
     }
@@ -349,7 +349,7 @@ void DebuggerGUI::UpdateGUI()
     currentLine += 2; //We have two lines to jump for "Variables"
 
     i = 0;
-    const std::map < std::string, gd::Variable* > & objectVariables = object->GetVariables().DumpAllVariables();
+    const std::map < gd::String, gd::Variable* > & objectVariables = object->GetVariables().DumpAllVariables();
 
     //Suppression des lignes en trop pour les variables
     while(m_objectList->GetItemCount() > baseItemCount+objectVariables.size())
@@ -362,11 +362,11 @@ void DebuggerGUI::UpdateGUI()
     }
 
     //Mise à jour des variables
-    for (std::map < std::string, gd::Variable* >::const_iterator it = objectVariables.begin();
+    for (std::map < gd::String, gd::Variable* >::const_iterator it = objectVariables.begin();
         it!=objectVariables.end();++it, ++i)
     {
-        m_objectList->SetItem(baseItemCount+i, 0, gd::utf8::ToWxString(it->first));
-        m_objectList->SetItem(baseItemCount+i, 1, it->second->IsStructure() ? _("(Structure)") : gd::String::FromUTF8(it->second->GetString()));
+        m_objectList->SetItem(baseItemCount+i, 0, it->first);
+        m_objectList->SetItem(baseItemCount+i, 1, it->second->IsStructure() ? _("(Structure)") : it->second->GetString());
     }
 }
 
@@ -385,8 +385,8 @@ void DebuggerGUI::OnobjectListItemActivated(wxListEvent& event)
 
     //Obtain the shared_ptr to the object
     RuntimeObjSPtr object = std::shared_ptr<RuntimeObject>();
-    std::map < std::weak_ptr<RuntimeObject>, std::pair<std::string, wxTreeItemId> >::const_iterator end = objectsInTree.end();
-    for (std::map < std::weak_ptr<RuntimeObject>, std::pair<std::string, wxTreeItemId> >::iterator i = objectsInTree.begin();i != end;++i)
+    std::map < std::weak_ptr<RuntimeObject>, std::pair<gd::String, wxTreeItemId> >::const_iterator end = objectsInTree.end();
+    for (std::map < std::weak_ptr<RuntimeObject>, std::pair<gd::String, wxTreeItemId> >::iterator i = objectsInTree.begin();i != end;++i)
     {
         if ( i->second.second == m_objectsTree->GetSelection() && !i->first.expired())
         {
@@ -403,9 +403,9 @@ void DebuggerGUI::OnobjectListItemActivated(wxListEvent& event)
     {
         int propNb = event.GetIndex()-1;
 
-        std::string uselessName, oldValue;
+        gd::String uselessName, oldValue;
         object->RuntimeObject::GetPropertyForDebugger(propNb, uselessName, oldValue);
-        std::string newValue = gd::utf8::FromWxString(wxGetTextFromUser(_("Enter the new value"), _("Editing a value"), gd::utf8::ToWxString(oldValue)));
+        gd::String newValue = wxGetTextFromUser(_("Enter the new value"), _("Editing a value"), oldValue);
 
         if ( !object->RuntimeObject::ChangeProperty(propNb, newValue) )
         {
@@ -418,9 +418,9 @@ void DebuggerGUI::OnobjectListItemActivated(wxListEvent& event)
     {
         int propNb = event.GetIndex()-1-2-object->RuntimeObject::GetNumberOfProperties();
 
-        std::string uselessName, oldValue;
+        gd::String uselessName, oldValue;
         object->GetPropertyForDebugger(propNb, uselessName, oldValue);
-        std::string newValue = gd::utf8::FromWxString(wxGetTextFromUser(_("Enter the new value"), _("Editing a value"), gd::utf8::ToWxString(oldValue)));
+        gd::String newValue = wxGetTextFromUser(_("Enter the new value"), _("Editing a value"), oldValue);
 
         if ( !object->ChangeProperty(propNb, newValue) )
         {
@@ -429,11 +429,11 @@ void DebuggerGUI::OnobjectListItemActivated(wxListEvent& event)
     }
     else //Or a variable
     {
-        std::string name = gd::utf8::FromWxString(m_objectList->GetItemText(event.GetIndex()));
+        gd::String name = m_objectList->GetItemText(event.GetIndex());
 
-        std::string newValue = gd::utf8::FromWxString(wxGetTextFromUser(_("Enter the new value"), 
-                                                                    _("Editing a variable"), 
-                                                                    gd::utf8::ToWxString(object->GetVariables().Get(name).GetString())));
+        gd::String newValue = wxGetTextFromUser(_("Enter the new value"),
+                                                _("Editing a variable"),
+                                                object->GetVariables().Get(name).GetString());
         object->GetVariables().Get(name).SetString(newValue);
     }
 }
@@ -445,20 +445,20 @@ void DebuggerGUI::OngeneralListItemActivated(wxListEvent& event)
 {
     if ( event.GetIndex() < (generalBaseItemCount + scene.GetVariables().Count()))
     {
-        std::string name = gd::utf8::FromWxString(m_generalList->GetItemText(event.GetIndex()));
+        gd::String name = m_generalList->GetItemText(event.GetIndex());
 
-        std::string newValue = gd::utf8::FromWxString(wxGetTextFromUser(_("Enter the new value"), 
-                                                                    _("Editing a value"), 
-                                                                    gd::utf8::ToWxString(scene.GetVariables().Get(name).GetString())));
+        gd::String newValue = wxGetTextFromUser(_("Enter the new value"),
+                                                _("Editing a value"),
+                                                scene.GetVariables().Get(name).GetString());
         scene.GetVariables().Get(name).SetString(newValue);
     }
     else if ( event.GetIndex() < ( generalBaseAndVariablesItemCount + scene.game->GetVariables().Count()) )
     {
-        std::string name = gd::utf8::FromWxString(m_generalList->GetItemText(event.GetIndex()));
+        gd::String name = m_generalList->GetItemText(event.GetIndex());
 
-        std::string newValue = gd::utf8::FromWxString(wxGetTextFromUser(_("Enter the new value"), 
-                                                                    _("Editing a value"), 
-                                                                    gd::utf8::ToWxString(scene.game->GetVariables().Get(name).GetString())));
+        gd::String newValue = wxGetTextFromUser(_("Enter the new value"),
+                                                _("Editing a value"),
+                                                scene.game->GetVariables().Get(name).GetString());
         scene.game->GetVariables().Get(name).SetString(newValue);
     }
 }
@@ -475,7 +475,7 @@ void DebuggerGUI::OnExtensionListItemActivated(wxListEvent& event)
         return;
     }
 
-    std::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(std::string(list->GetName().mb_str()));
+    std::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(gd::String(list->GetName()));
     std::shared_ptr<ExtensionBase> extension = std::dynamic_pointer_cast<ExtensionBase>(gdExtension);
 
     if ( extension == std::shared_ptr<ExtensionBase>() )
@@ -485,9 +485,9 @@ void DebuggerGUI::OnExtensionListItemActivated(wxListEvent& event)
     }
 
     int propNb = event.GetIndex();
-    std::string uselessName, oldValue;
+    gd::String uselessName, oldValue;
     extension->GetPropertyForDebugger(scene, propNb, uselessName, oldValue);
-    std::string newValue = std::string(wxGetTextFromUser(_("Enter the new value"), _("Editing a value"), oldValue).mb_str());
+    gd::String newValue = wxGetTextFromUser(_("Enter the new value"), _("Editing a value"), oldValue);
 
     if ( !extension->ChangeProperty(scene, propNb, newValue) )
     {
@@ -510,7 +510,7 @@ void DebuggerGUI::RecreateListForObject(const RuntimeObjSPtr & object)
 {
     m_objectList->DeleteAllItems();
     unsigned int currentLine = 0;
-    std::string name, uselessValue;
+    gd::String name, uselessValue;
 
     m_objectList->InsertItem(0, _("General"));
     m_objectList->SetItemFont(0, font);
@@ -560,8 +560,8 @@ void DebuggerGUI::OndeleteBtClick(wxCommandEvent& event)
 
     //Obtain the shared_ptr to the object
     RuntimeObjSPtr object = std::shared_ptr<RuntimeObject>();
-    std::map < std::weak_ptr<RuntimeObject>, std::pair<std::string, wxTreeItemId> >::const_iterator end = objectsInTree.end();
-    for (std::map < std::weak_ptr<RuntimeObject>, std::pair<std::string, wxTreeItemId> >::iterator i = objectsInTree.begin();i != end;++i)
+    std::map < std::weak_ptr<RuntimeObject>, std::pair<gd::String, wxTreeItemId> >::const_iterator end = objectsInTree.end();
+    for (std::map < std::weak_ptr<RuntimeObject>, std::pair<gd::String, wxTreeItemId> >::iterator i = objectsInTree.begin();i != end;++i)
     {
         if ( i->second.second == m_objectsTree->GetSelection() && !i->first.expired())
         {
@@ -578,7 +578,7 @@ void DebuggerGUI::OndeleteBtClick(wxCommandEvent& event)
  */
 void DebuggerGUI::OnAddVarSceneBtClick( wxCommandEvent & event )
 {
-    std::string variableName = gd::utf8::FromWxString(wxGetTextFromUser(_("Type the name of the new variable"), _("Adding a scene variable")).mb_str());
+    gd::String variableName = wxGetTextFromUser(_("Type the name of the new variable"), _("Adding a scene variable"));
 
     if ( variableName == "" ) return;
     if ( scene.GetVariables().Has(variableName) )
@@ -587,7 +587,7 @@ void DebuggerGUI::OnAddVarSceneBtClick( wxCommandEvent & event )
         return;
     }
 
-    std::string variableValue = gd::utf8::FromWxString(wxGetTextFromUser(_("Enter the value of the variable"), _("Adding a scene variable")));
+    gd::String variableValue = wxGetTextFromUser(_("Enter the value of the variable"), _("Adding a scene variable"));
 
     scene.GetVariables().Get(variableName).SetString(variableValue);
 }
@@ -597,7 +597,7 @@ void DebuggerGUI::OnAddVarSceneBtClick( wxCommandEvent & event )
  */
 void DebuggerGUI::OnAddVarGlobalBtClick( wxCommandEvent & event )
 {
-    std::string variableName = gd::utf8::FromWxString(wxGetTextFromUser(_("Type the name of the new variable"), _("Adding a global variable")));
+    gd::String variableName = wxGetTextFromUser(_("Type the name of the new variable"), _("Adding a global variable"));
 
     if ( variableName == "" ) return;
     if ( scene.game->GetVariables().Has(variableName) )
@@ -606,7 +606,7 @@ void DebuggerGUI::OnAddVarGlobalBtClick( wxCommandEvent & event )
         return;
     }
 
-    std::string variableValue = gd::utf8::FromWxString(wxGetTextFromUser(_("Enter the value of the variable"), _("Adding a global variable")));
+    gd::String variableValue = wxGetTextFromUser(_("Enter the value of the variable"), _("Adding a global variable"));
 
     scene.game->GetVariables().Get(variableName).SetString(variableValue);
 }
@@ -616,7 +616,7 @@ void DebuggerGUI::OnAddObjBtClick( wxCommandEvent & event )
     gd::ChooseObjectDialog dialog( this, *scene.game, scene, false );
     if ( dialog.ShowModal() != 1 ) return;
 
-    std::string objectWanted = dialog.GetChosenObject();
+    gd::String objectWanted = dialog.GetChosenObject();
     std::vector<ObjSPtr>::iterator sceneObject = std::find_if(scene.GetObjects().begin(), scene.GetObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
     std::vector<ObjSPtr>::iterator globalObject = std::find_if(scene.game->GetObjects().begin(), scene.game->GetObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
 
@@ -634,8 +634,8 @@ void DebuggerGUI::OnAddObjBtClick( wxCommandEvent & event )
         return;
     }
 
-    int x = ToInt(std::string(wxGetTextFromUser(_("Enter the X position of the object"), _("Adding an object")).mb_str()));
-    int y = ToInt(std::string(wxGetTextFromUser(_("Enter the object's Y position"), _("Adding an object")).mb_str()));
+    int x = gd::String(wxGetTextFromUser(_("Enter the X position of the object"), _("Adding an object"))).ToInt();
+    int y = gd::String(wxGetTextFromUser(_("Enter the object's Y position"), _("Adding an object"))).ToInt();
     newObject->SetX( x );
     newObject->SetY( y );
 

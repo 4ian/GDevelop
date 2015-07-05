@@ -6,9 +6,7 @@
 #ifndef TEXT_H
 #define TEXT_H
 #include <SFML/Graphics.hpp>
-#include <string>
-
-using namespace std;
+#include "GDCpp/Utf8String.h"
 
 /**
  * \brief Old class for drawing objects.
@@ -25,8 +23,8 @@ public:
     virtual ~Text();
 
     sf::Text text;
-    string fontName;
-    string layer;
+    gd::String fontName;
+    gd::String layer;
 
     void Draw(sf::RenderWindow& main_window);
 

@@ -6,6 +6,7 @@
 #ifndef RUNTIMELAYER_H
 #define RUNTIMELAYER_H
 #include <SFML/Graphics.hpp>
+#include "GDCpp/Utf8String.h"
 namespace gd { class Camera; }
 namespace gd { class Layer; }
 
@@ -117,12 +118,12 @@ public:
     /**
      * Change layer name
      */
-    virtual void SetName(const std::string & name_) { name = name_; }
+    virtual void SetName(const gd::String & name_) { name = name_; }
 
     /**
      * Get layer name
      */
-    virtual const std::string & GetName() const { return name; }
+    virtual const gd::String & GetName() const { return name; }
 
     /**
      * Change if layer is displayed or not
@@ -161,7 +162,7 @@ public:
 
 private:
 
-    std::string name; ///< The name of the layer
+    gd::String name; ///< The name of the layer
     bool isVisible; ///< True if the layer is visible
     std::vector < RuntimeCamera > cameras; ///< The camera displayed by the layer
 };

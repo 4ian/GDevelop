@@ -36,7 +36,7 @@ void ChangesNotifier::OnObjectAdded(gd::Project & project, gd::Layout * layout, 
 {
     RequestFullRecompilation(project, layout);
 }
-void ChangesNotifier::OnObjectRenamed(gd::Project & project, gd::Layout * layout, gd::Object & object, const std::string & oldName) const
+void ChangesNotifier::OnObjectRenamed(gd::Project & project, gd::Layout * layout, gd::Object & object, const gd::String & oldName) const
 {
     RequestFullRecompilation(project, layout);
 }
@@ -44,24 +44,24 @@ void ChangesNotifier::OnVariablesModified(gd::Project & project, gd::Layout * la
 {
     RequestFullRecompilation(project, layout);
 }
-void ChangesNotifier::OnObjectGroupAdded(gd::Project & project, gd::Layout * layout, const std::string & groupName) const
+void ChangesNotifier::OnObjectGroupAdded(gd::Project & project, gd::Layout * layout, const gd::String & groupName) const
 {
     RequestFullRecompilation(project, layout);
 }
-void ChangesNotifier::OnObjectGroupEdited(gd::Project & project, gd::Layout * layout, const std::string & groupName) const
+void ChangesNotifier::OnObjectGroupEdited(gd::Project & project, gd::Layout * layout, const gd::String & groupName) const
 {
     RequestFullRecompilation(project, layout);
 }
-void ChangesNotifier::OnObjectGroupRenamed(gd::Project & project, gd::Layout * layout, const std::string & groupName, const std::string & oldName) const
+void ChangesNotifier::OnObjectGroupRenamed(gd::Project & project, gd::Layout * layout, const gd::String & groupName, const gd::String & oldName) const
 {
     RequestFullRecompilation(project, layout);
 }
-void ChangesNotifier::OnObjectGroupDeleted(gd::Project & project, gd::Layout * layout, const std::string & groupName) const
+void ChangesNotifier::OnObjectGroupDeleted(gd::Project & project, gd::Layout * layout, const gd::String & groupName) const
 {
     RequestFullRecompilation(project, layout);
 }
 
-void ChangesNotifier::OnObjectsDeleted(gd::Project & project, gd::Layout * layout, const std::vector<std::string> & deletedObjects) const
+void ChangesNotifier::OnObjectsDeleted(gd::Project & project, gd::Layout * layout, const std::vector<gd::String> & deletedObjects) const
 {
     RequestFullRecompilation(project, layout);
 }
@@ -82,12 +82,12 @@ void ChangesNotifier::OnAutomatismAdded(gd::Project & project, gd::Layout * layo
     RequestFullRecompilation(project, layout);
 }
 
-void ChangesNotifier::OnAutomatismRenamed(gd::Project & project, gd::Layout * layout, gd::Object & object, gd::Automatism & automatism, const std::string & oldName) const
+void ChangesNotifier::OnAutomatismRenamed(gd::Project & project, gd::Layout * layout, gd::Object & object, gd::Automatism & automatism, const gd::String & oldName) const
 {
     RequestFullRecompilation(project, layout);
 }
 
-void ChangesNotifier::OnAutomatismDeleted(gd::Project & project, gd::Layout * layout, gd::Object & object, const std::string & automatismName) const
+void ChangesNotifier::OnAutomatismDeleted(gd::Project & project, gd::Layout * layout, gd::Object & object, const gd::String & automatismName) const
 {
     RequestFullRecompilation(project, layout);
 }
@@ -112,7 +112,7 @@ void ChangesNotifier::OnObjectVariablesChanged(gd::Project & game, gd::Layout * 
     #endif
 }
 
-void ChangesNotifier::OnEventsModified(gd::Project & game, gd::Layout & scene, bool indirectChange, std::string sourceOfTheIndirectChange) const
+void ChangesNotifier::OnEventsModified(gd::Project & game, gd::Layout & scene, bool indirectChange, gd::String sourceOfTheIndirectChange) const
 {
     #if !defined(GD_NO_WX_GUI) //Compilation is not supported when wxWidgets support is disabled.
     std::cout << "Changes occured inside " << scene.GetName() << "...";
@@ -142,11 +142,11 @@ void ChangesNotifier::OnEventsModified(gd::Project & game, gd::Layout & scene, b
     #endif
 }
 
-void ChangesNotifier::OnEventsModified(gd::Project & game, gd::ExternalEvents & events, bool indirectChange, std::string sourceOfTheIndirectChange) const
+void ChangesNotifier::OnEventsModified(gd::Project & game, gd::ExternalEvents & events, bool indirectChange, gd::String sourceOfTheIndirectChange) const
 {
     #if !defined(GD_NO_WX_GUI) //Compilation is not supported when wxWidgets support is disabled.
     DependenciesAnalyzer analyzer(game, events);
-    std::string associatedScene = analyzer.ExternalEventsCanBeCompiledForAScene();
+    gd::String associatedScene = analyzer.ExternalEventsCanBeCompiledForAScene();
     bool externalEventsAreCompiledSeparately = !associatedScene.empty();
 
     if ( !externalEventsAreCompiledSeparately ) return;
@@ -188,7 +188,7 @@ void ChangesNotifier::OnLayoutAdded(gd::Project & project, gd::Layout & layout) 
     gd::EventsChangesNotifier::NotifyChangesInEventsOfScene(project, layout);
 }
 
-void ChangesNotifier::OnLayoutRenamed(gd::Project & project, gd::Layout & layout, const std::string & oldName) const
+void ChangesNotifier::OnLayoutRenamed(gd::Project & project, gd::Layout & layout, const gd::String & oldName) const
 {
     //A renamed layout may trigger recompilation of some events.
     gd::EventsChangesNotifier::NotifyChangesInEventsOfScene(project, layout);
@@ -200,18 +200,18 @@ void ChangesNotifier::OnExternalEventsAdded(gd::Project & project, gd::ExternalE
     gd::EventsChangesNotifier::NotifyChangesInEventsOfExternalEvents(project, events);
 }
 
-void ChangesNotifier::OnExternalEventsRenamed(gd::Project & project, gd::ExternalEvents & events, const std::string & oldName) const
+void ChangesNotifier::OnExternalEventsRenamed(gd::Project & project, gd::ExternalEvents & events, const gd::String & oldName) const
 {
     //A renamed external events sheet may trigger recompilation of some events.
     gd::EventsChangesNotifier::NotifyChangesInEventsOfExternalEvents(project, events);
 }
 
-void ChangesNotifier::OnExternalEventsDeleted(gd::Project & project, const std::string deletedLayout) const
+void ChangesNotifier::OnExternalEventsDeleted(gd::Project & project, const gd::String deletedLayout) const
 {
     RequestFullRecompilation(project, NULL);
 }
 
-void ChangesNotifier::OnLayoutDeleted(gd::Project & project, const std::string deletedLayout) const
+void ChangesNotifier::OnLayoutDeleted(gd::Project & project, const gd::String deletedLayout) const
 {
     //There is a possibility that the deleting the layout now enables some external events
     //to be compiled separately from the scene using them ( For instance, scenes A and B are including
@@ -236,8 +236,8 @@ void ChangesNotifier::RequestFullRecompilation(gd::Project & game, gd::Layout * 
             return;
         }
 
-        std::set< std::string > externalEventsDependencies = analyzer.GetExternalEventsDependencies();
-        for (std::set<std::string>::const_iterator i = externalEventsDependencies.begin();i!=externalEventsDependencies.end();++i)
+        std::set< gd::String > externalEventsDependencies = analyzer.GetExternalEventsDependencies();
+        for (std::set<gd::String>::const_iterator i = externalEventsDependencies.begin();i!=externalEventsDependencies.end();++i)
         {
             if ( game.HasExternalEventsNamed(*i) )
                 game.GetExternalEvents(*i).SetLastChangeTimeStamp(wxDateTime::Now().GetTicks());
@@ -261,7 +261,7 @@ void ChangesNotifier::RequestFullRecompilation(gd::Project & game, gd::Layout * 
     #endif
 }
 
-void ChangesNotifier::OnResourceModified(gd::Project & project, const std::string & resourceName) const
+void ChangesNotifier::OnResourceModified(gd::Project & project, const gd::String & resourceName) const
 {
     project.imagesChanged.push_back(resourceName);
 }

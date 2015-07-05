@@ -5,6 +5,7 @@
  */
 #include <string>
 #include "GDCpp/RuntimeScene.h"
+#include "GDCpp/Utf8String.h"
 #include "GDCpp/Utf8Tools.h"
 
 using namespace std;
@@ -17,10 +18,10 @@ namespace StringTools
 /**
  * Expression function for getting a substring from a string
  */
-string GD_API SubStr(const std::string & str, size_t start, size_t length )
+gd::String GD_API SubStr(const gd::String & str, size_t start, size_t length )
 {
-    if ( start < gd::utf8::StrLength(str) )
-        return gd::utf8::SubStr(str, start, length);
+    if ( start < str.size() )
+        return str.substr(start, length);
 
     return "";
 }
@@ -28,10 +29,10 @@ string GD_API SubStr(const std::string & str, size_t start, size_t length )
 /**
  * Expression function for getting a character from a string
  */
-string GD_API StrAt(const std::string & str, size_t pos )
+gd::String GD_API StrAt(const gd::String & str, size_t pos )
 {
-    if ( pos < gd::utf8::StrLength(str) )
-        return gd::utf8::SubStr(str, pos, 1);
+    if ( pos < str.size() )
+        return str.substr(pos, 1);
 
     return "";
 }
@@ -39,56 +40,56 @@ string GD_API StrAt(const std::string & str, size_t pos )
 /**
  * Expression function for getting a substring from a string
  */
-unsigned int GD_API StrLen(const std::string & str)
+unsigned int GD_API StrLen(const gd::String & str)
 {
-    return gd::utf8::StrLength(str);
+    return str.size();
 }
 
 /**
  * Expression function for finding a string in another
  */
-int GD_API StrFind(const std::string & str, const std::string & findwhat)
+int GD_API StrFind(const gd::String & str, const gd::String & findwhat)
 {
-    size_t pos = gd::utf8::Find(str, findwhat);
+    size_t pos = str.find(findwhat);
 
-    if ( pos != string::npos ) return pos;
+    if ( pos != gd::String::npos ) return pos;
     return -1;
 }
 
 /**
  * Expression function for finding a string in another
  */
-int GD_API StrRFind(const std::string & str, const std::string & findwhat)
+int GD_API StrRFind(const gd::String & str, const gd::String & findwhat)
 {
-    size_t pos = gd::utf8::RFind(str, findwhat);
+    size_t pos = str.rfind(findwhat);
 
-    if ( pos != string::npos ) return pos;
+    if ( pos != gd::String::npos ) return pos;
     return -1;
 }
 
 /**
  * Expression function for finding a string in another
  */
-int GD_API StrFindFrom(const std::string & str, const std::string & findwhat, unsigned int start)
+int GD_API StrFindFrom(const gd::String & str, const gd::String & findwhat, unsigned int start)
 {
-    size_t pos = gd::utf8::Find(str, findwhat, start);
+    size_t pos = str.find(findwhat, start);
 
-    if ( pos != string::npos ) return pos;
+    if ( pos != gd::String::npos ) return pos;
     return -1;
 }
 
 /**
  * Expression function for finding a string in another
  */
-int GD_API StrRFindFrom(const std::string & str, const std::string & findwhat, unsigned int start)
+int GD_API StrRFindFrom(const gd::String & str, const gd::String & findwhat, unsigned int start)
 {
-    size_t pos = gd::utf8::RFind(str, findwhat, start);
+    size_t pos = str.rfind(findwhat, start);
 
-    if ( pos != string::npos ) return pos;
+    if ( pos != gd::String::npos ) return pos;
     return -1;
 }
 
-std::string GD_API NewLine()
+gd::String GD_API NewLine()
 {
     return "\n";
 };

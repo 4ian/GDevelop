@@ -61,12 +61,12 @@ CppPlatform::CppPlatform() :
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
     //Events compiler setup
     cout << "* Setting up events compiler..." << endl;
-    CodeCompiler::Get()->SetBaseDirectory(ToString(wxGetCwd()));
+    CodeCompiler::Get()->SetBaseDirectory(wxGetCwd());
     wxString eventsCompilerTempDir;
     if ( wxConfigBase::Get()->Read("/Dossier/EventsCompilerTempDir", &eventsCompilerTempDir) && !eventsCompilerTempDir.empty() )
-        CodeCompiler::Get()->SetOutputDirectory(ToString(eventsCompilerTempDir));
+        CodeCompiler::Get()->SetOutputDirectory(eventsCompilerTempDir);
     else
-        CodeCompiler::Get()->SetOutputDirectory(ToString(wxFileName::GetTempDir()+"/GDTemporaries"));
+        CodeCompiler::Get()->SetOutputDirectory(wxFileName::GetTempDir()+"/GDTemporaries");
     int eventsCompilerMaxThread = 0;
     if ( wxConfigBase::Get()->Read("/CodeCompiler/MaxThread", &eventsCompilerMaxThread, 0) && eventsCompilerMaxThread >= 0 )
         CodeCompiler::Get()->AllowMultithread(eventsCompilerMaxThread > 1, eventsCompilerMaxThread);
@@ -115,7 +115,7 @@ bool CppPlatform::AddExtension(std::shared_ptr<gd::PlatformExtension> platformEx
     if (!gd::Platform::AddExtension(extension)) return false;
 
     //Then Load all runtime objects provided by the extension
-    std::vector < std::string > objectsTypes = extension->GetExtensionObjectsTypes();
+    std::vector < gd::String > objectsTypes = extension->GetExtensionObjectsTypes();
     for ( unsigned int i = 0; i < objectsTypes.size();++i)
     {
         runtimeObjCreationFunctionTable[objectsTypes[i]] = extension->GetRuntimeObjectCreationFunctionPtr(objectsTypes[i]);
@@ -131,7 +131,7 @@ bool CppPlatform::AddExtension(std::shared_ptr<gd::PlatformExtension> platformEx
 
 std::shared_ptr<RuntimeObject> CppPlatform::CreateRuntimeObject(RuntimeScene & scene, gd::Object & object)
 {
-    const std::string & type = object.GetType();
+    const gd::String & type = object.GetType();
 
     if ( runtimeObjCreationFunctionTable.find(type) == runtimeObjCreationFunctionTable.end() )
     {
@@ -145,7 +145,7 @@ std::shared_ptr<RuntimeObject> CppPlatform::CreateRuntimeObject(RuntimeScene & s
 }
 
 #if defined(GD_IDE_ONLY)
-std::string CppPlatform::GetDescription() const
+gd::String CppPlatform::GetDescription() const
 {
     return GD_T("Allows to create 2D games which can be compiled and played on Windows or Linux.");
 }

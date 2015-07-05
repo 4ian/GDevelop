@@ -5,12 +5,15 @@
  */
 #ifndef JOYSTICKTOOLS_H
 #define JOYSTICKTOOLS_H
+
 #include <string>
+#include "GDCpp/Utf8String.h"
+
 class RuntimeScene;
 namespace gd { class Variable; }
 
 bool GD_API JoystickButtonDown( RuntimeScene & scene, unsigned int joystick, unsigned int button );
-double GD_API GetJoystickAxisValue( RuntimeScene & scene, unsigned int joystick, const std::string & axisStr );
-void GD_API JoystickAxisValueToVariable( RuntimeScene & scene, unsigned int joystick, const std::string & axisStr, gd::Variable & variable );
+double GD_API GetJoystickAxisValue( RuntimeScene & scene, unsigned int joystick, const gd::String & axisStr );
+void GD_API JoystickAxisValueToVariable( RuntimeScene & scene, unsigned int joystick, const gd::String & axisStr, gd::Variable & variable );
 
 #endif // JOYSTICKTOOLS_H

@@ -8,6 +8,7 @@
 #ifndef FULLPROJECTCOMPILER_H
 #define FULLPROJECTCOMPILER_H
 #include <string>
+#include "GDCpp/Utf8String.h"
 namespace gd { class Project; }
 
 namespace GDpriv
@@ -21,7 +22,7 @@ class FullProjectCompilerDiagnosticManager; //Definition below
 class GD_API FullProjectCompiler
 {
 public:
-    FullProjectCompiler(gd::Project & game_, FullProjectCompilerDiagnosticManager & diagnosticManager_, std::string outDir_) :
+    FullProjectCompiler(gd::Project & game_, FullProjectCompilerDiagnosticManager & diagnosticManager_, gd::String outDir_) :
         gameToCompile(game_),
         diagnosticManager(diagnosticManager_),
         outDir(outDir_),
@@ -33,9 +34,9 @@ public:
 
     void LaunchProjectCompilation();
 
-    void ClearDirectory(std::string directory);
-    std::string GetTempDir();
-    void SetForcedTempDir(const std::string & dir) { forcedTempDir = dir; };
+    void ClearDirectory(gd::String directory);
+    gd::String GetTempDir();
+    void SetForcedTempDir(const gd::String & dir) { forcedTempDir = dir; };
 
     //Cross compilation is not available
     /*void TargetWindows(bool enable = true) { windowsTarget = enable; };
@@ -48,8 +49,8 @@ private:
 
     gd::Project & gameToCompile;
     FullProjectCompilerDiagnosticManager & diagnosticManager;
-    std::string outDir;
-    std::string forcedTempDir;
+    gd::String outDir;
+    gd::String forcedTempDir;
 
     bool windowsTarget;
     bool linuxTarget;
@@ -67,14 +68,14 @@ class GD_API FullProjectCompilerDiagnosticManager
 public:
     virtual void OnCompilationFailed() {};
     virtual void OnCompilationSucceeded() {};
-    virtual void OnMessage(std::string message, std::string message2 = "") {};
+    virtual void OnMessage(gd::String message, gd::String message2 = "") {};
     virtual void OnPercentUpdate(float percents) {};
 
-    std::string GetErrors() const { return errors; }
-    void AddError(std::string error) { errors += error+"\n"; };
+    gd::String GetErrors() const { return errors; }
+    void AddError(gd::String error) { errors += error+"\n"; };
 
 private:
-    std::string errors;
+    gd::String errors;
 };
 
 /**
@@ -85,7 +86,7 @@ class GD_API FullProjectCompilerConsoleDiagnosticManager : public FullProjectCom
 public:
     virtual void OnCompilationFailed();
     virtual void OnCompilationSucceeded();
-    virtual void OnMessage(std::string message, std::string message2 = "");
+    virtual void OnMessage(gd::String message, gd::String message2 = "");
     virtual void OnPercentUpdate(float percents);
 };
 
@@ -94,4 +95,3 @@ public:
 
 #endif // FULLPROJECTCOMPILER_H
 #endif
-

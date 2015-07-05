@@ -9,6 +9,7 @@
 #include <map>
 #include <string>
 #include <SFML/Window.hpp>
+#include "GDCpp/Utf8String.h"
 
 /**
  * \brief Manage the events and mouse, keyboard
@@ -72,12 +73,12 @@ public:
     /**
      * \brief Return the key name of the latest pressed key.
      */
-    std::string GetLastPressedKey() const;
+    gd::String GetLastPressedKey() const;
 
     /**
      * \brief Return true if the specified key name is pressed.
      */
-    bool IsKeyPressed(std::string key) const;
+    bool IsKeyPressed(gd::String key) const;
 
     /**
      * \brief Return true if any key was pressed since the last call
@@ -90,8 +91,8 @@ public:
      */
     std::vector<sf::Uint32> GetCharactersEntered() const { return charactersEntered; };
 
-    static const std::map<std::string, int> & GetKeyNameToSfKeyMap();
-    static const std::map<int, std::string> & GetSfKeyToKeyNameMap();
+    static const std::map<gd::String, int> & GetKeyNameToSfKeyMap();
+    static const std::map<int, gd::String> & GetSfKeyToKeyNameMap();
     ///@}
 
     /** \name Mouse
@@ -105,7 +106,7 @@ public:
     /**
      * @brief Return true if the specified mouse button is pressed.
      */
-    bool IsMouseButtonPressed(const std::string & button) const;
+    bool IsMouseButtonPressed(const gd::String & button) const;
 
     /**
      * @brief Get the number of ticks the wheel moved during last frame.

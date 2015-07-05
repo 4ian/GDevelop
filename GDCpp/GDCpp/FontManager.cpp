@@ -17,12 +17,12 @@ FontManager::~FontManager()
 void FontManager::UnloadAllFonts()
 {
     //Need to explicit delete fonts...
-    for ( map<string, sf::Font*>::iterator it=fonts.begin() ; it != fonts.end(); ++it )
+    for ( map<gd::String, sf::Font*>::iterator it=fonts.begin() ; it != fonts.end(); ++it )
     {
         if ((*it).second) delete (*it).second;
     }
     //...and their buffers
-    for ( map<string, char*>::iterator it=fontsBuffer.begin() ; it != fontsBuffer.end(); ++it )
+    for ( map<gd::String, char*>::iterator it=fontsBuffer.begin() ; it != fontsBuffer.end(); ++it )
     {
         if ((*it).second) delete (*it).second;
     }
@@ -50,7 +50,7 @@ void FontManager::EnsureDefaultFontIsLoaded()
     }
 }
 
-const sf::Font * FontManager::GetFont(const string & fontName)
+const sf::Font * FontManager::GetFont(const gd::String & fontName)
 {
     //Use default font if no font is specified
     if (fontName.empty())

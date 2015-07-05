@@ -5,7 +5,9 @@
  */
 #ifndef COMMONINSTRUCTIONS_H
 #define COMMONINSTRUCTIONS_H
+
 #include <string>
+#include "GDCpp/Utf8String.h"
 
 namespace GDpriv
 {
@@ -28,19 +30,19 @@ bool GD_API LogicalNegation(bool param);
  * Convert the string to a double.
  * \warning This function is meant to be used only in GD events generated code.
  */
-double GD_API ToDouble( const std::string & str );
+double GD_API ToDouble( const gd::String & str );
 
 /**
  * Convert the double to a string.
  * \warning This function is meant to be used only in GD events generated code.
  */
-std::string GD_API ToString( double number );
+gd::String GD_API ToString( double number );
 
 /**
  * Convert the double to a string, disabling scientific notation.
  * \warning This function is meant to be used only in GD events generated code.
  */
-std::string GD_API LargeNumberToString( double number );
+gd::String GD_API LargeNumberToString( double number );
 
 /**
  * Convert the angle from degrees to radians

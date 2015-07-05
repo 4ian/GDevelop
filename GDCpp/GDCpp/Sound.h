@@ -6,7 +6,7 @@
 #ifndef SOUND_H
 #define SOUND_H
 #include <SFML/Audio.hpp>
-#include <string>
+#include "GDCpp/Utf8String.h"
 
 /**
  * \brief Represents a sound to be played
@@ -18,7 +18,7 @@ class GD_API Sound : sf::NonCopyable
 {
 public:
     Sound();
-    Sound(std::string file);
+    Sound(gd::String file);
     Sound(const Sound & copy);
     virtual ~Sound();
 
@@ -64,7 +64,7 @@ public:
     sf::SoundBuffer buffer;
     sf::Sound       sound;
 
-    std::string file;
+    gd::String file;
 
     /**
      * \brief Internal member functions to update music volume according to global volume.

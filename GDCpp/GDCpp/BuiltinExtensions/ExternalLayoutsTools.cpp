@@ -6,7 +6,7 @@
 namespace ExternalLayoutsTools
 {
 
-void GD_API CreateObjectsFromExternalLayout(RuntimeScene & scene, const std::string & externalLayoutName, float xOffset, float yOffset)
+void GD_API CreateObjectsFromExternalLayout(RuntimeScene & scene, const gd::String & externalLayoutName, float xOffset, float yOffset)
 {
     for (unsigned int i = 0;i<scene.game->GetExternalLayoutsCount();++i)
     {

@@ -39,17 +39,17 @@ CodeCompilerTask ConstructEmptyTask()
 
 }
 
-std::string CodeCompilerCall::GetFullCall() const
+gd::String CodeCompilerCall::GetFullCall() const
 {
     #if defined(WINDOWS)
-    std::string compilerExecutable = "\""+CodeCompiler::Get()->GetBaseDirectory()+"CppPlatform/MinGW32/bin/g++.exe\"";
+    gd::String compilerExecutable = "\""+CodeCompiler::Get()->GetBaseDirectory()+"CppPlatform/MinGW32/bin/g++.exe\"";
     #else
-    std::string compilerExecutable = "g++";
+    gd::String compilerExecutable = "g++";
     #endif
 
-    std::string baseDir = CodeCompiler::Get()->GetBaseDirectory();
+    gd::String baseDir = CodeCompiler::Get()->GetBaseDirectory();
 
-    std::vector<std::string> args;
+    std::vector<gd::String> args;
 	args.push_back("-std=gnu++11");
     #if defined(WINDOWS)
     args.push_back("-m32");
@@ -72,7 +72,7 @@ std::string CodeCompilerCall::GetFullCall() const
         args.push_back("-c \""+inputFile+"\"");
 
         //Compiler default directories
-        std::vector<std::string> standardsIncludeDirs;
+        std::vector<gd::String> standardsIncludeDirs;
         #if defined(WINDOWS)
         standardsIncludeDirs.push_back("CppPlatform/MinGW32/include");
         standardsIncludeDirs.push_back("CppPlatform/MinGW32/lib/gcc/mingw32/4.9.2/include");
@@ -99,8 +99,8 @@ std::string CodeCompilerCall::GetFullCall() const
             args.push_back("-I\""+baseDir+standardsIncludeDirs[i]+"\"");
 
         //CodeCompiler extra headers directories
-        const std::set<std::string> & codeCompilerHeaders = CodeCompiler::Get()->GetAllHeadersDirectories();
-        for (std::set<std::string>::const_iterator header = codeCompilerHeaders.begin();header != codeCompilerHeaders.end();++header)
+        const std::set<gd::String> & codeCompilerHeaders = CodeCompiler::Get()->GetAllHeadersDirectories();
+        for (std::set<gd::String>::const_iterator header = codeCompilerHeaders.begin();header != codeCompilerHeaders.end();++header)
             args.push_back("-I\""+*header+"\"");
 
         //Additional headers for the task
@@ -220,7 +220,7 @@ std::string CodeCompilerCall::GetFullCall() const
         }
     }
 
-    std::string argsStr;
+    gd::String argsStr;
     for (unsigned int i = 0;i<args.size();++i) argsStr += args[i]+" ";
 
     return compilerExecutable+" "+argsStr;
@@ -380,7 +380,7 @@ void CodeCompiler::ProcessEndedWork(wxCommandEvent & event)
             lastTaskMessages += currentTaskProcess->outputErrors[i]+"\n";
 
         ofstream outputFile;
-        outputFile.open (std::string(outputDir+"LatestCompilationOutput.txt").c_str());
+        outputFile.open (gd::String(outputDir+"LatestCompilationOutput.txt").ToLocale().c_str());
         if (outputFile.is_open())
         {
             outputFile << lastTaskMessages;
@@ -557,7 +557,7 @@ bool CodeCompiler::CompilationInProcess() const
     return processLaunched;
 }
 
-void CodeCompiler::SetOutputDirectory(std::string outputDir_)
+void CodeCompiler::SetOutputDirectory(gd::String outputDir_)
 {
     outputDir = outputDir_;
     if ( outputDir.empty() || (outputDir[outputDir.length()-1] != '/' && outputDir[outputDir.length()-1] != '\\' ) )
@@ -579,17 +579,17 @@ void CodeCompiler::ClearOutputDirectory()
     }
 }
 
-void CodeCompiler::AddHeaderDirectory(const std::string & dir)
+void CodeCompiler::AddHeaderDirectory(const gd::String & dir)
 {
     wxFileName filename = wxFileName::FileName(dir);
     filename.MakeAbsolute(baseDir);
 
-    headersDirectories.insert(ToString(filename.GetPath()));
+    headersDirectories.insert(filename.GetPath());
 }
 
-void CodeCompiler::SetBaseDirectory(std::string baseDir_)
+void CodeCompiler::SetBaseDirectory(gd::String baseDir_)
 {
-    std::string oldBaseDir = baseDir; //Remember the old base directory, see below
+    gd::String oldBaseDir = baseDir; //Remember the old base directory, see below
     baseDir = baseDir_;
 
     if ( baseDir.empty() || (baseDir[baseDir.length()-1] != '/' && baseDir[baseDir.length()-1] != '\\' ) )
@@ -631,7 +631,7 @@ void CodeCompilerProcess::ReadOutput()
 
     if(IsInputAvailable())
     {
-        std::string line;
+        gd::String line;
         do
         {
             c = GetInputStream()->GetC();
@@ -646,7 +646,7 @@ void CodeCompilerProcess::ReadOutput()
     }
     if(IsErrorAvailable())
     {
-        std::string line;
+        gd::String line;
         do
         {
             c = GetErrorStream()->GetC();
@@ -698,4 +698,3 @@ void CodeCompiler::DestroySingleton()
     }
 }
 #endif
-

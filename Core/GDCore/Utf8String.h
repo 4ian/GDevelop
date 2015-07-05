@@ -733,6 +733,20 @@ typedef utf8::String String;
 
 }
 
+namespace std
+{
+    /**
+     * std::hash specialization for gd::String
+     */
+    template <> struct hash<gd::String>
+    {
+        size_t operator()(const gd::String & x) const
+        {
+            return hash<std::string>()(x.Raw());
+        }
+    };
+}
+
 #endif
 
 

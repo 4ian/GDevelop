@@ -10,6 +10,7 @@
 
 #include <map>
 #include <string>
+#include "GDCpp/Utf8String.h"
 #include <iostream>
 #include <vector>
 #include <set>

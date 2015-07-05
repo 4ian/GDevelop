@@ -9,6 +9,7 @@
 
 #include <string>
 #include <vector>
+#include "GDCpp/Utf8String.h"
 
 using namespace std;
 
@@ -44,19 +45,18 @@ struct sFileEntry
 class GD_API DatFile
 {
 private :
-    std::string m_datfile; /// name of the DAT file
+    gd::String m_datfile; /// name of the DAT file
     sDATHeader m_header; /// file header
     std::vector<sFileEntry> m_entries; /// vector of files entries
     char* m_buffer; /// Buffer pointing on a file in memory
 public :
     DatFile (void);
     ~DatFile (void);
-    bool Create (std::vector<std::string> files, std::string directory, std::string destination);
-    bool ContainsFile(const std::string & filename);
-    bool Read (std::string source);
-    char* GetFile (std::string filename);
-    long int GetFileSize (std::string filename);
+    bool Create (std::vector<gd::String> files, gd::String directory, gd::String destination);
+    bool ContainsFile(const gd::String & filename);
+    bool Read (gd::String source);
+    char* GetFile (gd::String filename);
+    long int GetFileSize (gd::String filename);
 };
 
 #endif // DATFILE_H
-

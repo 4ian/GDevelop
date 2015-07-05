@@ -59,7 +59,7 @@ namespace GDpriv
  * \param game Game associated with the scene
  * \param scene Scene with events to compile
  */
-bool CreateWholeProjectRuntimeLinkingTask(gd::Project & game, const std::string & outputFilename)
+bool CreateWholeProjectRuntimeLinkingTask(gd::Project & game, const gd::String & outputFilename)
 {
     std::cout << "Preparing linking task for project " << game.GetName() << "..." << std::endl;
     CodeCompilerTask task;
@@ -92,7 +92,7 @@ bool CreateWholeProjectRuntimeLinkingTask(gd::Project & game, const std::string 
     for (unsigned int l= 0;l<game.GetLayoutsCount();++l)
     {
         std::cout << "Added GD" << gd::ToString(&game.GetLayout(l)) << "RuntimeObjectFile.o (Layout object file) to the linking." << std::endl;
-        task.compilerCall.extraObjectFiles.push_back(string(CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::ToString(&game.GetLayout(l))+"RuntimeObjectFile.o"));
+        task.compilerCall.extraObjectFiles.push_back(gd::String(CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::String::FromLocale(gd::ToString(&game.GetLayout(l)))+"RuntimeObjectFile.o"));
 
         DependenciesAnalyzer analyzer(game, game.GetLayout(l));
         if ( !analyzer.Analyze() )
@@ -101,13 +101,13 @@ bool CreateWholeProjectRuntimeLinkingTask(gd::Project & game, const std::string 
             return false;
         }
 
-        for (std::set<std::string>::const_iterator i = analyzer.GetSourceFilesDependencies().begin();i!=analyzer.GetSourceFilesDependencies().end();++i)
+        for (std::set<gd::String>::const_iterator i = analyzer.GetSourceFilesDependencies().begin();i!=analyzer.GetSourceFilesDependencies().end();++i)
         {
             if (!game.HasSourceFile(*i, "C++")) continue;
             const gd::SourceFile & sourceFile = game.GetSourceFile(*i);
 
             std::cout << "Added GD" << gd::ToString(&sourceFile) << "RuntimeObjectFile.o (Created from a Source file) to the linking." << std::endl;
-            task.compilerCall.extraObjectFiles.push_back(string(CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::ToString(&sourceFile)+"RuntimeObjectFile.o"));
+            task.compilerCall.extraObjectFiles.push_back(gd::String(CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::String::FromLocale(gd::ToString(&sourceFile))+"RuntimeObjectFile.o"));
         }
     }
     for (unsigned int l= 0;l<game.GetExternalEventsCount();++l)
@@ -118,7 +118,7 @@ bool CreateWholeProjectRuntimeLinkingTask(gd::Project & game, const std::string 
         if ( !analyzer.ExternalEventsCanBeCompiledForAScene().empty() )
         {
             std::cout << "Added GD" << gd::ToString(&externalEvents) << "RuntimeObjectFile.o (Created from external events) to the linking." << std::endl;
-            task.compilerCall.extraObjectFiles.push_back(string(CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::ToString(&externalEvents)+"RuntimeObjectFile.o"));
+            task.compilerCall.extraObjectFiles.push_back(gd::String(CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::String::FromLocale(gd::ToString(&externalEvents))+"RuntimeObjectFile.o"));
         }
     }
 
@@ -150,9 +150,9 @@ void FullProjectCompiler::LaunchProjectCompilation()
         #warning Unknown OS
     #endif
 
-    std::string winExecutableName = gameToCompile.winExecutableFilename.empty() ? "GameWin.exe" : gameToCompile.winExecutableFilename+".exe";
-    std::string linuxExecutableName = gameToCompile.linuxExecutableFilename.empty() ? "GameLinux" : gameToCompile.linuxExecutableFilename;
-    std::string macExecutableName = gameToCompile.macExecutableFilename.empty() ? "GameMac" : gameToCompile.macExecutableFilename;
+    gd::String winExecutableName = gameToCompile.winExecutableFilename.empty() ? "GameWin.exe" : gameToCompile.winExecutableFilename+".exe";
+    gd::String linuxExecutableName = gameToCompile.linuxExecutableFilename.empty() ? "GameLinux" : gameToCompile.linuxExecutableFilename;
+    gd::String macExecutableName = gameToCompile.macExecutableFilename.empty() ? "GameMac" : gameToCompile.macExecutableFilename;
 
     diagnosticManager.OnMessage(GD_T("Project compilation launching"));
     if ( !windowsTarget && !linuxTarget && !macTarget)
@@ -164,11 +164,11 @@ void FullProjectCompiler::LaunchProjectCompilation()
 
     //Used to handle all files which must be exported
     gd::ResourcesMergingHelper resourcesMergingHelper(NativeFileSystem::Get());
-    resourcesMergingHelper.SetBaseDirectory(gd::ToString(wxFileName::FileName(gameToCompile.GetProjectFile()).GetPath()));
+    resourcesMergingHelper.SetBaseDirectory(wxFileName::FileName(gameToCompile.GetProjectFile()).GetPath());
 
     wxLogNull noLogPlease;
     wxString tempDir = GetTempDir();
-    ClearDirectory(gd::ToString(tempDir)); //Préparation du répertoire
+    ClearDirectory(tempDir); //Prï¿½paration du rï¿½pertoire
 
     //Wait current compilations to end
     if ( CodeCompiler::Get()->CompilationInProcess() )
@@ -193,7 +193,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
     diagnosticManager.OnMessage( GD_T("Preparing resources...") );
 
     //Add images
-    std::vector<std::string> allResources = game.GetResourcesManager().GetAllResourcesList();
+    std::vector<gd::String> allResources = game.GetResourcesManager().GetAllResourcesList();
     for ( unsigned int i = 0;i < allResources.size() ;i++ )
     {
         diagnosticManager.OnMessage( GD_T("Preparing resources..."), allResources[i] );
@@ -229,8 +229,8 @@ void FullProjectCompiler::LaunchProjectCompilation()
         task.compilerCall.compilationForRuntime = true;
         task.compilerCall.optimize = optimize;
         task.compilerCall.eventsGeneratedCode = true;
-        task.compilerCall.inputFile = string(CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::ToString(&game.GetLayout(i))+"RuntimeEventsSource.cpp");
-        task.compilerCall.outputFile = string(CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::ToString(&game.GetLayout(i))+"RuntimeObjectFile.o");
+        task.compilerCall.inputFile = gd::String(CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::String::FromLocale(gd::ToString(&game.GetLayout(i)))+"RuntimeEventsSource.cpp");
+        task.compilerCall.outputFile = gd::String(CodeCompiler::Get()->GetOutputDirectory()+"GD"+gd::String::FromLocale(gd::ToString(&game.GetLayout(i)))+"RuntimeObjectFile.o");
         task.userFriendlyName = "Compilation of events of scene "+game.GetLayout(i).GetName();
         task.preWork = std::shared_ptr<CodeCompilerExtraWork>(new EventsCodeCompilerRuntimePreWork(&game, &game.GetLayout(i), resourcesMergingHelper));
         task.scene = &game.GetLayout(i);
@@ -263,9 +263,9 @@ void FullProjectCompiler::LaunchProjectCompilation()
 
     //Now copy resources
     diagnosticManager.OnMessage( GD_T("Copying resources...") );
-    map<string, string> & resourcesNewFilename = resourcesMergingHelper.GetAllResourcesOldAndNewFilename();
+    map<gd::String, gd::String> & resourcesNewFilename = resourcesMergingHelper.GetAllResourcesOldAndNewFilename();
     unsigned int i = 0;
-    for(map<string, string>::const_iterator it = resourcesNewFilename.begin(); it != resourcesNewFilename.end(); ++it)
+    for(auto it = resourcesNewFilename.begin(); it != resourcesNewFilename.end(); ++it)
     {
         diagnosticManager.OnMessage( GD_T("Copying resources..."), it->first );
 
@@ -281,7 +281,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
     diagnosticManager.OnMessage(GD_T( "Copying resources..." ), GD_T( "Step 1 out of 3" ));
     gd::Project strippedProject = game;
     gd::ProjectStripper::StripProject(strippedProject);
-    strippedProject.SaveToFile(static_cast<string>( tempDir + "/GDProjectSrcFile.gdg" ));
+    strippedProject.SaveToFile( tempDir + "/GDProjectSrcFile.gdg" );
     diagnosticManager.OnPercentUpdate(80);
 
     gd::SafeYield::Do();
@@ -289,11 +289,11 @@ void FullProjectCompiler::LaunchProjectCompilation()
 
     //Encrypt the source file.
     {
-		std::string ifileName = tempDir.ToStdString() + "/GDProjectSrcFile.gdg";
-		std::string ofileName = tempDir.ToStdString() + "/src";
+		gd::String ifileName = tempDir + "/GDProjectSrcFile.gdg";
+		gd::String ofileName = tempDir + "/src";
 
-        ifstream ifile(ifileName.c_str(), ios_base::binary);
-        ofstream ofile(ofileName.c_str(), ios_base::binary);
+        ifstream ifile(ifileName.ToLocale().c_str(), ios_base::binary);
+        ofstream ofile(ofileName.ToLocale().c_str(), ios_base::binary);
 
         // get file size
         ifile.seekg(0,ios_base::end);
@@ -327,26 +327,26 @@ void FullProjectCompiler::LaunchProjectCompilation()
     wxRemoveFile( tempDir + "/compil.gdg" );
     diagnosticManager.OnPercentUpdate(85);
 
-    //Création du fichier gam.egd
+    //Crï¿½ation du fichier gam.egd
     diagnosticManager.OnMessage(GD_T( "Copying resources..." ), GD_T( "Step 3 out of 3" ));
     gd::SafeYield::Do();
 
-    //On créé une liste avec tous les fichiers
-    vector < string > files;
+    //On crï¿½ï¿½ une liste avec tous les fichiers
+    std::vector < gd::String > files;
     {
         wxString file = wxFindFirstFile( tempDir + "/*" );
         while ( !file.empty() )
         {
             wxFileName filename(file);
 
-            files.push_back( static_cast<string>(filename.GetFullName()) );
+            files.push_back( filename.GetFullName() );
             file = wxFindNextFile();
         }
     }
 
-    //On créé le fichier à partir des fichiers
+    //On crï¿½ï¿½ le fichier ï¿½ partir des fichiers
     DatFile gameDatFile;
-    gameDatFile.Create(files, static_cast<string>(tempDir), static_cast<string>(tempDir + "/gam.egd"));
+    gameDatFile.Create(files, tempDir, tempDir + "/gam.egd");
 
     //On supprime maintenant tout le superflu
     {
@@ -368,9 +368,9 @@ void FullProjectCompiler::LaunchProjectCompilation()
     {
         diagnosticManager.OnMessage(GD_T( "Linking project files..." ));
         #if defined(WINDOWS)
-        std::string codeOutputFile = "Code.dll";
+        gd::String codeOutputFile = "Code.dll";
         #else
-        std::string codeOutputFile = "Code.so";
+        gd::String codeOutputFile = "Code.so";
         #endif
         codeOutputFile = tempDir+"/"+codeOutputFile;
 
@@ -437,7 +437,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
             }
         }
 
-        const std::vector < std::pair<std::string, std::string> > & supplementaryFiles = extension->GetSupplementaryRuntimeFiles();
+        const std::vector < std::pair<gd::String, gd::String> > & supplementaryFiles = extension->GetSupplementaryRuntimeFiles();
         for (unsigned int i = 0;i<supplementaryFiles.size();++i)
         {
             if ( (supplementaryFiles[i].first == "Windows" && windowsTarget) ||
@@ -490,7 +490,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
                 diagnosticManager.AddError(GD_T( "Unable to create ")+"libGDCpp.dylib"+GD_T(" in compilation directory.\n" ));
         }
 
-        //Copie du tout dans le répertoire final
+        //Copie du tout dans le rï¿½pertoire final
         wxString file = wxFindFirstFile( tempDir + "/*" );
         while ( !file.empty() )
         {
@@ -518,7 +518,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
 
             //Make the archive autoextractible
             std::ofstream outFile;
-            outFile.open (std::string(outDir+"/"+winExecutableName).c_str(), std::ofstream::out | std::ofstream::binary);
+            outFile.open (gd::String(outDir+"/"+winExecutableName).ToLocale().c_str(), std::ofstream::out | std::ofstream::binary);
             {
                 std::ifstream file;
                 char buffer[1];
@@ -555,7 +555,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
                 std::ifstream file;
                 char buffer[1];
 
-                file.open (std::string(tempDir +"/archive.7z").c_str(), std::ifstream::in | std::ifstream::binary);
+                file.open (gd::String(tempDir +"/archive.7z").ToLocale().c_str(), std::ifstream::in | std::ifstream::binary);
                 if (file.is_open())
                 {
                     file.seekg (0, std::ios::beg);
@@ -565,7 +565,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
                     file.close();
                 }
                 else
-                    diagnosticManager.AddError( GD_T("Unable to open ")+std::string(tempDir +"/archive.7z") );
+                    diagnosticManager.AddError( GD_T("Unable to open ")+gd::String(tempDir +"/archive.7z") );
             }
 
             outFile.close();
@@ -589,10 +589,10 @@ void FullProjectCompiler::LaunchProjectCompilation()
 /**
  * Return a temporary directory
  */
-std::string FullProjectCompiler::GetTempDir()
+gd::String FullProjectCompiler::GetTempDir()
 {
 #if !defined(GD_NO_WX_GUI)
-    std::string tempDir = forcedTempDir;
+    gd::String tempDir = forcedTempDir;
     if ( tempDir.empty() ) //If the user has not forced a directory
     {
         tempDir = wxFileName::GetTempDir();
@@ -610,7 +610,7 @@ std::string FullProjectCompiler::GetTempDir()
 #endif
 }
 
-void FullProjectCompiler::ClearDirectory(std::string directory)
+void FullProjectCompiler::ClearDirectory(gd::String directory)
 {
 #if !defined(GD_NO_WX_GUI)
     if ( !wxDirExists( directory ) && !wxMkdir( directory ) )
@@ -639,7 +639,7 @@ void FullProjectCompilerConsoleDiagnosticManager::OnCompilationSucceeded()
     cout << GD_T("Compilation succeeded.") << endl;
 }
 
-void FullProjectCompilerConsoleDiagnosticManager::OnMessage(std::string message, std::string message2)
+void FullProjectCompilerConsoleDiagnosticManager::OnMessage(gd::String message, gd::String message2)
 {
     if ( message2.empty() )
         cout << message << endl;

@@ -21,7 +21,7 @@ ExtensionBase::~ExtensionBase()
 {
 };
 
-CreateRuntimeObjectFunPtr ExtensionBase::GetRuntimeObjectCreationFunctionPtr(std::string objectType) const
+CreateRuntimeObjectFunPtr ExtensionBase::GetRuntimeObjectCreationFunctionPtr(gd::String objectType) const
 {
     if ( runtimeObjectCreationFunctionTable.find(objectType) != runtimeObjectCreationFunctionTable.end())
         return runtimeObjectCreationFunctionTable.find(objectType)->second;
@@ -29,7 +29,7 @@ CreateRuntimeObjectFunPtr ExtensionBase::GetRuntimeObjectCreationFunctionPtr(std
     return NULL;
 }
 
-void ExtensionBase::AddRuntimeObject(gd::ObjectMetadata & object, std::string className, CreateRuntimeObjectFunPtr createFun)
+void ExtensionBase::AddRuntimeObject(gd::ObjectMetadata & object, gd::String className, CreateRuntimeObjectFunPtr createFun)
 {
 #if defined(GD_IDE_ONLY)
     object.className = className;

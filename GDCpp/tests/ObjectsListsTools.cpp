@@ -32,7 +32,7 @@ TEST_CASE( "ObjectsListsTools", "[game-engine]" ) {
 	RuntimeObject obj2B(scene, obj2);
 	RuntimeObject obj2C(scene, obj2);
 	SECTION("PickObjectsIf") {
-		std::map <std::string, std::vector<RuntimeObject*> *> map;
+		std::map <gd::String, std::vector<RuntimeObject*> *> map;
 		std::vector<RuntimeObject*> list1 = {&obj1A, &obj1B, &obj1C};
 		map["1"] = &list1;
 
@@ -63,8 +63,8 @@ TEST_CASE( "ObjectsListsTools", "[game-engine]" ) {
 	}
 	SECTION("TwoObjectListsTest") {
 
-		std::map <std::string, std::vector<RuntimeObject*> *> map1;
-		std::map <std::string, std::vector<RuntimeObject*> *> map2;
+		std::map <gd::String, std::vector<RuntimeObject*> *> map1;
+		std::map <gd::String, std::vector<RuntimeObject*> *> map2;
 		std::vector<RuntimeObject*> list1 = {&obj1A, &obj1B, &obj1C};
 		std::vector<RuntimeObject*> list2 = {&obj2A, &obj2B, &obj2C};
 		map1["1"] = &list1;
@@ -95,7 +95,7 @@ TEST_CASE( "ObjectsListsTools", "[game-engine]" ) {
 		REQUIRE(list2[0] == &obj2C);
 	}
 	SECTION("PickNearestObject") {
-		std::map <std::string, std::vector<RuntimeObject*> *> map;
+		std::map <gd::String, std::vector<RuntimeObject*> *> map;
 		std::vector<RuntimeObject*> list1 = {&obj1A, &obj1B, &obj1C};
 		map["1"] = &list1;
 		obj1A.SetX(50);
@@ -110,7 +110,7 @@ TEST_CASE( "ObjectsListsTools", "[game-engine]" ) {
 		REQUIRE(list1[0] == &obj1A);
 
 		SECTION("Furthest") {
-			std::map <std::string, std::vector<RuntimeObject*> *> map;
+			std::map <gd::String, std::vector<RuntimeObject*> *> map;
 			std::vector<RuntimeObject*> list1 = {&obj1A, &obj1B, &obj1C};
 			map["1"] = &list1;
 

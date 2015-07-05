@@ -66,7 +66,7 @@ CppLayoutPreviewer::CppLayoutPreviewer(gd::LayoutEditorCanvas & editor_) :
     reloadingIconImage.loadFromFile("res/compile128.png");
     reloadingIconSprite.setTexture(reloadingIconImage);
     reloadingText.setColor(sf::Color(0,0,0,128));
-    reloadingText.setString(gd::utf8::ToSfString(GD_T("Compiling...")));
+    reloadingText.setString(GD_T("Compiling..."));
     reloadingText.setCharacterSize(40);
     reloadingText.setFont(*FontManager::Get()->GetFont(""));
 
@@ -166,7 +166,7 @@ void CppLayoutPreviewer::OnUpdate()
             else if ( retourEvent != -1 )
             {
                 if (retourEvent > 0 && static_cast<unsigned>(retourEvent) < editor.GetProject().GetLayoutsCount())
-                    mainFrameWrapper.GetInfoBar()->ShowMessage(_( "In the compiled game, the scene will change for " ) + "\"" + gd::String::FromUTF8(editor.GetProject().GetLayout(retourEvent).GetName()) + "\"");
+                    mainFrameWrapper.GetInfoBar()->ShowMessage(_( "In the compiled game, the scene will change for " ) + "\"" + editor.GetProject().GetLayout(retourEvent).GetName() + "\"");
             }
         }
         else if ( !previewScene.running ) //Paused

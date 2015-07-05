@@ -18,7 +18,7 @@ using namespace std;
 /**
  * Test a collision between two sprites objects
  */
-bool GD_API SpriteCollision( std::map <std::string, std::vector<RuntimeObject*> *> objectsLists1, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists2, bool conditionInverted )
+bool GD_API SpriteCollision( std::map <gd::String, std::vector<RuntimeObject*> *> objectsLists1, std::map <gd::String, std::vector<RuntimeObject*> *> objectsLists2, bool conditionInverted )
 {
     return TwoObjectListsTest(objectsLists1, objectsLists2, conditionInverted, [](RuntimeObject * obj1, RuntimeObject * obj2) {
     	return CheckCollision( static_cast<RuntimeSpriteObject*>(obj1), static_cast<RuntimeSpriteObject*>(obj2));

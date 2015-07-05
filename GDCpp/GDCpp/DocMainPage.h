@@ -76,9 +76,9 @@
  *
  * \section utf8section UTF8 strings
  * 
- * GDevelop uses UTF8 encoded std::string as string parameters passed to actions/conditions and expressions and as return value for string expressions.
- * Your extension is free to take advantage of UTF8 or can use std::string encoded with the current locale (the default C++ behavior). GDCpp provides tools to work
- * with UTF8 strings as some methods (like std::string::size()) are not valid anymore with them.
+ * GDevelop uses UTF8 encoded gd::String as string parameters passed to actions/conditions and expressions and as return value for string expressions.
+ * Your extension is free to take advantage of UTF8 or can use gd::String encoded with the current locale (the default C++ behavior). GDCpp provides tools to work
+ * with UTF8 strings as some methods (like gd::String::size()) are not valid anymore with them.
  *
  * For more information, see \ref utf8support 
  */

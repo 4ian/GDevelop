@@ -59,12 +59,12 @@ public :
      * \param createFun A function taking a reference to a RuntimeScene and to a const reference to a gd::Object and returning a pointer
      * to the RuntimeObject created.
      */
-    void AddRuntimeObject(gd::ObjectMetadata & object, std::string className, CreateRuntimeObjectFunPtr createFun);
+    void AddRuntimeObject(gd::ObjectMetadata & object, gd::String className, CreateRuntimeObjectFunPtr createFun);
 
     /**
      * \brief Return a function to create the runtime object if the type is handled by the extension
      */
-    CreateRuntimeObjectFunPtr GetRuntimeObjectCreationFunctionPtr(std::string objectType) const;
+    CreateRuntimeObjectFunPtr GetRuntimeObjectCreationFunctionPtr(gd::String objectType) const;
 
     /**
      * \brief Called when a scene is loaded: Useful to initialize some extensions specific objects related to scene
@@ -101,34 +101,34 @@ public :
      * \brief Called by the debugger so as to get a property value and name.
      * \see RuntimeObject::GetPropertyForDebugger
      */
-    virtual void GetPropertyForDebugger(RuntimeScene & scene, unsigned int propertyNb, std::string & name, std::string & value) const {};
+    virtual void GetPropertyForDebugger(RuntimeScene & scene, unsigned int propertyNb, gd::String & name, gd::String & value) const {};
 
     /**
      * \brief Called by the debugger so as to update a property
      * \see RuntimeObject::ChangeProperty
      */
-    virtual bool ChangeProperty(RuntimeScene & scene, unsigned int propertyNb, std::string newValue) { return false; };
+    virtual bool ChangeProperty(RuntimeScene & scene, unsigned int propertyNb, gd::String newValue) { return false; };
 
     /**
      * \brief Must return the number of available properties for the debugger
      */
     virtual unsigned int GetNumberOfProperties(RuntimeScene & scene) const { return 0; };
 
-    const std::vector < std::pair<std::string, std::string> > & GetSupplementaryRuntimeFiles() const { return supplementaryRuntimeFiles; };
-    const std::vector < std::string > & GetSupplementaryIncludeDirectories() const { return supplementaryIncludeDirectories; };
-    const std::vector < std::string > & GetSupplementaryLibFiles() const { return supplementaryLibFiles; };
+    const std::vector < std::pair<gd::String, gd::String> > & GetSupplementaryRuntimeFiles() const { return supplementaryRuntimeFiles; };
+    const std::vector < gd::String > & GetSupplementaryIncludeDirectories() const { return supplementaryIncludeDirectories; };
+    const std::vector < gd::String > & GetSupplementaryLibFiles() const { return supplementaryLibFiles; };
     #endif
 
 protected :
 
     #if defined(GD_IDE_ONLY)
-    std::vector < std::pair<std::string, std::string> > supplementaryRuntimeFiles; ///<Supplementary runtime files to copy on compilation
-    std::vector < std::string > supplementaryIncludeDirectories; ///<Supplementary include directories to use on events compilation
-    std::vector < std::string > supplementaryLibFiles; ///<Supplementary libraries files to be used when compiling events with this extension. Files must be in CppPlatform/Extensions and CppPlatform/Extensions/Runtime directories. The filename will be completed with lib and .a.
+    std::vector < std::pair<gd::String, gd::String> > supplementaryRuntimeFiles; ///<Supplementary runtime files to copy on compilation
+    std::vector < gd::String > supplementaryIncludeDirectories; ///<Supplementary include directories to use on events compilation
+    std::vector < gd::String > supplementaryLibFiles; ///<Supplementary libraries files to be used when compiling events with this extension. Files must be in CppPlatform/Extensions and CppPlatform/Extensions/Runtime directories. The filename will be completed with lib and .a.
     #endif
 
 private:
-    std::map < std::string, CreateRuntimeObjectFunPtr > runtimeObjectCreationFunctionTable;
+    std::map < gd::String, CreateRuntimeObjectFunPtr > runtimeObjectCreationFunctionTable;
 };
 
 #endif // EXTENSIONBASE_H

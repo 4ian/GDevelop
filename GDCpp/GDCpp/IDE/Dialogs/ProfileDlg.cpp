@@ -160,7 +160,7 @@ void ProfileDlg::UpdateGUI()
     eventsTimeTxt->SetLabel(_("Events:")+gd::String::FromDouble(static_cast<double>(lastEventsTime)/1000.0f)+_("ms")
                             +_("/ Percent of time used by events:")
                                      +gd::String::FromDouble(static_cast<double>(lastEventsTime)/static_cast<double>((lastEventsTime+lastRenderingTime))*100.0f)
-                                     +GD_LOC("%"));
+                                     +"%");
 
     totalTimeTxt->SetLabel(_("Total rendering time ( Display + Events ):")+
         gd::String::FromDouble(static_cast<double>((lastRenderingTime+lastEventsTime))/1000.0f)+_("ms"));
@@ -189,7 +189,7 @@ void ProfileDlg::UpdateGUI()
 
 void ProfileDlg::OnratioGraphicsPaint(wxPaintEvent& event)
 {
-    wxBufferedPaintDC dc( ratioGraphics ); //Création obligatoire du wxBufferedPaintDC
+    wxBufferedPaintDC dc( ratioGraphics ); //Crï¿½ation obligatoire du wxBufferedPaintDC
     ratioGraphics->SetBackgroundStyle( wxBG_STYLE_PAINT );
 
     dc.SetBackgroundMode( wxBG_STYLE_COLOUR );
@@ -301,14 +301,14 @@ void ProfileDlg::OnratioGraphicsRightUp(wxMouseEvent& event)
 
 void ProfileDlg::OnChangeDurationSelected(wxCommandEvent& event)
 {
-    std::string newMaxData = string(wxGetTextFromUser(_("Enter the number of measure to memorize"), _("Number of measures"), ToString(maxData)).mb_str());
-    maxData = ToInt(newMaxData);
+    gd::String newMaxData = wxGetTextFromUser(_("Enter the number of measure to memorize"), _("Number of measures"), gd::String::FromInt(maxData));
+    maxData = newMaxData.ToInt();
 }
 
 void ProfileDlg::OnStepTimeSelected(wxCommandEvent& event)
 {
-    std::string newStepTime = string(wxGetTextFromUser(_("Enter time between each measure ( milliseconds )"), _("Time between each measure"), ToString(static_cast<double>(stepTime)*1000.0f)).mb_str());
-    stepTime = ToFloat(newStepTime)/1000.0f;
+    gd::String newStepTime = wxGetTextFromUser(_("Enter time between each measure ( milliseconds )"), _("Time between each measure"), gd::String::FromDouble(static_cast<double>(stepTime)*1000.0f));
+    stepTime = newStepTime.ToFloat()/1000.0f;
 }
 
 void ProfileDlg::OnactivateCheckClick(wxCommandEvent& event)

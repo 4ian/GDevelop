@@ -31,13 +31,13 @@ RuntimeObject::RuntimeObject(RuntimeScene & scene, const gd::Object & object) :
     ClearForce();
 
     //Do not forget to delete automatisms which are managed using raw pointers.
-    for (std::map<std::string, Automatism* >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
+    for (std::map<gd::String, Automatism* >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
     	delete it->second;
 
     automatisms.clear();
 
     //And insert the new ones.
-    for (std::map<std::string, Automatism* >::const_iterator it = object.GetAllAutomatisms().begin() ; it != object.GetAllAutomatisms().end(); ++it )
+    for (std::map<gd::String, Automatism* >::const_iterator it = object.GetAllAutomatisms().begin() ; it != object.GetAllAutomatisms().end(); ++it )
     {
     	automatisms[it->first] = it->second->Clone();
     	automatisms[it->first]->SetOwner(this);
@@ -47,7 +47,7 @@ RuntimeObject::RuntimeObject(RuntimeScene & scene, const gd::Object & object) :
 RuntimeObject::~RuntimeObject()
 {
     //Do not forget to delete automatisms and forces which are managed using raw pointers.
-    for (std::map<std::string, Automatism* >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
+    for (std::map<gd::String, Automatism* >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
     	delete it->second;
 }
 
@@ -66,11 +66,11 @@ void RuntimeObject::Init(const RuntimeObject & object)
     forces = object.forces;
 
     //Do not forget to delete automatisms which are managed using raw pointers.
-    for (std::map<std::string, Automatism* >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
+    for (std::map<gd::String, Automatism* >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
     	delete it->second;
 
     automatisms.clear();
-    for (std::map<std::string, Automatism* >::const_iterator it = object.automatisms.begin() ; it != object.automatisms.end(); ++it )
+    for (std::map<gd::String, Automatism* >::const_iterator it = object.automatisms.begin() ; it != object.automatisms.end(); ++it )
     {
     	automatisms[it->first] = it->second->Clone();
     	automatisms[it->first]->SetOwner(this);
@@ -78,21 +78,21 @@ void RuntimeObject::Init(const RuntimeObject & object)
 }
 
 #if defined(GD_IDE_ONLY)
-void RuntimeObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
+void RuntimeObject::GetPropertyForDebugger(unsigned int propertyNb, gd::String & name, gd::String & value) const
 {
-    if      ( propertyNb == 0 ) {name = GD_T("Position");      value = ToString(GetX())+";"+ToString(GetY());}
-    else if ( propertyNb == 1 ) {name = GD_T("Angle");         value = ToString(GetAngle())+u8"°";}
-    else if ( propertyNb == 2 ) {name = GD_T("Size");        value = ToString(GetWidth())+";"+ToString(GetHeight());}
+    if      ( propertyNb == 0 ) {name = GD_T("Position");      value = gd::String::FromFloat(GetX())+";"+gd::String::FromFloat(GetY());}
+    else if ( propertyNb == 1 ) {name = GD_T("Angle");         value = gd::String::FromFloat(GetAngle())+u8"°";}
+    else if ( propertyNb == 2 ) {name = GD_T("Size");        value = gd::String::FromFloat(GetWidth())+";"+gd::String::FromFloat(GetHeight());}
     else if ( propertyNb == 3 ) {name = GD_T("Visibility");    value = hidden ? GD_T("Hidden") : GD_T("Displayed");}
     else if ( propertyNb == 4 ) {name = GD_T("Layer");        value = layer;}
-    else if ( propertyNb == 5 ) {name = GD_T("Z order");          value = ToString(zOrder);}
-    else if ( propertyNb == 6 ) {name = GD_T("Speed");       value = ToString(TotalForceLength());}
-    else if ( propertyNb == 7 ) {name = GD_T("Angle of moving"); value = ToString(TotalForceAngle());}
-    else if ( propertyNb == 8 ) {name = GD_T("X coordinate of moving");     value = ToString(TotalForceX());}
-    else if ( propertyNb == 9 ) {name = GD_T("Y coordinate of moving"); value = ToString(TotalForceY());}
+    else if ( propertyNb == 5 ) {name = GD_T("Z order");          value = gd::String::FromInt(zOrder);}
+    else if ( propertyNb == 6 ) {name = GD_T("Speed");       value = gd::String::FromFloat(TotalForceLength());}
+    else if ( propertyNb == 7 ) {name = GD_T("Angle of moving"); value = gd::String::FromFloat(TotalForceAngle());}
+    else if ( propertyNb == 8 ) {name = GD_T("X coordinate of moving");     value = gd::String::FromFloat(TotalForceX());}
+    else if ( propertyNb == 9 ) {name = GD_T("Y coordinate of moving"); value = gd::String::FromFloat(TotalForceY());}
 }
 
-bool RuntimeObject::ChangeProperty(unsigned int propertyNb, string newValue)
+bool RuntimeObject::ChangeProperty(unsigned int propertyNb, gd::String newValue)
 {
     if ( propertyNb == 0 )
     {
@@ -101,13 +101,13 @@ bool RuntimeObject::ChangeProperty(unsigned int propertyNb, string newValue)
         if ( separationPos > newValue.length())
             return false;
 
-        string xValue = newValue.substr(0, separationPos);
-        string yValue = newValue.substr(separationPos+1, newValue.length());
+        gd::String xValue = newValue.substr(0, separationPos);
+        gd::String yValue = newValue.substr(separationPos+1, newValue.length());
 
-        SetX(ToFloat(xValue));
-        SetY(ToFloat(yValue));
+        SetX(xValue.ToFloat());
+        SetY(yValue.ToFloat());
     }
-    else if ( propertyNb == 1 ) {return SetAngle(ToFloat(newValue));}
+    else if ( propertyNb == 1 ) {return SetAngle(newValue.ToFloat());}
     else if ( propertyNb == 2 ) {return false;}
     else if ( propertyNb == 3 )
     {
@@ -119,7 +119,7 @@ bool RuntimeObject::ChangeProperty(unsigned int propertyNb, string newValue)
             SetHidden(false);
     }
     else if ( propertyNb == 4 ) { layer = newValue; }
-    else if ( propertyNb == 5 ) {SetZOrder(ToInt(newValue));}
+    else if ( propertyNb == 5 ) {SetZOrder(newValue.ToInt());}
     else if ( propertyNb == 6 ) {return false;}
     else if ( propertyNb == 7 ) {return false;}
     else if ( propertyNb == 8 ) {return false;}
@@ -196,7 +196,7 @@ void RuntimeObject::AddForceToMoveAround( float positionX, float positionY, floa
     forces.push_back( Force(newX-oldX, newY-oldY, clearing) );
 }
 
-void RuntimeObject::Duplicate(RuntimeScene & scene, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists)
+void RuntimeObject::Duplicate(RuntimeScene & scene, std::map <gd::String, std::vector<RuntimeObject*> *> pickedObjectLists)
 {
     std::shared_ptr<RuntimeObject> newObject = std::shared_ptr<RuntimeObject>(Clone());
 
@@ -230,12 +230,12 @@ bool RuntimeObject::TestAngleOfDisplacement(float angle, float tolerance)
     return false;
 }
 
-void RuntimeObject::ActivateAutomatism( const std::string & automatismName, bool activate )
+void RuntimeObject::ActivateAutomatism( const gd::String & automatismName, bool activate )
 {
     GetAutomatismRawPointer(automatismName)->Activate(activate);
 }
 
-bool RuntimeObject::AutomatismActivated( const std::string & automatismName )
+bool RuntimeObject::AutomatismActivated( const gd::String & automatismName )
 {
     return GetAutomatismRawPointer(automatismName)->Activated();
 }
@@ -262,10 +262,10 @@ double RuntimeObject::GetDistanceWithObject(RuntimeObject * object)
     return sqrt(GetSqDistanceWithObject(object));
 }
 
-bool RuntimeObject::SeparateFromObjects(std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists)
+bool RuntimeObject::SeparateFromObjects(std::map <gd::String, std::vector<RuntimeObject*> *> pickedObjectLists)
 {
     vector<RuntimeObject*> objects;
-    for (std::map <std::string, std::vector<RuntimeObject*> *>::const_iterator it = pickedObjectLists.begin();it!=pickedObjectLists.end();++it)
+    for (std::map <gd::String, std::vector<RuntimeObject*> *>::const_iterator it = pickedObjectLists.begin();it!=pickedObjectLists.end();++it)
     {
         if ( it->second != NULL )
         {
@@ -376,10 +376,10 @@ bool RuntimeObject::IsCollidingWith(RuntimeObject * obj2)
     return false;
 }
 
-void RuntimeObject::SeparateObjectsWithoutForces( std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists)
+void RuntimeObject::SeparateObjectsWithoutForces( std::map <gd::String, std::vector<RuntimeObject*> *> pickedObjectLists)
 {
     vector<RuntimeObject*> objects2;
-    for (std::map <std::string, std::vector<RuntimeObject*> *>::const_iterator it = pickedObjectLists.begin();it!=pickedObjectLists.end();++it)
+    for (std::map <gd::String, std::vector<RuntimeObject*> *>::const_iterator it = pickedObjectLists.begin();it!=pickedObjectLists.end();++it)
     {
         if ( it->second != NULL )
         {
@@ -422,10 +422,10 @@ void RuntimeObject::SeparateObjectsWithoutForces( std::map <std::string, std::ve
     }
 }
 
-void RuntimeObject::SeparateObjectsWithForces( std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists)
+void RuntimeObject::SeparateObjectsWithForces( std::map <gd::String, std::vector<RuntimeObject*> *> pickedObjectLists)
 {
     vector<RuntimeObject*> objects2;
-    for (std::map <std::string, std::vector<RuntimeObject*> *>::const_iterator it = pickedObjectLists.begin();it!=pickedObjectLists.end();++it)
+    for (std::map <gd::String, std::vector<RuntimeObject*> *>::const_iterator it = pickedObjectLists.begin();it!=pickedObjectLists.end();++it)
     {
         if ( it->second != NULL )
         {
@@ -553,12 +553,12 @@ bool RuntimeObject::CursorOnObject(RuntimeScene & scene, bool)
     return false;
 }
 
-Automatism* RuntimeObject::GetAutomatismRawPointer(const std::string & name)
+Automatism* RuntimeObject::GetAutomatismRawPointer(const gd::String & name)
 {
     return automatisms.find(name)->second;
 }
 
-Automatism* RuntimeObject::GetAutomatismRawPointer(const std::string & name) const
+Automatism* RuntimeObject::GetAutomatismRawPointer(const gd::String & name) const
 {
     return automatisms.find(name)->second;
 }
@@ -631,27 +631,27 @@ float RuntimeObject::TotalForceLength() const
 
 void RuntimeObject::DoAutomatismsPreEvents(RuntimeScene & scene)
 {
-    for (std::map<std::string, Automatism* >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
+    for (std::map<gd::String, Automatism* >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
         it->second->StepPreEvents(scene);
 }
 
 void RuntimeObject::DoAutomatismsPostEvents(RuntimeScene & scene)
 {
-    for (std::map<std::string, Automatism* >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
+    for (std::map<gd::String, Automatism* >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
         it->second->StepPostEvents(scene);
 }
 
-bool RuntimeObject::VariableExists(const std::string & variable)
+bool RuntimeObject::VariableExists(const gd::String & variable)
 {
     return objectVariables.Has(variable);
 }
 
-bool RuntimeObject::VariableChildExists(const gd::Variable & variable, const std::string & childName)
+bool RuntimeObject::VariableChildExists(const gd::Variable & variable, const gd::String & childName)
 {
     return variable.HasChild(childName);
 }
 
-void RuntimeObject::VariableRemoveChild(gd::Variable & variable, const std::string & childName)
+void RuntimeObject::VariableRemoveChild(gd::Variable & variable, const gd::String & childName)
 {
     variable.RemoveChild(childName);
 }

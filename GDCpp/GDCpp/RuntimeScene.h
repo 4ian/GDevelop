@@ -91,7 +91,7 @@ public:
     /**
      * Get the layer with specified name.
      */
-    RuntimeLayer & GetRuntimeLayer(const std::string & name);
+    RuntimeLayer & GetRuntimeLayer(const gd::String & name);
 
     /**
      * Add a text to be displayed on the scene
@@ -104,7 +104,7 @@ public:
      * \warning Be careful, no check is made to ensure that the shared data exist.
      * \param name The name of the automatism for which shared data must be fetched.
      */
-    const std::shared_ptr<AutomatismsRuntimeSharedData> & GetAutomatismSharedData(const std::string & automatismName) const { return automatismsSharedDatas.GetAutomatismSharedData(automatismName); }
+    const std::shared_ptr<AutomatismsRuntimeSharedData> & GetAutomatismSharedData(const gd::String & automatismName) const { return automatismsSharedDatas.GetAutomatismSharedData(automatismName); }
 
     /**
      * Set up the RuntimeScene using a Scene.
@@ -248,7 +248,7 @@ protected:
 
     bool UpdateTime();
 
-    bool DisplayLegacyTexts(std::string layer = "");
+    bool DisplayLegacyTexts(gd::String layer = "");
 
     bool                                    firstLoop; ///<true if the scene was just rendered once.
     bool                                    isFullScreen; ///< As sf::RenderWindow can't say if it is fullscreen or not

@@ -25,8 +25,8 @@ class AudioExtension : public ExtensionBase
         virtual void ExposeActionsResources(gd::Instruction & action, gd::ArbitraryResourceWorker & worker);
 
         bool HasDebuggingProperties() const { return true; };
-        void GetPropertyForDebugger(RuntimeScene & scene, unsigned int propertyNb, std::string & name, std::string & value) const;
-        bool ChangeProperty(RuntimeScene & scene, unsigned int propertyNb, std::string newValue);
+        void GetPropertyForDebugger(RuntimeScene & scene, unsigned int propertyNb, gd::String & name, gd::String & value) const;
+        bool ChangeProperty(RuntimeScene & scene, unsigned int propertyNb, gd::String newValue);
         unsigned int GetNumberOfProperties(RuntimeScene & scene) const;
         #endif
 };

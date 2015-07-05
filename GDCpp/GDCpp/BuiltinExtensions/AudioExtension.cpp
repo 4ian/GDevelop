@@ -69,18 +69,18 @@ void AudioExtension::ExposeActionsResources(gd::Instruction & action, gd::Arbitr
 {
     if ( action.GetType() == "PlaySound" || action.GetType() == "PlaySoundCanal" || action.GetType() == "PlayMusic" || action.GetType() == "PlayMusicCanal" )
     {
-        std::string parameter = action.GetParameter(1).GetPlainString();
+        gd::String parameter = action.GetParameter(1).GetPlainString();
         worker.ExposeFile(parameter);
         action.SetParameter(1, parameter);
     }
 }
 
-void AudioExtension::GetPropertyForDebugger(RuntimeScene & scene, unsigned int propertyNb, std::string & name, std::string & value) const
+void AudioExtension::GetPropertyForDebugger(RuntimeScene & scene, unsigned int propertyNb, gd::String & name, gd::String & value) const
 {
     if ( propertyNb == 0 )
     {
         name = GD_T("Global volume:");
-        value = ToString(SoundManager::Get()->GetGlobalVolume());
+        value = gd::String::FromFloat(SoundManager::Get()->GetGlobalVolume());
     }
     else if ( propertyNb < 1+SoundManager::Get()->sounds.size()*3 )
     {
@@ -103,13 +103,13 @@ void AudioExtension::GetPropertyForDebugger(RuntimeScene & scene, unsigned int p
         else if ( propertyNb % 3 == 2)
         {
             name = GD_T(" -Volume/Pitch:");
-            value = ToString(SoundManager::Get()->sounds[soundNb]->GetVolume())
-                    +"/"+ToString(SoundManager::Get()->sounds[soundNb]->GetPitch());
+            value = gd::String::FromFloat(SoundManager::Get()->sounds[soundNb]->GetVolume())
+                    +"/"+gd::String::FromFloat(SoundManager::Get()->sounds[soundNb]->GetPitch());
         }
         else
         {
             name = GD_T(" -Progress (seconds) :");
-            value = ToString(SoundManager::Get()->sounds[soundNb]->GetPlayingOffset());
+            value = gd::String::FromFloat(SoundManager::Get()->sounds[soundNb]->GetPlayingOffset());
         }
 
     }
@@ -134,22 +134,22 @@ void AudioExtension::GetPropertyForDebugger(RuntimeScene & scene, unsigned int p
         else if ( propertyNb % 3 == 2)
         {
             name = GD_T(" -Volume/Pitch:");
-            value = ToString(SoundManager::Get()->musics[musicNb]->GetVolume())
-                    +"/"+ToString(SoundManager::Get()->musics[musicNb]->GetPitch());
+            value = gd::String::FromFloat(SoundManager::Get()->musics[musicNb]->GetVolume())
+                    +"/"+gd::String::FromFloat(SoundManager::Get()->musics[musicNb]->GetPitch());
         }
         else
         {
             name = GD_T(" -Progress (seconds) :");
-            value = ToString(SoundManager::Get()->musics[musicNb]->GetPlayingOffset());
+            value = gd::String::FromFloat(SoundManager::Get()->musics[musicNb]->GetPlayingOffset());
         }
     }
 }
 
-bool AudioExtension::ChangeProperty(RuntimeScene & scene, unsigned int propertyNb, std::string newValue)
+bool AudioExtension::ChangeProperty(RuntimeScene & scene, unsigned int propertyNb, gd::String newValue)
 {
     if ( propertyNb == 0 )
     {
-        SoundManager::Get()->SetGlobalVolume(ToFloat(newValue));
+        SoundManager::Get()->SetGlobalVolume(newValue.ToFloat());
         return true;
     }
     else if ( propertyNb < 1+SoundManager::Get()->sounds.size()*3 )
@@ -163,16 +163,16 @@ bool AudioExtension::ChangeProperty(RuntimeScene & scene, unsigned int propertyN
         }
         else if ( propertyNb % 3 == 2)
         {
-            std::vector<string> values = SplitString<string>(newValue, '/');
+            std::vector<gd::String> values = newValue.Split(U'/');
             if ( values.size() < 2 ) return false;
 
-            SoundManager::Get()->sounds[soundNb]->SetVolume(ToFloat(values[0]));
-            SoundManager::Get()->sounds[soundNb]->SetPitch(ToFloat(values[1]));
+            SoundManager::Get()->sounds[soundNb]->SetVolume(values[0].ToInt());
+            SoundManager::Get()->sounds[soundNb]->SetPitch(values[1].ToFloat());
             return true;
         }
         else
         {
-            SoundManager::Get()->sounds[soundNb]->SetPlayingOffset(ToFloat(newValue));
+            SoundManager::Get()->sounds[soundNb]->SetPlayingOffset(newValue.ToFloat());
             return true;
         }
 
@@ -188,16 +188,16 @@ bool AudioExtension::ChangeProperty(RuntimeScene & scene, unsigned int propertyN
         }
         else if ( propertyNb % 3 == 2)
         {
-            std::vector<string> values = SplitString<string>(newValue, '/');
+            std::vector<gd::String> values = newValue.Split(U'/');
             if ( values.size() < 2 ) return false;
 
-            SoundManager::Get()->musics[musicNb]->SetVolume(ToFloat(values[0]));
-            SoundManager::Get()->musics[musicNb]->SetPitch(ToFloat(values[1]));
+            SoundManager::Get()->musics[musicNb]->SetVolume(values[0].ToFloat());
+            SoundManager::Get()->musics[musicNb]->SetPitch(values[1].ToFloat());
             return true;
         }
         else
         {
-            SoundManager::Get()->musics[musicNb]->SetPlayingOffset(ToFloat(newValue));
+            SoundManager::Get()->musics[musicNb]->SetPlayingOffset(newValue.ToFloat());
             return true;
         }
     }
@@ -212,4 +212,3 @@ unsigned int AudioExtension::GetNumberOfProperties(RuntimeScene & scene) const
 }
 
 #endif
-

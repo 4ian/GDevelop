@@ -25,6 +25,8 @@
 #include <wx/msw/winundef.h>
 #endif
 
+#include "GDCpp/Utf8String.h"
+
 using namespace std;
 
 /**

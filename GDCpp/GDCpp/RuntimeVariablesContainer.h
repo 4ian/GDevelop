@@ -58,7 +58,7 @@ public:
     /**
      * \brief Return true if the specified variable is in the container
      */
-    bool Has(const std::string & name) const { return variables.find(name) != variables.end(); }
+    bool Has(const gd::String & name) const { return variables.find(name) != variables.end(); }
 
     #if defined(GD_IDE_ONLY)
     /**
@@ -70,12 +70,12 @@ public:
     /**
      * \brief Return a reference to the variable called \a name.
      */
-    virtual gd::Variable & Get(const std::string & name);
+    virtual gd::Variable & Get(const gd::String & name);
 
     /**
      * \brief Return a reference to the variable called \a name.
      */
-    virtual const gd::Variable & Get(const std::string & name) const;
+    virtual const gd::Variable & Get(const gd::String & name) const;
 
     /**
      * \brief Return a reference to the variable at the @ index position in the list.
@@ -113,7 +113,7 @@ public:
     /**
      * Get a map containing all variables.
      */
-    const std::map < std::string, gd::Variable* > & DumpAllVariables() { return variables; };
+    const std::map < gd::String, gd::Variable* > & DumpAllVariables() { return variables; };
 
 private:
 
@@ -123,7 +123,7 @@ private:
     void Clear();
 
     std::vector < gd::Variable* > variablesArray;
-    mutable std::map < std::string, gd::Variable* > variables;
+    mutable std::map < gd::String, gd::Variable* > variables;
     static BadVariable badVariable;
     static BadRuntimeVariablesContainer badVariablesContainer;
 };
@@ -142,11 +142,11 @@ public:
     BadVariable() : gd::Variable() {};
     virtual ~BadVariable() {};
 
-    virtual void SetString(const std::string &) { };
+    virtual void SetString(const gd::String &) { };
     virtual void SetValue(double) { };
-    virtual bool HasChild(const std::string & name) const { return false; }
-    virtual Variable & GetChild(const std::string & name) { return RuntimeVariablesContainer::GetBadVariable(); }
-    virtual const Variable & GetChild(const std::string & name) const { return RuntimeVariablesContainer::GetBadVariable(); }
+    virtual bool HasChild(const gd::String & name) const { return false; }
+    virtual Variable & GetChild(const gd::String & name) { return RuntimeVariablesContainer::GetBadVariable(); }
+    virtual const Variable & GetChild(const gd::String & name) const { return RuntimeVariablesContainer::GetBadVariable(); }
 };
 
 /**
@@ -162,8 +162,8 @@ public:
     BadRuntimeVariablesContainer() : RuntimeVariablesContainer() {};
     virtual ~BadRuntimeVariablesContainer() {};
 
-    virtual gd::Variable & Get(const std::string & name) { return RuntimeVariablesContainer::GetBadVariable(); }
-    virtual const gd::Variable & Get(const std::string & name) const { return RuntimeVariablesContainer::GetBadVariable(); }
+    virtual gd::Variable & Get(const gd::String & name) { return RuntimeVariablesContainer::GetBadVariable(); }
+    virtual const gd::Variable & Get(const gd::String & name) const { return RuntimeVariablesContainer::GetBadVariable(); }
     virtual gd::Variable & Get(unsigned int index) { return RuntimeVariablesContainer::GetBadVariable(); }
     virtual const gd::Variable & Get(unsigned int index) const { return RuntimeVariablesContainer::GetBadVariable(); }
     virtual void Merge(const gd::VariablesContainer & container) {}

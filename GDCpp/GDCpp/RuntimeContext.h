@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include "GDCpp/Utf8String.h"
 class RuntimeObject;
 class RuntimeScene;
 class RuntimeVariablesContainer;
@@ -29,7 +30,7 @@ public:
      * scene->objectsInstances.GetObjectsRawPointers(name)
      * \endcode
      */
-    std::vector<RuntimeObject*> GetObjectsRawPointers(const std::string & name);
+    std::vector<RuntimeObject*> GetObjectsRawPointers(const gd::String & name);
 
     /**
      * \brief Shortcut for scene->GetVariables();
@@ -54,13 +55,13 @@ public:
     void StartNewFrame();
 
     RuntimeContext & ClearObjectListsMap();
-    RuntimeContext & AddObjectListToMap(const std::string & objectName, std::vector<RuntimeObject*> & list);
-    std::map <std::string, std::vector<RuntimeObject*> *> ReturnObjectListsMap();
+    RuntimeContext & AddObjectListToMap(const gd::String & objectName, std::vector<RuntimeObject*> & list);
+    std::map <gd::String, std::vector<RuntimeObject*> *> ReturnObjectListsMap();
 
     RuntimeScene * scene; ///< The associated scene.
 
 private:
-    std::map <std::string, std::vector<RuntimeObject*> *> temporaryMap;
+    std::map <gd::String, std::vector<RuntimeObject*> *> temporaryMap;
     std::map <unsigned int, bool> onceConditionsTriggered;
     std::map <unsigned int, bool> onceConditionsTriggeredLastFrame;
 };

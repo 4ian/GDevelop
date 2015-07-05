@@ -10,6 +10,7 @@
 #include <vector>
 #include <cmath>
 #include <SFML/System/String.hpp>
+#include "GDCpp/Utf8String.h"
 #if defined(GD_IDE_ONLY)
 class wxString;
 #endif
@@ -18,7 +19,7 @@ class wxString;
  * Convert anything to an integer.
  * Example:
  * \code
- * std::string five = 5;
+ * gd::String five = 5;
  * int number = ToInt(five);
  * \endcode
  * \ingroup CommonProgrammingTools
@@ -59,7 +60,7 @@ double ToDouble( const T & value )
 }
 
 /**
- * Convert anything to a std::string
+ * Convert anything to a gd::String
  * \ingroup CommonProgrammingTools
  */
 template<typename T>
@@ -72,7 +73,7 @@ std::string ToString( const T & value )
 
 #if defined(GD_IDE_ONLY)
 /**
- * Specialization for converting wxString to a std::string
+ * Specialization for converting wxString to a gd::String
  * \ingroup CommonProgrammingTools
  */
 template<>
@@ -98,11 +99,11 @@ std::vector <T> SplitString( const std::string & str, char separator )
 }
 
 /**
- * \brief Functor testing if a std::string is empty
+ * \brief Functor testing if a gd::String is empty
  *
  * Usage example:
  * \code
- * //Remove all empty strings from a std::vector<std::string>.
+ * //Remove all empty strings from a std::vector<gd::String>.
  * myVector.erase(std::remove_if(myVector.begin(), myVector.end(), StringEmpty()), myVector.end());
  * \endcode
  *
@@ -110,7 +111,7 @@ std::vector <T> SplitString( const std::string & str, char separator )
  */
 struct StringEmpty
 {
-   bool operator ()(const std::string & a) const
+   bool operator ()(const gd::String & a) const
    {
       return a.empty();
    }
@@ -137,4 +138,3 @@ inline double GDRound( double d )
 #endif
 
 #endif // GDCPP_COMMONTOOLS_H_INCLUDED
-

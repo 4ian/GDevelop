@@ -51,9 +51,9 @@ private:
 
     RuntimeScene & scene;
 
-    std::map < std::weak_ptr<RuntimeObject>, std::pair<std::string, wxTreeItemId>, std::owner_less<std::weak_ptr<RuntimeObject>>> objectsInTree; 
+    std::map < std::weak_ptr<RuntimeObject>, std::pair<gd::String, wxTreeItemId>, std::owner_less<std::weak_ptr<RuntimeObject>>> objectsInTree; 
     //(Use std::owner_less to allow comparison between weak_ptr)
-    std::map < std::string, wxTreeItemId > initialObjects;
+    std::map < gd::String, wxTreeItemId > initialObjects;
     bool mustRecreateTree;
 
     std::vector<wxListCtrl*> extensionsListCtrls; ///< Contains wxListCtrl used to display properties of each extensions.

@@ -14,10 +14,10 @@
 
 using namespace std;
 
-double GD_API PickedObjectsCount( std::map <std::string, std::vector<RuntimeObject*> *> objectsLists )
+double GD_API PickedObjectsCount( std::map <gd::String, std::vector<RuntimeObject*> *> objectsLists )
 {
     unsigned int size = 0;
-    std::map <std::string, std::vector<RuntimeObject*> *>::const_iterator it = objectsLists.begin();
+    std::map <gd::String, std::vector<RuntimeObject*> *>::const_iterator it = objectsLists.begin();
     for (;it!=objectsLists.end();++it)
     {
         if ( it->second == NULL ) continue;
@@ -28,14 +28,14 @@ double GD_API PickedObjectsCount( std::map <std::string, std::vector<RuntimeObje
     return size;
 }
 
-bool GD_API HitBoxesCollision(std::map <std::string, std::vector<RuntimeObject*> *> objectsLists1, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists2, bool conditionInverted )
+bool GD_API HitBoxesCollision(std::map <gd::String, std::vector<RuntimeObject*> *> objectsLists1, std::map <gd::String, std::vector<RuntimeObject*> *> objectsLists2, bool conditionInverted )
 {
     return TwoObjectListsTest(objectsLists1, objectsLists2, conditionInverted, [](RuntimeObject * obj1, RuntimeObject * obj2) {
         return obj1->IsCollidingWith(obj2);
     });
 }
 
-bool GD_API ObjectsTurnedToward( std::map <std::string, std::vector<RuntimeObject*> *> objectsLists1, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists2, float tolerance, bool conditionInverted )
+bool GD_API ObjectsTurnedToward( std::map <gd::String, std::vector<RuntimeObject*> *> objectsLists1, std::map <gd::String, std::vector<RuntimeObject*> *> objectsLists2, float tolerance, bool conditionInverted )
 {
     return TwoObjectListsTest(objectsLists1, objectsLists2, conditionInverted, [tolerance](RuntimeObject * obj1, RuntimeObject * obj2) {
         double objAngle = atan2(obj2->GetDrawableY()+obj2->GetCenterY() - (obj1->GetDrawableY()+obj1->GetCenterY()),
@@ -46,7 +46,7 @@ bool GD_API ObjectsTurnedToward( std::map <std::string, std::vector<RuntimeObjec
     });
 }
 
-float GD_API DistanceBetweenObjects( std::map <std::string, std::vector<RuntimeObject*> *> objectsLists1, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists2, float length, bool conditionInverted)
+float GD_API DistanceBetweenObjects( std::map <gd::String, std::vector<RuntimeObject*> *> objectsLists1, std::map <gd::String, std::vector<RuntimeObject*> *> objectsLists2, float length, bool conditionInverted)
 {
     length *= length;
     return TwoObjectListsTest(objectsLists1, objectsLists2, conditionInverted, [length](RuntimeObject * obj1, RuntimeObject * obj2) {
@@ -57,7 +57,7 @@ float GD_API DistanceBetweenObjects( std::map <std::string, std::vector<RuntimeO
     });
 }
 
-bool GD_API MovesToward( std::map <std::string, std::vector<RuntimeObject*> *> objectsLists1, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists2, float tolerance, bool conditionInverted )
+bool GD_API MovesToward( std::map <gd::String, std::vector<RuntimeObject*> *> objectsLists1, std::map <gd::String, std::vector<RuntimeObject*> *> objectsLists2, float tolerance, bool conditionInverted )
 {
     return TwoObjectListsTest(objectsLists1, objectsLists2, conditionInverted, [tolerance](RuntimeObject * obj1, RuntimeObject * obj2) {
         if ( obj1->TotalForceLength() == 0 ) return false;

@@ -8,15 +8,15 @@
 #include "GDCpp/AutomatismsSharedData.h"
 #include <iostream>
 
-const std::shared_ptr<AutomatismsRuntimeSharedData> & AutomatismsRuntimeSharedDataHolder::GetAutomatismSharedData(const std::string & automatismName) const
+const std::shared_ptr<AutomatismsRuntimeSharedData> & AutomatismsRuntimeSharedDataHolder::GetAutomatismSharedData(const gd::String & automatismName) const
 {
 	return automatismsSharedDatas.find(automatismName)->second;
 }
 
-void AutomatismsRuntimeSharedDataHolder::LoadFrom(const std::map < std::string, std::shared_ptr<gd::AutomatismsSharedData> > & sharedData)
+void AutomatismsRuntimeSharedDataHolder::LoadFrom(const std::map < gd::String, std::shared_ptr<gd::AutomatismsSharedData> > & sharedData)
 {
     automatismsSharedDatas.clear();
-    for(std::map < std::string, std::shared_ptr<gd::AutomatismsSharedData> >::const_iterator it = sharedData.begin();
+    for(std::map < gd::String, std::shared_ptr<gd::AutomatismsSharedData> >::const_iterator it = sharedData.begin();
         it != sharedData.end();
         ++it)
     {
@@ -46,7 +46,7 @@ AutomatismsRuntimeSharedDataHolder& AutomatismsRuntimeSharedDataHolder::operator
 void AutomatismsRuntimeSharedDataHolder::Init(const AutomatismsRuntimeSharedDataHolder & other)
 {
     automatismsSharedDatas.clear();
-    for (std::map < std::string, std::shared_ptr<AutomatismsRuntimeSharedData> >::const_iterator it = other.automatismsSharedDatas.begin();
+    for (std::map < gd::String, std::shared_ptr<AutomatismsRuntimeSharedData> >::const_iterator it = other.automatismsSharedDatas.begin();
          it != other.automatismsSharedDatas.end();++it)
     {
     	automatismsSharedDatas[it->first] = it->second->Clone();

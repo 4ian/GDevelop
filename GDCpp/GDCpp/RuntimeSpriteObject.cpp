@@ -191,7 +191,7 @@ float RuntimeSpriteObject::GetCenterY() const
     return GetCurrentSprite().GetCenter().GetY()*fabs(scaleY);
 }
 
-float RuntimeSpriteObject::GetPointX(const std::string & name) const
+float RuntimeSpriteObject::GetPointX(const gd::String & name) const
 {
     if ( !name.empty() )
     {
@@ -202,7 +202,7 @@ float RuntimeSpriteObject::GetPointX(const std::string & name) const
     return GetX();
 }
 
-float RuntimeSpriteObject::GetPointY(const std::string & name) const
+float RuntimeSpriteObject::GetPointY(const gd::String & name) const
 {
     if ( !name.empty() )
     {
@@ -213,7 +213,7 @@ float RuntimeSpriteObject::GetPointY(const std::string & name) const
     return GetY();
 }
 
-void RuntimeSpriteObject::ChangeScale( const std::string & operatorStr, double newScale)
+void RuntimeSpriteObject::ChangeScale( const gd::String & operatorStr, double newScale)
 {
     //TODO : Generate appropriate code calling SetScaleX/Y instead of this.
     if ( operatorStr == "=" )
@@ -245,7 +245,7 @@ void RuntimeSpriteObject::ChangeScale( const std::string & operatorStr, double n
     return;
 }
 
-void RuntimeSpriteObject::CopyImageOnImageOfCurrentSprite(RuntimeScene & scene, const std::string & imageName, float xPosition, float yPosition, bool useTransparency)
+void RuntimeSpriteObject::CopyImageOnImageOfCurrentSprite(RuntimeScene & scene, const gd::String & imageName, float xPosition, float yPosition, bool useTransparency)
 {
     if ( needUpdateCurrentSprite ) UpdateCurrentSprite();
 
@@ -261,30 +261,30 @@ void RuntimeSpriteObject::CopyImageOnImageOfCurrentSprite(RuntimeScene & scene, 
     dest->texture.loadFromImage(dest->image);
 }
 
-void RuntimeSpriteObject::MakeColorTransparent( const std::string & colorStr )
+void RuntimeSpriteObject::MakeColorTransparent( const gd::String & colorStr )
 {
     if ( needUpdateCurrentSprite ) UpdateCurrentSprite();
 
     ptrToCurrentSprite->MakeSpriteOwnsItsImage(); //We want to modify only the image of the object, not all objects which have the same image.
     std::shared_ptr<SFMLTextureWrapper> dest = ptrToCurrentSprite->GetSFMLTexture();
 
-    std::vector < std::string > colors = SplitString <std::string> (colorStr, ';');
+    std::vector < gd::String > colors = colorStr.Split(U';');
 
     if ( colors.size() < 3 ) return; //La couleur est incorrecte
 
     //Update texture and pixel perfect collision mask
-    dest->image.createMaskFromColor(  sf::Color( ToInt(colors[0]), ToInt(colors[1]), ToInt(colors[2])));
+    dest->image.createMaskFromColor(  sf::Color( colors[0].ToInt(), colors[1].ToInt(), colors[2].ToInt()));
     dest->texture.loadFromImage(dest->image);
 }
 
-void RuntimeSpriteObject::SetColor(const std::string & colorStr)
+void RuntimeSpriteObject::SetColor(const gd::String & colorStr)
 {
-    std::vector < std::string > colors = SplitString<std::string>(colorStr, ';');
+    std::vector < gd::String > colors = colorStr.Split(U';');
     if ( colors.size() < 3 ) return; //Color is not valid
 
-    SetColor(  ToInt(colors[0]),
-               ToInt(colors[1]),
-               ToInt(colors[2]) );
+    SetColor(  colors[0].ToInt(),
+               colors[1].ToInt(),
+               colors[2].ToInt() );
 }
 
 /**
@@ -604,34 +604,34 @@ void RuntimeSpriteObject::TurnTowardObject(RuntimeObject * object, RuntimeScene 
 }
 
 #if defined(GD_IDE_ONLY)
-void RuntimeSpriteObject::GetPropertyForDebugger(unsigned int propertyNb, std::string & name, std::string & value) const
+void RuntimeSpriteObject::GetPropertyForDebugger(unsigned int propertyNb, gd::String & name, gd::String & value) const
 {
-    if      ( propertyNb == 0 ) {name = GD_T("Animation");     value = ToString(GetCurrentAnimation());}
-    else if ( propertyNb == 1 ) {name = GD_T("Direction");     value = ToString(GetCurrentDirection());}
-    else if ( propertyNb == 2 ) {name = GD_T("Image");         value = ToString(GetSpriteNb());}
-    else if ( propertyNb == 3 ) {name = GD_T("Opacity");       value = ToString(GetOpacity());}
+    if      ( propertyNb == 0 ) {name = GD_T("Animation");     value = gd::String::FromUInt(GetCurrentAnimation());}
+    else if ( propertyNb == 1 ) {name = GD_T("Direction");     value = gd::String::FromUInt(GetCurrentDirection());}
+    else if ( propertyNb == 2 ) {name = GD_T("Image");         value = gd::String::FromUInt(GetSpriteNb());}
+    else if ( propertyNb == 3 ) {name = GD_T("Opacity");       value = gd::String::FromFloat(GetOpacity());}
     else if ( propertyNb == 4 ) {name = GD_T("Blend mode");   if ( blendMode == 0) value = "0 (Alpha)";
                                                                     else if ( blendMode == 1) value = "1 (Add)";
                                                                     else if ( blendMode == 2) value = "2 (Multiply)";
                                                                     else if ( blendMode == 3) value = "3 (None)";}
-    else if ( propertyNb == 5 ) {name = GD_T("X Scale");       value = ToString(GetScaleX());}
-    else if ( propertyNb == 6 ) {name = GD_T("Y Scale");       value = ToString(GetScaleY());}
+    else if ( propertyNb == 5 ) {name = GD_T("X Scale");       value = gd::String::FromFloat(GetScaleX());}
+    else if ( propertyNb == 6 ) {name = GD_T("Y Scale");       value = gd::String::FromFloat(GetScaleY());}
 }
 
-bool RuntimeSpriteObject::ChangeProperty(unsigned int propertyNb, std::string newValue)
+bool RuntimeSpriteObject::ChangeProperty(unsigned int propertyNb, gd::String newValue)
 {
-    if ( propertyNb == 0 ) { return SetCurrentAnimation(ToInt(newValue)); }
+    if ( propertyNb == 0 ) { return SetCurrentAnimation(newValue.ToInt()); }
     else if ( propertyNb == 1 )
     {
         if ( currentAnimation >= GetAnimationsCount() ) return false;
 
-        return animations[currentAnimation].Get().useMultipleDirections ? SetDirection(ToInt(newValue)) : SetAngle(ToFloat(newValue));
+        return animations[currentAnimation].Get().useMultipleDirections ? SetDirection(newValue.ToUInt()) : SetAngle(newValue.ToFloat());
     }
-    else if ( propertyNb == 2 ) { return SetSprite(ToInt(newValue)); }
-    else if ( propertyNb == 3 ) { SetOpacity(ToFloat(newValue)); }
-    else if ( propertyNb == 4 ) { SetBlendMode(ToInt(newValue)); }
-    else if ( propertyNb == 5 ) {SetScaleX(ToFloat(newValue));}
-    else if ( propertyNb == 6 ) {SetScaleY(ToFloat(newValue));}
+    else if ( propertyNb == 2 ) { return SetSprite(newValue.ToInt()); }
+    else if ( propertyNb == 3 ) { SetOpacity(newValue.ToFloat()); }
+    else if ( propertyNb == 4 ) { SetBlendMode(newValue.ToInt()); }
+    else if ( propertyNb == 5 ) {SetScaleX(newValue.ToFloat());}
+    else if ( propertyNb == 6 ) {SetScaleY(newValue.ToFloat());}
 
     return true;
 }

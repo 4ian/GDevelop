@@ -12,7 +12,7 @@
 #include "RuntimeScene.h"
 #include "RuntimeObject.h"
 
-typedef std::map <std::string, std::vector<RuntimeObject*> *> RuntimeObjectsLists;
+typedef std::map <gd::String, std::vector<RuntimeObject*> *> RuntimeObjectsLists;
 
 /**
  * \brief Keep only the specified object in the lists of picked objects.

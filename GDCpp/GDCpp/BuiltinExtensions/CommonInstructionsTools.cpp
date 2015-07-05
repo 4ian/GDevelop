@@ -46,22 +46,17 @@ bool GD_API LogicalNegation(bool param)
     return !param;
 }
 
-double GD_API ToDouble( const std::string & str )
+double GD_API ToDouble( const gd::String & str )
 {
-    double d;
-    std::istringstream oss(str);
-    oss >> d;
-    return d;
+    return str.ToDouble();
 }
 
-std::string GD_API ToString( double number )
+gd::String GD_API ToString( double number )
 {
-    std::ostringstream oss;
-    oss << number;
-    return oss.str();
+    return gd::String::FromDouble(number);
 }
 
-std::string GD_API LargeNumberToString( double number )
+gd::String GD_API LargeNumberToString( double number )
 {
     std::ostringstream oss;
     oss.setf(std::ios::fixed);
@@ -79,7 +74,7 @@ std::string GD_API LargeNumberToString( double number )
         formattedStr.resize(searchPos+1);
     }
 
-    return formattedStr;
+    return gd::String::FromUTF8(formattedStr);
 }
 
 double GD_API ToRad( double angle )

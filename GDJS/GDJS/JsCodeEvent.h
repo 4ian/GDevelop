@@ -32,11 +32,11 @@ public:
     virtual bool IsExecutable() const {return true;}
     virtual bool CanHaveSubEvents() const {return false;}
 
-    const std::string & GetInlineCode() const { return inlineCode; };
-    void SetInlineCode(const std::string & code) { inlineCode = code; };
+    const gd::String & GetInlineCode() const { return inlineCode; };
+    void SetInlineCode(const gd::String & code) { inlineCode = code; };
 
-    std::string GetParameterObjects() const { return parameterObjects; };
-    void SetParameterObjects(std::string objectName) { parameterObjects = objectName; };
+    gd::String GetParameterObjects() const { return parameterObjects; };
+    void SetParameterObjects(gd::String objectName) { parameterObjects = objectName; };
 
     virtual void SerializeTo(gd::SerializerElement & element) const;
     virtual void UnserializeFrom(gd::Project & project, const gd::SerializerElement & element);
@@ -59,8 +59,8 @@ public:
 private:
     void Init(const JsCodeEvent & event);
 
-    std::string inlineCode; ///< Contains the Javacript code of the event.
-    std::string parameterObjects; ///< Name of the (group of) objects to pass as parameter.
+    gd::String inlineCode; ///< Contains the Javacript code of the event.
+    gd::String parameterObjects; ///< Name of the (group of) objects to pass as parameter.
 };
 
 }

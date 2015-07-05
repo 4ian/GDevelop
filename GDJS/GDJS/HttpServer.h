@@ -7,6 +7,7 @@
 #ifndef HTTPSERVER_H
 #define HTTPSERVER_H
 #include <string>
+#include "GDCore/Utf8String.h"
 struct mg_context;
 
 namespace gdjs
@@ -16,7 +17,7 @@ namespace gdjs
  * \brief A very simple web server.
  *
  * Basically a wrapper around mongoose ( https://github.com/valenok/mongoose ).
- */ 
+ */
 class HttpServer
 {
 public:
@@ -36,7 +37,7 @@ public:
      * \brief Run a web server, on port 2828, which index is located at \a indexDirectory.
      * \param indexDirectory The root of the webserver.
      */
-    void Run(std::string indexDirectory);
+    void Run(gd::String indexDirectory);
 
     /**
      * \brief Stop the webserver if it was running

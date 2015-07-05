@@ -38,10 +38,10 @@ public:
      * \param includeFiles A reference to a set of strings where needed includes files will be stored.
      * \return JS code
      */
-    static std::string GenerateSceneEventsCompleteCode(gd::Project & project,
+    static gd::String GenerateSceneEventsCompleteCode(gd::Project & project,
                                                        gd::Layout & scene,
                                                        gd::EventsList & events,
-                                                       std::set < std::string > & includeFiles,
+                                                       std::set < gd::String > & includeFiles,
                                                        bool compilationForRuntime = false);
 
     /**
@@ -53,89 +53,89 @@ public:
      * \param context Context used for generation
      * \return JS code.
      */
-    virtual std::string GenerateConditionsListCode(gd::InstructionsList & conditions, gd::EventsCodeGenerationContext & context);
+    virtual gd::String GenerateConditionsListCode(gd::InstructionsList & conditions, gd::EventsCodeGenerationContext & context);
 
     /**
      * \brief Generate the full name for accessing to a boolean variable used for conditions.
      */
-    virtual std::string GenerateBooleanFullName(const std::string & boolName, const gd::EventsCodeGenerationContext & context);
+    virtual gd::String GenerateBooleanFullName(const gd::String & boolName, const gd::EventsCodeGenerationContext & context);
 
     /**
      * \brief Set a boolean to false.
      */
-    virtual std::string GenerateBooleanInitializationToFalse(const std::string & boolName, const gd::EventsCodeGenerationContext & context);
+    virtual gd::String GenerateBooleanInitializationToFalse(const gd::String & boolName, const gd::EventsCodeGenerationContext & context);
 
     /**
      * \brief Get the full name for accessing to a list of objects
      */
-    virtual std::string GetObjectListName(const std::string & name, const gd::EventsCodeGenerationContext & context);
+    virtual gd::String GetObjectListName(const gd::String & name, const gd::EventsCodeGenerationContext & context);
 
-    std::string GetCodeNamespace();
+    gd::String GetCodeNamespace();
 
 protected:
 
-    virtual std::string GenerateParameterCodes(const std::string & parameter, const gd::ParameterMetadata & metadata,
+    virtual gd::String GenerateParameterCodes(const gd::String & parameter, const gd::ParameterMetadata & metadata,
                                                gd::EventsCodeGenerationContext & context,
-                                               const std::string & previousParameter,
-                                               std::vector < std::pair<std::string, std::string> > * supplementaryParametersTypes);
+                                               const gd::String & previousParameter,
+                                               std::vector < std::pair<gd::String, gd::String> > * supplementaryParametersTypes);
 
-    virtual std::string GenerateObjectFunctionCall(std::string objectListName,
+    virtual gd::String GenerateObjectFunctionCall(gd::String objectListName,
                                                           const gd::ObjectMetadata & objMetadata,
                                                           const gd::ExpressionCodeGenerationInformation & codeInfo,
-                                                          std::string parametersStr,
-                                                          std::string defaultOutput,
+                                                          gd::String parametersStr,
+                                                          gd::String defaultOutput,
                                                           gd::EventsCodeGenerationContext & context);
 
-    virtual std::string GenerateObjectAutomatismFunctionCall(std::string objectListName,
-                                                                      std::string automatismName,
+    virtual gd::String GenerateObjectAutomatismFunctionCall(gd::String objectListName,
+                                                                      gd::String automatismName,
                                                                       const gd::AutomatismMetadata & autoInfo,
                                                                       const gd::ExpressionCodeGenerationInformation & codeInfo,
-                                                                      std::string parametersStr,
-                                                                      std::string defaultOutput,
+                                                                      gd::String parametersStr,
+                                                                      gd::String defaultOutput,
                                                                       gd::EventsCodeGenerationContext & context);
 
-    virtual std::string GenerateFreeCondition(const std::vector<std::string> & arguments,
+    virtual gd::String GenerateFreeCondition(const std::vector<gd::String> & arguments,
                                               const gd::InstructionMetadata & instrInfos,
-                                              const std::string & returnBoolean,
+                                              const gd::String & returnBoolean,
                                               bool conditionInverted,
                                               gd::EventsCodeGenerationContext & context);
 
-    virtual std::string GenerateObjectCondition(const std::string & objectName,
+    virtual gd::String GenerateObjectCondition(const gd::String & objectName,
                                                             const gd::ObjectMetadata & objInfo,
-                                                            const std::vector<std::string> & arguments,
+                                                            const std::vector<gd::String> & arguments,
                                                             const gd::InstructionMetadata & instrInfos,
-                                                            const std::string & returnBoolean,
+                                                            const gd::String & returnBoolean,
                                                             bool conditionInverted,
                                                             gd::EventsCodeGenerationContext & context);
 
-    virtual std::string GenerateAutomatismCondition(const std::string & objectName,
-                                                                const std::string & automatismName,
+    virtual gd::String GenerateAutomatismCondition(const gd::String & objectName,
+                                                                const gd::String & automatismName,
                                                                 const gd::AutomatismMetadata & autoInfo,
-                                                                const std::vector<std::string> & arguments,
+                                                                const std::vector<gd::String> & arguments,
                                                                 const gd::InstructionMetadata & instrInfos,
-                                                                const std::string & returnBoolean,
+                                                                const gd::String & returnBoolean,
                                                                 bool conditionInverted,
                                                             gd::EventsCodeGenerationContext & context);
 
-    virtual std::string GenerateObjectAction(const std::string & objectName,
+    virtual gd::String GenerateObjectAction(const gd::String & objectName,
                                                         const gd::ObjectMetadata & objInfo,
-                                                        const std::vector<std::string> & arguments,
+                                                        const std::vector<gd::String> & arguments,
                                                         const gd::InstructionMetadata & instrInfos,
                                                         gd::EventsCodeGenerationContext & context);
 
-    virtual std::string GenerateAutomatismAction(const std::string & objectName,
-                                                            const std::string & automatismName,
+    virtual gd::String GenerateAutomatismAction(const gd::String & objectName,
+                                                            const gd::String & automatismName,
                                                             const gd::AutomatismMetadata & autoInfo,
-                                                            const std::vector<std::string> & arguments,
+                                                            const std::vector<gd::String> & arguments,
                                                             const gd::InstructionMetadata & instrInfos,
                                                             gd::EventsCodeGenerationContext & context);
 
-    virtual std::string GenerateNegatedPredicat(const std::string & predicat) const { return "!("+predicat+")"; };
-    virtual std::string GenerateReferenceToUpperScopeBoolean(const std::string & referenceName,
-                                                   const std::string & referencedBoolean,
+    virtual gd::String GenerateNegatedPredicat(const gd::String & predicat) const { return "!("+predicat+")"; };
+    virtual gd::String GenerateReferenceToUpperScopeBoolean(const gd::String & referenceName,
+                                                   const gd::String & referencedBoolean,
                                                    gd::EventsCodeGenerationContext & context);
 
-    virtual std::string GenerateObjectsDeclarationCode(gd::EventsCodeGenerationContext & context);
+    virtual gd::String GenerateObjectsDeclarationCode(gd::EventsCodeGenerationContext & context);
 
     /**
      * \brief Construct a code generator for the specified project and layout.

@@ -35,7 +35,7 @@ public:
      * \brief Return the label that will be displayed on the button or menu item
      * allowing the user to export the project for the JS Platform.
      */
-    virtual std::string GetProjectExportButtonLabel();
+    virtual gd::String GetProjectExportButtonLabel();
 
     /**
      * \brief Create a preview for the specified layout.
@@ -45,27 +45,27 @@ public:
      * \param exportDir The directory where the preview must be created.
      * \return true if export was successful.
      */
-    bool ExportLayoutForPreview(gd::Project & project, gd::Layout & layout, std::string exportDir);
+    bool ExportLayoutForPreview(gd::Project & project, gd::Layout & layout, gd::String exportDir);
 
     /**
      * \brief Export the specified project.
      *
      * Called by ShowProjectExportDialog if the user clicked on Ok.
      */
-    bool ExportWholeProject(gd::Project & project, std::string exportDir,
+    bool ExportWholeProject(gd::Project & project, gd::String exportDir,
         bool minify, bool exportForCocoonJS, bool exportForIntelXDK);
 
     /**
      * \brief Return the error that occurred during the last export.
      */
-    const std::string & GetLastError() const { return lastError; };
+    const gd::String & GetLastError() const { return lastError; };
 
     #if !defined(GD_NO_WX_GUI)
     /**
      * \brief Try to locate the Node.js executable. (Node must be installed in a standard folder).
      * \return An empty string if not found, a full path to the node executable otherwise.
      */
-    static std::string GetNodeExecutablePath();
+    static gd::String GetNodeExecutablePath();
     #endif
 
 private:
@@ -81,7 +81,7 @@ private:
      * \param prettyPrinting If set to true, the JSON will be nicely indented
      * \return Empty string if everthing is ok, description of the error otherwise.
      */
-    static std::string ExportToJSON(gd::AbstractFileSystem & fs, const gd::Project & project, std::string filename, std::string wrapIntoVariable = "", bool prettyPrinting = false);
+    static gd::String ExportToJSON(gd::AbstractFileSystem & fs, const gd::Project & project, gd::String filename, gd::String wrapIntoVariable = "", bool prettyPrinting = false);
 
     /**
      * \brief Copy all the resources of the project to to the export directory, updating the resources filenames.
@@ -91,7 +91,7 @@ private:
      * \param exportDir The directory where the preview must be created.
      * \param progressDlg Optional wxProgressDialog which will be updated with the progress.
      */
-    static void ExportResources(gd::AbstractFileSystem & fs, gd::Project & project, std::string exportDir,
+    static void ExportResources(gd::AbstractFileSystem & fs, gd::Project & project, gd::String exportDir,
         wxProgressDialog * progressDlg = NULL);
 
     /**
@@ -105,7 +105,7 @@ private:
      * \param minify If true, the includes files must be merged into one file using Google Closure Compiler.
      * ( includesFiles parameter will be updated with the new filename )
      */
-    bool ExportIncludesAndLibs(std::vector<std::string> & includesFiles, std::string exportDir, bool minify);
+    bool ExportIncludesAndLibs(std::vector<gd::String> & includesFiles, gd::String exportDir, bool minify);
 
     /**
      * \brief Generate the events JS code, and save them to the export directory.
@@ -116,7 +116,7 @@ private:
      * \param includesFiles A reference to a vector that will be filled with JS files to be exported along with the project.
      * ( including "codeX.js" files ).
      */
-    bool ExportEventsCode(gd::Project & project, std::string outputDir, std::vector<std::string> & includesFiles);
+    bool ExportEventsCode(gd::Project & project, gd::String outputDir, std::vector<gd::String> & includesFiles);
 
     /**
      * \brief Copy the external source files used by the game into the export directory, and add them into files
@@ -128,7 +128,7 @@ private:
      * \param includesFiles A reference to a vector that will be filled with JS files to be exported along with the project.
      * ( including "ext-codeX.js" files ).
      */
-    bool ExportExternalSourceFiles(gd::Project & project, std::string outputDir, std::vector<std::string> & includesFiles);
+    bool ExportExternalSourceFiles(gd::Project & project, gd::String outputDir, std::vector<gd::String> & includesFiles);
 
     /**
      * \brief Generate the standard index file and save it to the export directory.
@@ -140,7 +140,7 @@ private:
      * \param includesFiles The JS files to be included in the HTML file. Order is important.
      * \param additionalSpec JSON string that will be passed to the gdjs.RuntimeGame object.
      */
-    bool ExportStandardIndexFile(gd::Project & project, std::string exportDir, const std::vector<std::string> & includesFiles, std::string additionalSpec = "");
+    bool ExportStandardIndexFile(gd::Project & project, gd::String exportDir, const std::vector<gd::String> & includesFiles, gd::String additionalSpec = "");
 
     /**
      * \brief Generate the standard index file for use with Intel XDK and save it to the export directory.
@@ -152,7 +152,7 @@ private:
      * \param includesFiles The JS files to be included in the HTML file. Order is important.
      * \param additionalSpec JSON string that will be passed to the gdjs.RuntimeGame object.
      */
-    bool ExportIntelXDKIndexFile(gd::Project & project, std::string exportDir, const std::vector<std::string> & includesFiles, std::string additionalSpec = "");
+    bool ExportIntelXDKIndexFile(gd::Project & project, gd::String exportDir, const std::vector<gd::String> & includesFiles, gd::String additionalSpec = "");
 
     /**
      * \brief Replace the annotations in a index.html file by the specified content.
@@ -164,10 +164,10 @@ private:
      * \param codeFilesIncludes "<!-- GDJS_CODE_FILES -->" will be replaced by HTML tags to include the filenames contained inside the vector.
      * \param additionalSpec The string "GDJS_ADDITIONAL_SPEC" surrounded by comments marks will be replaced by the content of the string.
      */
-    bool CompleteIndexFile(std::string & indexFileContent, std::string customCss, std::string customHtml, std::string exportDir, const std::vector<std::string> & includesFiles, std::string additionalSpec);
+    bool CompleteIndexFile(gd::String & indexFileContent, gd::String customCss, gd::String customHtml, gd::String exportDir, const std::vector<gd::String> & includesFiles, gd::String additionalSpec);
 
     gd::AbstractFileSystem & fs; ///< The abstract file system to be used for exportation.
-    std::string lastError; ///< The last error that occurred.
+    gd::String lastError; ///< The last error that occurred.
 };
 
 }

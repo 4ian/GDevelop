@@ -66,7 +66,7 @@ public:
 
     virtual bool LaunchPreview()
     {
-        std::string exportDir = gd::ToString(wxFileName::GetTempDir()+"/GDTemporaries/JSPreview/");
+        gd::String exportDir = wxFileName::GetTempDir()+"/GDTemporaries/JSPreview/";
 
         Exporter exporter(gd::NativeFileSystem::Get());
         if ( !exporter.ExportLayoutForPreview(project, layout, exportDir) )
@@ -95,7 +95,7 @@ void JsPlatform::OnIDEInitialized()
     //Initializing the tiny web server used to preview the games
     #if !defined(GD_NO_WX_GUI)
     std::cout << " * Starting web server..." << std::endl;
-    std::string exportDir = gd::ToString(wxFileName::GetTempDir()+"/GDTemporaries/JSPreview/");
+    gd::String exportDir = wxFileName::GetTempDir()+"/GDTemporaries/JSPreview/";
     httpServer.Run(exportDir);
     #endif
 }

@@ -21,9 +21,9 @@ SpriteExtension::SpriteExtension()
                           "Florian Rival",
                           "Open source (MIT License)");
 
-    std::map<std::string, gd::InstructionMetadata > & spriteActions = GetAllActionsForObject("Sprite");
-    std::map<std::string, gd::InstructionMetadata > & spriteConditions = GetAllConditionsForObject("Sprite");
-    std::map<std::string, gd::ExpressionMetadata > & spriteExpressions = GetAllExpressionsForObject("Sprite");
+    std::map<gd::String, gd::InstructionMetadata > & spriteActions = GetAllActionsForObject("Sprite");
+    std::map<gd::String, gd::InstructionMetadata > & spriteConditions = GetAllConditionsForObject("Sprite");
+    std::map<gd::String, gd::ExpressionMetadata > & spriteExpressions = GetAllExpressionsForObject("Sprite");
     spriteActions["ChangeBlendMode"].SetFunctionName("setBlendMode").SetIncludeFile("spriteruntimeobject.js");
     spriteActions["Opacity"].SetFunctionName("setOpacity").SetGetter("getOpacity").SetIncludeFile("spriteruntimeobject.js");
     spriteConditions["BlendMode"].SetFunctionName("getBlendMode").SetIncludeFile("spriteruntimeobject.js");

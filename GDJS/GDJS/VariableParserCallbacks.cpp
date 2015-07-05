@@ -22,7 +22,7 @@ using namespace std;
 
 namespace gdjs {
 
-VariableCodeGenerationCallbacks::VariableCodeGenerationCallbacks(string & output_,
+VariableCodeGenerationCallbacks::VariableCodeGenerationCallbacks(gd::String & output_,
                                                                gd::EventsCodeGenerator & codeGenerator_,
                                                                gd::EventsCodeGenerationContext & context_,
                                                                const VariableScope & scope_) :
@@ -36,10 +36,10 @@ VariableCodeGenerationCallbacks::VariableCodeGenerationCallbacks(string & output
 	}
 }
 
-VariableCodeGenerationCallbacks::VariableCodeGenerationCallbacks(string & output_,
+VariableCodeGenerationCallbacks::VariableCodeGenerationCallbacks(gd::String & output_,
                                                                gd::EventsCodeGenerator & codeGenerator_,
                                                                gd::EventsCodeGenerationContext & context_,
-                                                               const std::string & object_) :
+                                                               const gd::String & object_) :
     output(output_),
     codeGenerator(codeGenerator_),
     context(context_),
@@ -48,7 +48,7 @@ VariableCodeGenerationCallbacks::VariableCodeGenerationCallbacks(string & output
 {
 }
 
-void VariableCodeGenerationCallbacks::OnRootVariable(std::string variableName)
+void VariableCodeGenerationCallbacks::OnRootVariable(gd::String variableName)
 {
 	const gd::VariablesContainer * variables = NULL;
 	if ( scope == LAYOUT_VARIABLE ) {
@@ -60,7 +60,7 @@ void VariableCodeGenerationCallbacks::OnRootVariable(std::string variableName)
 		variables = &codeGenerator.GetProject().GetVariables();
 	}
 	else {
-	    std::vector<std::string> realObjects = codeGenerator.ExpandObjectsName(object, context);
+	    std::vector<gd::String> realObjects = codeGenerator.ExpandObjectsName(object, context);
 
 	    output = "gdjs.VariablesContainer.badVariablesContainer";
 	    for (unsigned int i = 0;i<realObjects.size();++i)
@@ -96,14 +96,14 @@ void VariableCodeGenerationCallbacks::OnRootVariable(std::string variableName)
 	output += ".get(\""+variableName+"\")";
 }
 
-void VariableCodeGenerationCallbacks::OnChildVariable(std::string variableName)
+void VariableCodeGenerationCallbacks::OnChildVariable(gd::String variableName)
 {
 	output += ".getChild(\""+variableName+"\")";
 }
 
-void VariableCodeGenerationCallbacks::OnChildSubscript(std::string stringExpression)
+void VariableCodeGenerationCallbacks::OnChildSubscript(gd::String stringExpression)
 {
-	std::string argumentCode;
+	gd::String argumentCode;
     gd::CallbacksForGeneratingExpressionCode callbacks(argumentCode, codeGenerator, context);
 
     gd::ExpressionParser parser(stringExpression);

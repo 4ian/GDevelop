@@ -28,13 +28,13 @@ using namespace std;
 namespace gdjs
 {
 
-std::string EventsCodeGenerator::GenerateSceneEventsCompleteCode(gd::Project & project,
+gd::String EventsCodeGenerator::GenerateSceneEventsCompleteCode(gd::Project & project,
                                                                  gd::Layout & scene,
                                                                  gd::EventsList & events,
-                                                                 std::set < std::string > & includeFiles,
+                                                                 std::set < gd::String > & includeFiles,
                                                                  bool compilationForRuntime)
 {
-    string output = "gdjs."+gd::SceneNameMangler::GetMangledSceneName(scene.GetName())+"Code = {};\n";
+    gd::String output = "gdjs."+gd::SceneNameMangler::GetMangledSceneName(scene.GetName())+"Code = {};\n";
 
     //Prepare the global context
     unsigned int maxDepthLevelReached = 0;
@@ -44,23 +44,23 @@ std::string EventsCodeGenerator::GenerateSceneEventsCompleteCode(gd::Project & p
     codeGenerator.PreprocessEventList(events);
 
     //Generate whole events code
-    string wholeEventsCode = codeGenerator.GenerateEventsListCode(events, context);
+    gd::String wholeEventsCode = codeGenerator.GenerateEventsListCode(events, context);
 
     //Extra declarations needed by events
-    for ( set<string>::iterator declaration = codeGenerator.GetCustomGlobalDeclaration().begin() ;
+    for ( set<gd::String>::iterator declaration = codeGenerator.GetCustomGlobalDeclaration().begin() ;
         declaration != codeGenerator.GetCustomGlobalDeclaration().end(); ++declaration )
         output += *declaration+"\n";
 
     //Global objects lists
     auto generateDeclarations = [&project, &scene, &codeGenerator](gd::Object & object, unsigned int maxDepth,
-        std::string & globalObjectLists, std::string & globalObjectListsReset) {
+        gd::String & globalObjectLists, gd::String & globalObjectListsReset) {
 
-        std::string type = gd::GetTypeOfObject(project, scene, object.GetName());
+        gd::String type = gd::GetTypeOfObject(project, scene, object.GetName());
         const gd::ObjectMetadata & metadata = gd::MetadataProvider::GetObjectMetadata(JsPlatform::Get(), type);
         codeGenerator.AddIncludeFiles(metadata.includeFiles);
 
         //Ensure needed files are included.
-        std::vector<std::string> automatisms = object.GetAllAutomatismNames();
+        std::vector<gd::String> automatisms = object.GetAllAutomatismNames();
         for (unsigned int j = 0;j<automatisms.size();++j)
         {
             const gd::AutomatismMetadata & metadata = gd::MetadataProvider::GetAutomatismMetadata(JsPlatform::Get(),
@@ -78,8 +78,8 @@ std::string EventsCodeGenerator::GenerateSceneEventsCompleteCode(gd::Project & p
         }
     };
 
-    std::string globalObjectLists;
-    std::string globalObjectListsReset;
+    gd::String globalObjectLists;
+    gd::String globalObjectListsReset;
     for (unsigned int i = 0;i<project.GetObjectsCount();++i)
         generateDeclarations(project.GetObject(i), maxDepthLevelReached, globalObjectLists, globalObjectListsReset);
 
@@ -87,13 +87,13 @@ std::string EventsCodeGenerator::GenerateSceneEventsCompleteCode(gd::Project & p
         generateDeclarations(scene.GetObject(i), maxDepthLevelReached, globalObjectLists, globalObjectListsReset);
 
     //Condition global booleans
-    std::string globalConditionsBooleans;
+    gd::String globalConditionsBooleans;
     for (unsigned int i = 0;i<=codeGenerator.GetMaxCustomConditionsDepth();++i)
     {
-        globalConditionsBooleans += codeGenerator.GetCodeNamespace()+"conditionTrue_"+gd::ToString(i)+" = {val:false};\n";
+        globalConditionsBooleans += codeGenerator.GetCodeNamespace()+"conditionTrue_"+gd::String::FromUInt(i)+" = {val:false};\n";
         for (unsigned int j = 0;j<=codeGenerator.GetMaxConditionsListsSize();++j)
         {
-            globalConditionsBooleans += codeGenerator.GetCodeNamespace()+"condition"+gd::ToString(j)+"IsTrue_"+gd::ToString(i)+" = {val:false};\n";
+            globalConditionsBooleans += codeGenerator.GetCodeNamespace()+"condition"+gd::ToString(j)+"IsTrue_"+gd::String::FromUInt(i)+" = {val:false};\n";
         }
     }
 
@@ -117,11 +117,11 @@ std::string EventsCodeGenerator::GenerateSceneEventsCompleteCode(gd::Project & p
     return output;
 }
 
-std::string EventsCodeGenerator::GenerateObjectFunctionCall(std::string objectListName,
+gd::String EventsCodeGenerator::GenerateObjectFunctionCall(gd::String objectListName,
                                                       const gd::ObjectMetadata & objMetadata,
                                                       const gd::ExpressionCodeGenerationInformation & codeInfo,
-                                                      std::string parametersStr,
-                                                      std::string defaultOutput,
+                                                      gd::String parametersStr,
+                                                      gd::String defaultOutput,
                                                       gd::EventsCodeGenerationContext & context)
 {
     if ( codeInfo.staticFunction )
@@ -132,12 +132,12 @@ std::string EventsCodeGenerator::GenerateObjectFunctionCall(std::string objectLi
         return "(( "+GetObjectListName(objectListName, context)+".length === 0 ) ? "+defaultOutput+" :"+ GetObjectListName(objectListName, context)+"[0]."+codeInfo.functionCallName+"("+parametersStr+"))";
 }
 
-std::string EventsCodeGenerator::GenerateObjectAutomatismFunctionCall(std::string objectListName,
-                                                      std::string automatismName,
+gd::String EventsCodeGenerator::GenerateObjectAutomatismFunctionCall(gd::String objectListName,
+                                                      gd::String automatismName,
                                                       const gd::AutomatismMetadata & autoInfo,
                                                       const gd::ExpressionCodeGenerationInformation & codeInfo,
-                                                      std::string parametersStr,
-                                                      std::string defaultOutput,
+                                                      gd::String parametersStr,
+                                                      gd::String defaultOutput,
                                                       gd::EventsCodeGenerationContext & context)
 {
     if ( codeInfo.staticFunction )
@@ -148,21 +148,21 @@ std::string EventsCodeGenerator::GenerateObjectAutomatismFunctionCall(std::strin
         return "(( "+GetObjectListName(objectListName, context)+".length === 0 ) ? "+defaultOutput+" :"+GetObjectListName(objectListName, context)+"[0].getAutomatism(\""+automatismName+"\")."+codeInfo.functionCallName+"("+parametersStr+"))";
 }
 
-std::string EventsCodeGenerator::GenerateFreeCondition(const std::vector<std::string> & arguments,
+gd::String EventsCodeGenerator::GenerateFreeCondition(const std::vector<gd::String> & arguments,
                                                              const gd::InstructionMetadata & instrInfos,
-                                                             const std::string & returnBoolean,
+                                                             const gd::String & returnBoolean,
                                                              bool conditionInverted,
                                                              gd::EventsCodeGenerationContext & context)
 {
     //Generate call
-    string predicat;
+    gd::String predicat;
     if ( instrInfos.codeExtraInformation.type == "number" || instrInfos.codeExtraInformation.type == "string")
     {
         predicat = GenerateRelationalOperatorCall(instrInfos, arguments, instrInfos.codeExtraInformation.functionCallName);
     }
     else
     {
-        string argumentsStr;
+        gd::String argumentsStr;
         for (unsigned int i = 0;i<arguments.size();++i)
         {
             if ( i != 0 ) argumentsStr += ", ";
@@ -185,28 +185,28 @@ std::string EventsCodeGenerator::GenerateFreeCondition(const std::vector<std::st
     return GenerateBooleanFullName(returnBoolean, context)+".val = "+predicat+";\n";
 }
 
-std::string EventsCodeGenerator::GenerateObjectCondition(const std::string & objectName,
+gd::String EventsCodeGenerator::GenerateObjectCondition(const gd::String & objectName,
                                                          const gd::ObjectMetadata & objInfo,
-                                                         const std::vector<std::string> & arguments,
+                                                         const std::vector<gd::String> & arguments,
                                                          const gd::InstructionMetadata & instrInfos,
-                                                         const std::string & returnBoolean,
+                                                         const gd::String & returnBoolean,
                                                          bool conditionInverted,
                                                         gd::EventsCodeGenerationContext & context)
 {
-    std::string conditionCode;
+    gd::String conditionCode;
 
     //Prepare call
-    string objectFunctionCallNamePart = GetObjectListName(objectName, context)+"[i]."+instrInfos.codeExtraInformation.functionCallName;
+    gd::String objectFunctionCallNamePart = GetObjectListName(objectName, context)+"[i]."+instrInfos.codeExtraInformation.functionCallName;
 
     //Create call
-    string predicat;
+    gd::String predicat;
     if ( (instrInfos.codeExtraInformation.type == "number" || instrInfos.codeExtraInformation.type == "string") )
     {
         predicat = GenerateRelationalOperatorCall(instrInfos, arguments, objectFunctionCallNamePart, 1);
     }
     else
     {
-        string argumentsStr;
+        gd::String argumentsStr;
         for (unsigned int i = 1;i<arguments.size();++i)
         {
             if ( i != 1 ) argumentsStr += ", ";
@@ -230,30 +230,30 @@ std::string EventsCodeGenerator::GenerateObjectCondition(const std::string & obj
     return conditionCode;
 }
 
-std::string EventsCodeGenerator::GenerateAutomatismCondition(const std::string & objectName,
-                                                             const std::string & automatismName,
+gd::String EventsCodeGenerator::GenerateAutomatismCondition(const gd::String & objectName,
+                                                             const gd::String & automatismName,
                                                                    const gd::AutomatismMetadata & autoInfo,
-                                                                   const std::vector<std::string> & arguments,
+                                                                   const std::vector<gd::String> & arguments,
                                                                    const gd::InstructionMetadata & instrInfos,
-                                                                   const std::string & returnBoolean,
+                                                                   const gd::String & returnBoolean,
                                                                    bool conditionInverted,
                                                       gd::EventsCodeGenerationContext & context)
 {
-    std::string conditionCode;
+    gd::String conditionCode;
 
     //Prepare call
-    string objectFunctionCallNamePart = GetObjectListName(objectName, context)+"[i].getAutomatism(\""+automatismName+"\")."
+    gd::String objectFunctionCallNamePart = GetObjectListName(objectName, context)+"[i].getAutomatism(\""+automatismName+"\")."
                                         +instrInfos.codeExtraInformation.functionCallName;
 
     //Create call
-    string predicat;
+    gd::String predicat;
     if ( (instrInfos.codeExtraInformation.type == "number" || instrInfos.codeExtraInformation.type == "string") )
     {
         predicat = GenerateRelationalOperatorCall(instrInfos, arguments, objectFunctionCallNamePart, 2);
     }
     else
     {
-        string argumentsStr;
+        gd::String argumentsStr;
         for (unsigned int i = 2;i<arguments.size();++i)
         {
             if ( i != 2 ) argumentsStr += ", ";
@@ -265,7 +265,7 @@ std::string EventsCodeGenerator::GenerateAutomatismCondition(const std::string &
     if ( conditionInverted ) predicat = GenerateNegatedPredicat(predicat);
 
     //Verify that object has automatism.
-    vector < string > automatisms = gd::GetAutomatismsOfObject(project, scene, objectName);
+    vector < gd::String > automatisms = gd::GetAutomatismsOfObject(project, scene, objectName);
     if ( find(automatisms.begin(), automatisms.end(), automatismName) == automatisms.end() )
     {
         cout << "Bad automatism requested" << endl;
@@ -286,19 +286,19 @@ std::string EventsCodeGenerator::GenerateAutomatismCondition(const std::string &
     return conditionCode;
 }
 
-std::string EventsCodeGenerator::GenerateObjectAction(const std::string & objectName,
+gd::String EventsCodeGenerator::GenerateObjectAction(const gd::String & objectName,
                                                                    const gd::ObjectMetadata & objInfo,
-                                                                   const std::vector<std::string> & arguments,
+                                                                   const std::vector<gd::String> & arguments,
                                                                    const gd::InstructionMetadata & instrInfos,
                                                       gd::EventsCodeGenerationContext & context)
 {
-    std::string actionCode;
+    gd::String actionCode;
 
     //Prepare call
-    string objectPart = GetObjectListName(objectName, context)+"[i]." ;
+    gd::String objectPart = GetObjectListName(objectName, context)+"[i]." ;
 
     //Create call
-    string call;
+    gd::String call;
     if ( instrInfos.codeExtraInformation.type == "number" || instrInfos.codeExtraInformation.type == "string")
     {
         if ( instrInfos.codeExtraInformation.accessType == gd::InstructionMetadata::ExtraInformation::MutatorAndOrAccessor )
@@ -308,7 +308,7 @@ std::string EventsCodeGenerator::GenerateObjectAction(const std::string & object
     }
     else
     {
-        string argumentsStr;
+        gd::String argumentsStr;
         for (unsigned int i = 1;i<arguments.size();++i)
         {
             if ( i != 1 ) argumentsStr += ", ";
@@ -326,21 +326,21 @@ std::string EventsCodeGenerator::GenerateObjectAction(const std::string & object
     return actionCode;
 }
 
-std::string EventsCodeGenerator::GenerateAutomatismAction(const std::string & objectName,
-                                                                    const std::string & automatismName,
+gd::String EventsCodeGenerator::GenerateAutomatismAction(const gd::String & objectName,
+                                                                    const gd::String & automatismName,
                                                                    const gd::AutomatismMetadata & autoInfo,
-                                                                   const std::vector<std::string> & arguments,
+                                                                   const std::vector<gd::String> & arguments,
                                                                    const gd::InstructionMetadata & instrInfos,
                                                       gd::EventsCodeGenerationContext & context)
 {
-    std::string actionCode;
+    gd::String actionCode;
 
     //Prepare call
     //Add a static_cast if necessary
-    string objectPart = GetObjectListName(objectName, context)+"[i].getAutomatism(\""+automatismName+"\").";
+    gd::String objectPart = GetObjectListName(objectName, context)+"[i].getAutomatism(\""+automatismName+"\").";
 
     //Create call
-    string call;
+    gd::String call;
     if ( (instrInfos.codeExtraInformation.type == "number" || instrInfos.codeExtraInformation.type == "string") )
     {
         if ( instrInfos.codeExtraInformation.accessType == gd::InstructionMetadata::ExtraInformation::MutatorAndOrAccessor )
@@ -350,7 +350,7 @@ std::string EventsCodeGenerator::GenerateAutomatismAction(const std::string & ob
     }
     else
     {
-        string argumentsStr;
+        gd::String argumentsStr;
         for (unsigned int i = 2;i<arguments.size();++i)
         {
             if ( i != 2 ) argumentsStr += ", ";
@@ -361,7 +361,7 @@ std::string EventsCodeGenerator::GenerateAutomatismAction(const std::string & ob
     }
 
     //Verify that object has automatism.
-    vector < string > automatisms = gd::GetAutomatismsOfObject(project, scene, objectName);
+    vector < gd::String > automatisms = gd::GetAutomatismsOfObject(project, scene, objectName);
     if ( find(automatisms.begin(), automatisms.end(), automatismName) == automatisms.end() )
     {
         cout << "Bad automatism requested for an action" << endl;
@@ -377,15 +377,15 @@ std::string EventsCodeGenerator::GenerateAutomatismAction(const std::string & ob
     return actionCode;
 }
 
-std::string EventsCodeGenerator::GetObjectListName(const std::string & name, const gd::EventsCodeGenerationContext & context)
+gd::String EventsCodeGenerator::GetObjectListName(const gd::String & name, const gd::EventsCodeGenerationContext & context)
 {
     return GetCodeNamespace()+ManObjListName(name)+gd::ToString(context.GetLastDepthObjectListWasNeeded(name));
 }
 
-std::string EventsCodeGenerator::GenerateObjectsDeclarationCode(gd::EventsCodeGenerationContext & context)
+gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(gd::EventsCodeGenerationContext & context)
 {
-    std::string declarationsCode;
-    for ( set<string>::iterator it = context.GetObjectsListsToBeDeclared().begin() ; it != context.GetObjectsListsToBeDeclared().end(); ++it )
+    gd::String declarationsCode;
+    for ( set<gd::String>::iterator it = context.GetObjectsListsToBeDeclared().begin() ; it != context.GetObjectsListsToBeDeclared().end(); ++it )
     {
         declarationsCode += GetObjectListName(*it, context);
         if ( !context.ObjectAlreadyDeclared(*it) )
@@ -401,7 +401,7 @@ std::string EventsCodeGenerator::GenerateObjectsDeclarationCode(gd::EventsCodeGe
                 std::cout << "ERROR: During code generation, a context tried tried to use an already declared object list without having a parent" << std::endl;
         }
     }
-    for ( set<string>::iterator it = context.GetObjectsListsToBeDeclaredEmpty().begin() ; it != context.GetObjectsListsToBeDeclaredEmpty().end(); ++it )
+    for ( set<gd::String>::iterator it = context.GetObjectsListsToBeDeclaredEmpty().begin() ; it != context.GetObjectsListsToBeDeclaredEmpty().end(); ++it )
     {
         declarationsCode += GetObjectListName(*it, context);
         if ( !context.ObjectAlreadyDeclared(*it) )
@@ -421,20 +421,20 @@ std::string EventsCodeGenerator::GenerateObjectsDeclarationCode(gd::EventsCodeGe
     return declarationsCode ;
 }
 
-string EventsCodeGenerator::GenerateConditionsListCode(gd::InstructionsList & conditions, gd::EventsCodeGenerationContext & context)
+gd::String EventsCodeGenerator::GenerateConditionsListCode(gd::InstructionsList & conditions, gd::EventsCodeGenerationContext & context)
 {
-    string outputCode;
+    gd::String outputCode;
 
     for (unsigned int i = 0;i<conditions.size();++i)
-        outputCode += GenerateBooleanInitializationToFalse("condition"+gd::ToString(i)+"IsTrue", context);
+        outputCode += GenerateBooleanInitializationToFalse("condition"+gd::String::FromUInt(i)+"IsTrue", context);
 
     for (unsigned int cId =0;cId < conditions.size();++cId)
     {
-        if (cId != 0) outputCode += "if ( "+GenerateBooleanFullName("condition"+gd::ToString(cId-1)+"IsTrue", context)+".val ) {\n";
+        if (cId != 0) outputCode += "if ( "+GenerateBooleanFullName("condition"+gd::String::FromUInt(cId-1)+"IsTrue", context)+".val ) {\n";
 
         gd::InstructionMetadata instrInfos = gd::MetadataProvider::GetConditionMetadata(platform, conditions[cId].GetType());
 
-        string conditionCode = GenerateConditionCode(conditions[cId], "condition"+gd::ToString(cId)+"IsTrue", context);
+        gd::String conditionCode = GenerateConditionCode(conditions[cId], "condition"+gd::String::FromUInt(cId)+"IsTrue", context);
         if ( !conditions[cId].GetType().empty() )
         {
             outputCode += "{\n";
@@ -453,12 +453,12 @@ string EventsCodeGenerator::GenerateConditionsListCode(gd::InstructionsList & co
     return outputCode;
 }
 
-std::string EventsCodeGenerator::GenerateParameterCodes(const std::string & parameter, const gd::ParameterMetadata & metadata,
+gd::String EventsCodeGenerator::GenerateParameterCodes(const gd::String & parameter, const gd::ParameterMetadata & metadata,
                                                         gd::EventsCodeGenerationContext & context,
-                                                        const std::string & previousParameter,
-                                                        std::vector < std::pair<std::string, std::string> > * supplementaryParametersTypes)
+                                                        const gd::String & previousParameter,
+                                                        std::vector < std::pair<gd::String, gd::String> > * supplementaryParametersTypes)
 {
-    std::string argOutput;
+    gd::String argOutput;
 
     //Code only parameter type
     if ( metadata.type == "currentScene" )
@@ -468,7 +468,7 @@ std::string EventsCodeGenerator::GenerateParameterCodes(const std::string & para
     //Code only parameter type
     else if ( metadata.type == "objectList" )
     {
-        std::vector<std::string> realObjects = ExpandObjectsName(parameter, context);
+        std::vector<gd::String> realObjects = ExpandObjectsName(parameter, context);
 
         argOutput += "context.clearEventsObjectsMap()";
         for (unsigned int i = 0;i<realObjects.size();++i)
@@ -481,7 +481,7 @@ std::string EventsCodeGenerator::GenerateParameterCodes(const std::string & para
     //Code only parameter type
     else if ( metadata.type == "objectListWithoutPicking" )
     {
-        std::vector<std::string> realObjects = ExpandObjectsName(parameter, context);
+        std::vector<gd::String> realObjects = ExpandObjectsName(parameter, context);
 
         argOutput += "context.clearEventsObjectsMap()";
         for (unsigned int i = 0;i<realObjects.size();++i)
@@ -494,7 +494,7 @@ std::string EventsCodeGenerator::GenerateParameterCodes(const std::string & para
     //Code only parameter type
     else if ( metadata.type == "objectPtr")
     {
-        std::vector<std::string> realObjects = ExpandObjectsName(parameter, context);
+        std::vector<gd::String> realObjects = ExpandObjectsName(parameter, context);
 
         if ( find(realObjects.begin(), realObjects.end(), context.GetCurrentObject()) != realObjects.end() && !context.GetCurrentObject().empty())
         {
@@ -539,7 +539,7 @@ std::string EventsCodeGenerator::GenerateParameterCodes(const std::string & para
     {
         //Object is either the object of the previous parameter or, if it is empty,
         //the object being picked by the instruction.
-        std::string object = previousParameter;
+        gd::String object = previousParameter;
         if ( object.empty() ) object = context.GetCurrentObject();
 
         VariableCodeGenerationCallbacks callbacks(argOutput, *this, context, object);
@@ -557,8 +557,8 @@ std::string EventsCodeGenerator::GenerateParameterCodes(const std::string & para
     return argOutput;
 }
 
-std::string EventsCodeGenerator::GenerateReferenceToUpperScopeBoolean(const std::string & referenceName,
-                                                            const std::string & referencedBoolean,
+gd::String EventsCodeGenerator::GenerateReferenceToUpperScopeBoolean(const gd::String & referenceName,
+                                                            const gd::String & referencedBoolean,
                                                             gd::EventsCodeGenerationContext & context)
 {
     if ( context.GetParentContext() == NULL) return "";
@@ -566,17 +566,17 @@ std::string EventsCodeGenerator::GenerateReferenceToUpperScopeBoolean(const std:
     return GenerateBooleanFullName(referenceName, context)+" = "+GenerateBooleanFullName(referencedBoolean, *context.GetParentContext())+";\n";
 }
 
-std::string EventsCodeGenerator::GenerateBooleanInitializationToFalse(const std::string & boolName, const gd::EventsCodeGenerationContext & context)
+gd::String EventsCodeGenerator::GenerateBooleanInitializationToFalse(const gd::String & boolName, const gd::EventsCodeGenerationContext & context)
 {
     return GenerateBooleanFullName(boolName, context)+".val = false;\n";
 }
 
-std::string EventsCodeGenerator::GenerateBooleanFullName(const std::string & boolName, const gd::EventsCodeGenerationContext & context )
+gd::String EventsCodeGenerator::GenerateBooleanFullName(const gd::String & boolName, const gd::EventsCodeGenerationContext & context )
 {
     return GetCodeNamespace()+boolName+"_"+gd::ToString(context.GetCurrentConditionDepth());
 }
 
-std::string EventsCodeGenerator::GetCodeNamespace()
+gd::String EventsCodeGenerator::GetCodeNamespace()
 {
     return "gdjs."+gd::SceneNameMangler::GetMangledSceneName(scene.GetName())+"Code.";
 }

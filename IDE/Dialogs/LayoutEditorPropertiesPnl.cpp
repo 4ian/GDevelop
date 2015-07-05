@@ -83,7 +83,7 @@ void LayoutEditorPropertiesPnl::Refresh()
     {
         std::vector<gd::InitialInstance*> selection = layoutEditorCanvas->GetSelection();
         instancesHelper.RefreshFrom(selection);
-        std::string objectName;
+        gd::String objectName;
         for (unsigned int i = 0;i<selection.size();++i)
         {
             if ( !selection[i] ) continue;

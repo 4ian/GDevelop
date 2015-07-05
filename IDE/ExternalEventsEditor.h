@@ -17,6 +17,7 @@ namespace gd { class Project; }
 class EventsEditor;
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
+#include "GDCore/Utf8String.h"
 
 /**
  * \brief A panel displaying an events editor to edit
@@ -68,4 +69,3 @@ private:
 };
 
 #endif
-

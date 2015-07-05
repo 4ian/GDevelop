@@ -58,7 +58,7 @@ BEGIN_EVENT_TABLE( BugReport, wxDialog )
     //*)
 END_EVENT_TABLE()
 
-BugReport::BugReport( wxWindow* parent, const std::vector<std::string> & openedFiles_ ) :
+BugReport::BugReport( wxWindow* parent, const std::vector<gd::String> & openedFiles_ ) :
     openedFiles(openedFiles_)
 {
     //(*Initialize(BugReport)
@@ -178,7 +178,7 @@ BugReport::BugReport( wxWindow* parent, const std::vector<std::string> & openedF
 
     for (unsigned int i = 0; i < openedFiles.size(); ++i)
     {
-        std::string file = openedFiles[i];
+        gd::String file = openedFiles[i];
         if (!wxFileExists(file+".autosave"))
             file += GD_T(" (Autosave not found!)");
         openedFilesEdit->AppendText(file+"\n");

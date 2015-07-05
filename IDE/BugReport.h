@@ -14,12 +14,13 @@
 //*)
 #include <vector>
 #include <string>
+#include "GDCore/Utf8String.h"
 
 class BugReport: public wxDialog
 {
 public:
 
-	BugReport(wxWindow* parent, const std::vector<std::string> & openedFiles);
+	BugReport(wxWindow* parent, const std::vector<gd::String> & openedFiles);
 	virtual ~BugReport();
 
 	//(*Declarations(BugReport)
@@ -85,10 +86,9 @@ private:
 	void OnUserReportEditText(wxCommandEvent& event);
 	//*)
 
-	const std::vector<std::string> & openedFiles; ///< The filenames to display
+	const std::vector<gd::String> & openedFiles; ///< The filenames to display
 
 	DECLARE_EVENT_TABLE()
 };
 
 #endif
-

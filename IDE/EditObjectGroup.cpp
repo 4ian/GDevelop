@@ -150,7 +150,7 @@ void EditObjectGroup::OnAnnulerBtClick(wxCommandEvent& event)
 {
     if ( modificationCount > 7 )
     {
-        wxMessageDialog msgDlg(this, _("You made ")+ToString(modificationCount)+_(" changes. Are you sure you want to cancel all changes\?"), _("Lot's of changes made."), wxYES_NO | wxICON_QUESTION);
+        wxMessageDialog msgDlg(this, _("You made ")+gd::String::FromUInt(modificationCount)+_(" changes. Are you sure you want to cancel all changes\?"), _("Lot's of changes made."), wxYES_NO | wxICON_QUESTION);
         if ( msgDlg.ShowModal() == wxID_NO )
             return;
     }
@@ -163,7 +163,7 @@ void EditObjectGroup::Refresh()
     ObjetsList->DeleteAllItems();
     ObjetsList->AddRoot( _( "All objects of the group" ) );
 
-    vector < string > allObjects = group.GetAllObjectsNames();
+    std::vector< gd::String > allObjects = group.GetAllObjectsNames();
     for ( unsigned int i = 0;i < allObjects.size();i++ )
         ObjetsList->AppendItem( ObjetsList->GetRootItem(), allObjects.at(i) );
 
@@ -196,7 +196,7 @@ void EditObjectGroup::OnAddObjetSelected(wxCommandEvent& event)
     {
         for (unsigned int i = 0;i<dialog.GetChosenObjects().size();++i)
         {
-            //On l'ajoute si il n'est pas déjà dans le groupe
+            //On l'ajoute si il n'est pas dï¿½jï¿½ dans le groupe
             if ( !group.Find( dialog.GetChosenObjects()[i] ) )
             {
                 group.AddObject( dialog.GetChosenObjects()[i] );
@@ -213,10 +213,10 @@ void EditObjectGroup::OnDelObjetSelected(wxCommandEvent& event)
     //Get selection and construct list of objects to remove.
     wxArrayTreeItemIds selection;
     unsigned int count = ObjetsList->GetSelections(selection);
-    std::vector <std::string> objectsToRemove;
+    std::vector <gd::String> objectsToRemove;
 
     for (unsigned int i = 0;i<count;++i)
-        objectsToRemove.push_back(ToString(ObjetsList->GetItemText( selection.Item(i) )));
+        objectsToRemove.push_back(ObjetsList->GetItemText( selection.Item(i) ));
 
     for (unsigned int i = 0;i<objectsToRemove.size();++i)
     {

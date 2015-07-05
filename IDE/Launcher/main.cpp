@@ -7,7 +7,7 @@
 typedef HINSTANCE Handle;
 typedef int (*EntryPointType)(int, char**);
 
-int AbortWithMessage(const std::string & message)
+int AbortWithMessage(const gd::String & message)
 {
     std::cout << message;
     MessageBox(NULL, message.c_str(), "Fatal error :(", MB_ICONERROR);
@@ -16,7 +16,7 @@ int AbortWithMessage(const std::string & message)
 
 using namespace std;
 
-std::string GetDynamicLibLastError()
+gd::String GetDynamicLibLastError()
 {
     LPSTR lpMsgBuf;
     DWORD dw = GetLastError();
@@ -35,7 +35,7 @@ std::string GetDynamicLibLastError()
     std::ostringstream oss;
     oss << dw;
 
-    std::string errorMsg = "Error ("+oss.str()+"): "+std::string(lpMsgBuf);
+    gd::String errorMsg = "Error ("+oss.str()+"): "+gd::String(lpMsgBuf);
     return errorMsg;
 }
 
@@ -49,7 +49,7 @@ int main(int argc, char ** argv)
     Handle lib = LoadLibrary("GDIDE.dll");
     if ( lib == NULL )
     {
-        std::string error =  "Unable to open GDIDE.dll!\n";
+        gd::String error =  "Unable to open GDIDE.dll!\n";
         error += "Full error message:\n";
         error += GetDynamicLibLastError();
         error += "\n\nMake sure that GDevelop is correctly installed and that GDIDE.dll is not missing.";
@@ -61,7 +61,7 @@ int main(int argc, char ** argv)
 
     if ( entryPoint == NULL )
     {
-        std::string error =  "Unable to find the IDE entry point!\n";
+        gd::String error =  "Unable to find the IDE entry point!\n";
         error += "Full error message:\n";
         error += GetDynamicLibLastError();
         error += "\n\nPlease report this error on the GDevelop forum.";

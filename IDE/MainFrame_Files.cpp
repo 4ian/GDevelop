@@ -63,10 +63,10 @@ void MainFrame::CreateNewProject()
                 newProject->SetProjectFile(dialog.GetChosenTemplateFile());
                 newProject->LoadFromFile(newProject->GetProjectFile());
                 gd::ProjectResourcesCopier::CopyAllResourcesTo(*newProject, gd::NativeFileSystem::Get(),
-                    gd::ToString(targetDirectory), false);
+                    targetDirectory, false);
             }
             else
-                newProject->InsertNewLayout(gd::ToString(_("New scene")), 0);
+                newProject->InsertNewLayout(_("New scene"), 0);
 
             newProject->SetProjectFile(dialog.GetChosenFilename());
             newProject->AddPlatform(*associatedPlatform);
@@ -114,7 +114,7 @@ void MainFrame::OnMenuOpenSelected( wxCommandEvent& event )
     wxSetWorkingDirectory(oldWorkingDir); //Ensure Windows does not mess up with the working directory.
 
     if (openFileDialog.ShowModal() != wxID_CANCEL && !openFileDialog.GetPath().empty() )
-        Open( gd::ToString(openFileDialog.GetPath()) );
+        Open( openFileDialog.GetPath() );
 }
 
 /**
@@ -136,7 +136,7 @@ void MainFrame::OnOpenExampleSelected(wxCommandEvent& event)
     wxSetWorkingDirectory(oldWorkingDir); //Ensure Windows does not mess up with the working directory.
 
     if ( open.ShowModal() != wxID_CANCEL && !open.GetPath().empty() )
-        Open(ToString(open.GetPath()));
+        Open(open.GetPath());
 }
 /**
  * Adapter for the ribbon
@@ -163,7 +163,7 @@ void MainFrame::SetLastUsedFile(wxString file)
 /**
  * Open a file
  */
-void MainFrame::Open( string file )
+void MainFrame::Open( gd::String file )
 {
     sf::Lock lock(CodeCompiler::openSaveDialogMutex);
     bool isJSON = wxString(file).EndsWith(".json");
@@ -177,17 +177,17 @@ void MainFrame::Open( string file )
 
         games.push_back(newProject);
 
-        //Sauvegarde fichiers récents
+        //Sauvegarde fichiers rï¿½cents
         SetLastUsedFile( file );
 
-        //Mise à jour des éditeurs
+        //Mise ï¿½ jour des ï¿½diteurs
         SetCurrentGame(games.size()-1);
         if ( startPage ) startPage->Refresh();
 
         //Update the file logging the opened project
         UpdateOpenedProjectsLogFile();
 
-        string unknownExtensions = "";
+        gd::String unknownExtensions = "";
         for (unsigned int i = 0;i<newProject->GetUsedExtensions().size();++i)
         {
             bool extensionFound = false;
@@ -216,7 +216,7 @@ void MainFrame::Open( string file )
             wxString errorMsg = _("One or more extensions are used by the project but are not installed for the platform used by the project :\n")
                 + unknownExtensions
                 + _("\nSome objects, actions, conditions or expressions can be unavailable or not working.");
-            gd::LogWarning(gd::utf8::FromWxString(errorMsg));
+            gd::LogWarning(errorMsg);
         }
     }
     //Ensure working directory is set to the IDE one.
@@ -270,14 +270,14 @@ void MainFrame::OnRibbonSaveAllClicked(wxRibbonButtonBarEvent& evt)
             wxFileDialog fileDialog( this, _( "Choose where to save the project" ), "", "", "GDevelop Project (*.gdg, *.json)|*.gdg;*.json", wxFD_SAVE );
             fileDialog.ShowModal();
 
-            std::string path = gd::ToString(fileDialog.GetPath());
+            gd::String path = fileDialog.GetPath();
 
             #if defined(LINUX) //Extension seems not be added with wxGTK?
             if ( fileDialog.GetFilterIndex() == 0 && !path.empty() && !fileDialog.GetPath().EndsWith(".json") )
                 path += ".gdg";
             #endif
 
-            //A t on  un fichier à enregistrer ?
+            //A t on  un fichier ï¿½ enregistrer ?
             if ( !path.empty() )
             {
                 //oui, donc on l'enregistre
@@ -314,8 +314,8 @@ bool MainFrame::Save(gd::Project & project, wxString file)
 {
     bool isJSON = file.EndsWith(".json");
     bool success =
-        (!isJSON && project.SaveToFile(gd::ToString(file))) ||
-        (isJSON  && project.SaveToJSONFile(gd::ToString(file)));
+        (!isJSON && project.SaveToFile(file)) ||
+        (isJSON  && project.SaveToJSONFile(file));
 
     return success;
 }
@@ -330,7 +330,7 @@ void MainFrame::SaveAs()
     wxFileDialog fileDialog( this, _( "Choose where to save the project" ), "", "", "GDevelop Project (*.gdg, *.json)|*.gdg;*.json", wxFD_SAVE );
     fileDialog.ShowModal();
 
-    std::string file = gd::ToString(fileDialog.GetPath());
+    gd::String file = fileDialog.GetPath();
     #if defined(LINUX) //Extension seems not be added with wxGTK?
     if ( fileDialog.GetFilterIndex() == 0 && !file.empty() && !fileDialog.GetPath().EndsWith(".json") )
         file += ".gdg";
@@ -354,7 +354,7 @@ void MainFrame::SaveAs()
             {
                 wxProgressDialog progressDialog(_("Save progress"), _("Exporting resources..."));
                 gd::ProjectResourcesCopier::CopyAllResourcesTo(*GetCurrentGame(), NativeFileSystem::Get(),
-                    gd::ToString(newPath), true, &progressDialog);
+                    newPath, true, &progressDialog);
             }
 
             if ( dlg.IsCheckBoxChecked() )
@@ -428,5 +428,5 @@ void MainFrame::OnRecentClicked( wxCommandEvent& event )
         break;
     }
 
-    Open( gd::ToString(last) );
+    Open( last );
 }

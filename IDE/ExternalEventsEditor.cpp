@@ -98,7 +98,7 @@ void ExternalEventsEditor::ForceRefreshRibbonAndConnect()
  */
 void ExternalEventsEditor::OnparentSceneComboBoxSelect(wxCommandEvent& event)
 {
-    std::string name = gd::ToString(parentSceneComboBox->GetValue()) ;
+    gd::String name = parentSceneComboBox->GetValue() ;
 
     gd::Layout * scene = game.HasLayoutNamed(name) ? &game.GetLayout(name) : NULL;
 
@@ -135,4 +135,3 @@ void ExternalEventsEditor::OnparentSceneComboBoxDropDown(wxCommandEvent& event)
     for (unsigned int i = 0;i<game.GetLayoutsCount();++i)
     	parentSceneComboBox->Append(game.GetLayout(i).GetName());
 }
-

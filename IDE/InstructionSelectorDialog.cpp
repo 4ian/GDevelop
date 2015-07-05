@@ -247,7 +247,7 @@ wxTreeItemId InstructionSelectorDialog::GetGroupItem(wxTreeCtrl * treeCtrl, wxTr
     return parent;
 }
 
-bool InstructionSelectorDialog::SelectInstruction(const std::string & type, wxTreeItemId parent)
+bool InstructionSelectorDialog::SelectInstruction(const gd::String & type, wxTreeItemId parent)
 {
     wxTreeItemIdValue cookie;
     for(wxTreeItemId instructionItem = instructionsTree->GetFirstChild(parent, cookie);
@@ -306,8 +306,8 @@ void InstructionSelectorDialog::RefreshList()
                   extensions[i]->GetName()) == game.GetUsedExtensions().end() )
             continue;
 
-        vector<string> objectsTypes = extensions[i]->GetExtensionObjectsTypes();
-        vector<string> automatismsTypes = extensions[i]->GetAutomatismsTypes();
+        std::vector<gd::String> objectsTypes = extensions[i]->GetExtensionObjectsTypes();
+        std::vector<gd::String> automatismsTypes = extensions[i]->GetAutomatismsTypes();
 
         wxTreeItemId extensionItem = instructionsTree->GetRootItem();
         if ( !objectsTypes.empty() || !automatismsTypes.empty() )//Display the extension name only if it contains objects/automatisms
@@ -315,17 +315,17 @@ void InstructionSelectorDialog::RefreshList()
             if ( extensions[i]->GetName() == "BuiltinObject" )
                 extensionItem = instructionsTree->AppendItem(instructionsTree->GetRootItem(), _("All objects"), 0);
             else
-                extensionItem = instructionsTree->AppendItem(instructionsTree->GetRootItem(), gd::utf8::ToWxString(extensions[i]->GetFullName()), 0);
+                extensionItem = instructionsTree->AppendItem(instructionsTree->GetRootItem(), extensions[i]->GetFullName(), 0);
         }
 
         for(unsigned int j = 0;j<objectsTypes.size();++j)
         {
             //Add each object instructions
-            std::map<string, gd::InstructionMetadata > allObjActions = editingAction ?
+            std::map<gd::String, gd::InstructionMetadata > allObjActions = editingAction ?
                 extensions[i]->GetAllActionsForObject(objectsTypes[j]) :
                 extensions[i]->GetAllConditionsForObject(objectsTypes[j]);
 
-            for(std::map<string, gd::InstructionMetadata>::const_iterator it = allObjActions.begin(); it != allObjActions.end(); ++it)
+            for(auto it = allObjActions.begin(); it != allObjActions.end(); ++it)
             {
                 if (!MatchSearchCriteria(search, it->second) || it->second.IsHidden())
                     continue;
@@ -349,11 +349,11 @@ void InstructionSelectorDialog::RefreshList()
         for(unsigned int j = 0;j<automatismsTypes.size();++j)
         {
             //Add each automatism instructions
-            std::map<string, gd::InstructionMetadata > allAutoActions = editingAction ?
+            std::map<gd::String, gd::InstructionMetadata > allAutoActions = editingAction ?
                 extensions[i]->GetAllActionsForAutomatism(automatismsTypes[j]) :
                 extensions[i]->GetAllConditionsForAutomatism(automatismsTypes[j]);
 
-            for(std::map<string, gd::InstructionMetadata>::const_iterator it = allAutoActions.begin(); it != allAutoActions.end(); ++it)
+            for(auto it = allAutoActions.begin(); it != allAutoActions.end(); ++it)
             {
                 if (!MatchSearchCriteria(search, it->second) || it->second.IsHidden())
                     continue;
@@ -375,11 +375,11 @@ void InstructionSelectorDialog::RefreshList()
         }
 
         //Add each (free) conditions
-        std::map<string, gd::InstructionMetadata > allActions = editingAction ?
+        std::map<gd::String, gd::InstructionMetadata > allActions = editingAction ?
             extensions[i]->GetAllActions() :
             extensions[i]->GetAllConditions();
 
-        for(std::map<string, gd::InstructionMetadata>::const_iterator it = allActions.begin(); it != allActions.end(); ++it)
+        for(auto it = allActions.begin(); it != allActions.end(); ++it)
         {
             if (!MatchSearchCriteria(search, it->second) || it->second.IsHidden())
                 continue;
@@ -463,7 +463,7 @@ void InstructionSelectorDialog::OnOkBtClick(wxCommandEvent& event)
 
     //Check for validity of parameters
     bool parametersHaveErrors = false;
-    string message;
+    gd::String message;
     size_t parameterDisplayIndex = 0;
     for ( unsigned int i = 0;i < instructionMetadata.parameters.size();i++ )
     {
@@ -473,7 +473,7 @@ void InstructionSelectorDialog::OnOkBtClick(wxCommandEvent& event)
         if ( !ParaFac.at(i)->IsShown() || (ParaFac.at(i)->IsShown() && ParaFac.at(i)->GetValue()))
         {
             gd::CallbacksForExpressionCorrectnessTesting callbacks(game, scene);
-            gd::ExpressionParser expressionParser(gd::utf8::FromWxString(ParaEdit.at(i)->GetValue()));
+            gd::ExpressionParser expressionParser(ParaEdit.at(i)->GetValue());
 
             if (  (instructionMetadata.parameters[i].type == "string" && !expressionParser.ParseStringExpression(game.GetCurrentPlatform(), game, scene, callbacks))
                 ||(instructionMetadata.parameters[i].type == "file" && !expressionParser.ParseStringExpression(game.GetCurrentPlatform(), game, scene, callbacks))
@@ -502,14 +502,14 @@ void InstructionSelectorDialog::OnOkBtClick(wxCommandEvent& event)
             return;
     }
 
-    //On ajoute les paramètres
+    //On ajoute les paramï¿½tres
     Param.clear();
     for ( unsigned int i = 0;i < instructionMetadata.parameters.size();i++ )
     {
         if ( ParaFac.at(i)->IsShown() && !ParaFac.at(i)->GetValue())
             Param.push_back(gd::Expression("")); //Optional parameter not filled stay empty.
         else
-            Param.push_back(gd::Expression(gd::utf8::FromWxString(ParaEdit.at(i)->GetValue())));
+            Param.push_back(gd::Expression(ParaEdit.at(i)->GetValue()));
     }
 
     isInverted = editingAction ? false : invertedCheck->GetValue();

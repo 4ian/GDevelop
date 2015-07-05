@@ -264,8 +264,8 @@ void SearchEvents::OnreplaceBtClick(wxCommandEvent& event)
 
     gd::EventsRefactorer::ReplaceStringInEvents(project, layout,
                                             onlySelectedEventCheck->GetValue() ? eventsToInspect : *events,
-                                            string(searchToReplaceEdit->GetValue().mb_str()),
-                                            string(replaceEdit->GetValue().mb_str()),
+                                            searchToReplaceEdit->GetValue(),
+                                            replaceEdit->GetValue(),
                                             replaceCaseCheck->GetValue(),
                                             replaceConditionsCheck->GetValue(),
                                             replaceActionsCheck->GetValue());
@@ -279,7 +279,7 @@ void SearchEvents::OnsearchBtClick(wxCommandEvent& event)
     if ( events == NULL ) return;
 
     searchResults = gd::EventsRefactorer::SearchInEvents(project, layout, *events,
-                                            string(searchEdit->GetValue().mb_str()),
+                                            searchEdit->GetValue(),
                                             caseCheck->GetValue(),
                                             conditionsCheck->GetValue(),
                                             actionsCheck->GetValue());

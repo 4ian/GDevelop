@@ -124,10 +124,10 @@ bool GDevelopIDEApp::OnInit()
     SetAppName("GDIDE");
     SetAppDisplayName("GDevelop IDE");
 
-    std::vector<std::string> filesToOpen;
+    std::vector<gd::String> filesToOpen;
     for (unsigned int i = 0;i<parser.GetParamCount();++i)
     {
-        filesToOpen.push_back(string(parser.GetParam(i).mb_str()));
+        filesToOpen.push_back(parser.GetParam(i));
     }
 
     //Load configuration
@@ -164,14 +164,14 @@ bool GDevelopIDEApp::OnInit()
         }
 
         //Retrieve languages files
-        std::vector <std::string> languagesAvailables;
+        std::vector <gd::String> languagesAvailables;
         wxDir dir(wxGetCwd()+"/locale/");
         wxString filename;
 
         bool cont = dir.GetFirst(&filename, "", wxDIR_DIRS);
         while ( cont )
         {
-            languagesAvailables.push_back(string(filename.mb_str()));
+            languagesAvailables.push_back(filename);
             cont = dir.GetNext(&filename);
         }
 
@@ -249,12 +249,12 @@ bool GDevelopIDEApp::OnInit()
         recoveringFromBug = true;
 
         //Get the files opened during the last crash
-        std::vector<string> openedFiles;
+        std::vector<gd::String> openedFiles;
         wxTextFile projectsLogFile(wxFileName::GetTempDir()+"/GameDevelopRunning.log");
         if (projectsLogFile.Open())
         {
             for (wxString str = projectsLogFile.GetFirstLine(); !projectsLogFile.Eof(); str = projectsLogFile.GetNextLine())
-                openedFiles.push_back(gd::ToString(str));
+                openedFiles.push_back(str);
         }
 
         projectsLogFile.Close();
@@ -474,7 +474,7 @@ void GDevelopIDEApp::OnUnhandledException()
     try
     {
         for (unsigned int i = 0;i<mainEditor->games.size();++i)
-            mainEditor->games[i]->SaveToFile("gameDump"+ToString(i)+".gdg");
+            mainEditor->games[i]->SaveToFile("gameDump"+gd::String::FromUInt(i)+".gdg");
     }
     catch(...)
     {
@@ -497,7 +497,7 @@ bool GDevelopIDEApp::OnExceptionInMainLoop()
     try
     {
         for (unsigned int i = 0;i<mainEditor->games.size();++i)
-            mainEditor->games[i]->SaveToFile("gameDump"+ToString(i)+".gdg");
+            mainEditor->games[i]->SaveToFile("gameDump"+gd::String::FromUInt(i)+".gdg");
     }
     catch(...)
     {
@@ -520,7 +520,7 @@ bool STConnection::OnExec(const wxString & topic, const wxString &filename)
     if ( filename.empty() )
         frame->Raise();
     else
-        frame->Open(gd::ToString(filename));
+        frame->Open(filename);
 
     return true;
 }

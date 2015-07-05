@@ -22,6 +22,7 @@ namespace gd { class Layout; }
 #include "GDCore/PlatformDefinition/Layout.h"
 #include <string>
 #include <vector>
+#include "GDCore/Utf8String.h"
 
 using namespace std;
 
@@ -32,7 +33,7 @@ class ChoiceFile: public wxDialog
 {
 	public:
 
-		ChoiceFile(wxWindow* parent, string file_, gd::Project & game_, gd::Layout & scene_);
+		ChoiceFile(wxWindow* parent, gd::String file_, gd::Project & game_, gd::Layout & scene_);
 		virtual ~ChoiceFile();
 
 		//(*Declarations(ChoiceFile)
@@ -48,7 +49,7 @@ class ChoiceFile: public wxDialog
 		wxButton* okBt;
 		//*)
 
-		string file;
+		gd::String file;
 
 	protected:
 
@@ -76,7 +77,7 @@ class ChoiceFile: public wxDialog
 		void OnhelpBtClick(wxCommandEvent& event);
 		//*)
 
-        //Données pour éditer une expression textuelle
+        //Donnï¿½es pour ï¿½diter une expression textuelle
 		gd::Project & game;
 		gd::Layout & scene;
 		bool canSelectGroup;
@@ -85,4 +86,3 @@ class ChoiceFile: public wxDialog
 };
 
 #endif
-

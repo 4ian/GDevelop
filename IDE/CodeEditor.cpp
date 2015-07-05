@@ -47,7 +47,7 @@ BEGIN_EVENT_TABLE(CodeEditor,wxPanel)
 	//*)
 END_EVENT_TABLE()
 
-CodeEditor::CodeEditor(wxWindow* parent, std::string filename_, gd::Project * game_, const gd::MainFrameWrapper & mainFrameWrapper_) :
+CodeEditor::CodeEditor(wxWindow* parent, gd::String filename_, gd::Project * game_, const gd::MainFrameWrapper & mainFrameWrapper_) :
 filename(filename_),
 game(game_),
 mainFrameWrapper(mainFrameWrapper_)

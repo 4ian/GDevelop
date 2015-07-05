@@ -358,7 +358,7 @@ void EventsEditor::RecreateCustomEventsMenu()
     const vector < std::shared_ptr<gd::PlatformExtension> > extensions = game.GetCurrentPlatform().GetAllPlatformExtensions();
 
     //Clear the menu
-    for (vector < std::pair<long, std::string> >::iterator idIter = idForEventTypesMenu.begin();
+    for (vector < std::pair<long, gd::String> >::iterator idIter = idForEventTypesMenu.begin();
          idIter != idForEventTypesMenu.end();
          ++idIter)
     {
@@ -376,14 +376,14 @@ void EventsEditor::RecreateCustomEventsMenu()
             continue;
 
         //Add each event type provided
-	    std::map<std::string, gd::EventMetadata > allEventsProvidedByExtension = extensions[i]->GetAllEvents();
-        for(std::map<string, gd::EventMetadata>::const_iterator it = allEventsProvidedByExtension.begin(); it != allEventsProvidedByExtension.end(); ++it)
+	    std::map<gd::String, gd::EventMetadata > allEventsProvidedByExtension = extensions[i]->GetAllEvents();
+        for(auto it = allEventsProvidedByExtension.begin(); it != allEventsProvidedByExtension.end(); ++it)
         {
             if (it->second.fullname.empty()) continue;
 
             //Find an identifier for the menu item
             long id = wxID_ANY;
-            for (vector < std::pair<long, std::string> >::iterator idIter = idForEventTypesMenu.begin();
+            for (vector < std::pair<long, gd::String> >::iterator idIter = idForEventTypesMenu.begin();
                  idIter != idForEventTypesMenu.end();
                  ++idIter)
             {
@@ -796,7 +796,7 @@ void EventsEditor::HandleSelectionAfterClick(int x, int y, bool allowLiveEditing
         if (liveEditedParameter.parameter == NULL ) return;
 
         liveEditingPanel->SetPosition(wxPoint(parameterArea.x+liveEditingPanel->GetSize().x < eventsPanel->GetSize().x ? parameterArea.x : (eventsPanel->GetSize().x-liveEditingPanel->GetSize().x), parameterArea.y));
-        liveEdit->SetValue(gd::utf8::ToWxString(liveEditedParameter.parameter->GetPlainString()));
+        liveEdit->SetValue(liveEditedParameter.parameter->GetPlainString());
         liveEditingPanel->Layout();
         liveEditingPanel->Show(true);
         liveEdit->SetFocus();
@@ -1153,7 +1153,7 @@ void EventsEditor::EndLiveEditing()
     }
 
     eventsPanel->SetFocus();
-    *liveEditedParameter.parameter = gd::Expression(gd::utf8::FromWxString(liveEdit->GetValue()));
+    *liveEditedParameter.parameter = gd::Expression(liveEdit->GetValue());
     liveEditedParameter.event->eventHeightNeedUpdate = true;
     liveEditingPanel->Show(false);
 
@@ -1358,7 +1358,7 @@ void EventsEditor::OnRibbonAddSubEventSelected(wxRibbonButtonBarEvent& evt)
 void EventsEditor::AddCustomEventFromMenu(unsigned int menuID, gd::EventItem & previousEventItem)
 {
     //Retrieve event type
-    string eventType;
+    gd::String eventType;
     for (unsigned int i = 0;i<idForEventTypesMenu.size();++i)
     {
     	if ( idForEventTypesMenu[i].first == menuID )
@@ -1505,7 +1505,7 @@ void EventsEditor::OneventPasteMenuSelected(wxCommandEvent& event)
 
         //Get information about list where conditions must be pasted
         gd::InstructionsList * instructionList = selection.HasSelectedConditions() ? selection.GetAllSelectedInstructions().back().instructionList : selection.GetHighlightedInstructionList().instructionList;
-        size_t positionInThisList = selection.HasSelectedConditions() ? selection.GetAllSelectedInstructions().back().positionInList : std::string::npos;
+        size_t positionInThisList = selection.HasSelectedConditions() ? selection.GetAllSelectedInstructions().back().positionInList : gd::String::npos;
         gd::BaseEvent * event = selection.HasSelectedConditions() ? selection.GetAllSelectedInstructions().back().event : selection.GetHighlightedInstructionList().event;
         if (instructionList == NULL) return;
 
@@ -1530,7 +1530,7 @@ void EventsEditor::OneventPasteMenuSelected(wxCommandEvent& event)
 
         //Get information about list where actions must be pasted
         gd::InstructionsList * instructionList = selection.HasSelectedActions() ? selection.GetAllSelectedInstructions().back().instructionList : selection.GetHighlightedInstructionList().instructionList;
-        size_t positionInThisList = selection.HasSelectedActions() ? selection.GetAllSelectedInstructions().back().positionInList : std::string::npos;
+        size_t positionInThisList = selection.HasSelectedActions() ? selection.GetAllSelectedInstructions().back().positionInList : gd::String::npos;
         gd::BaseEvent * event = selection.HasSelectedActions() ? selection.GetAllSelectedInstructions().back().event : selection.GetHighlightedInstructionList().event;
         if (instructionList == NULL) return;
 
@@ -1551,7 +1551,7 @@ void EventsEditor::OneventPasteMenuSelected(wxCommandEvent& event)
     else
     {
         gd::EventsList * eventsList; //The list where events should be inserted.
-        unsigned int position = std::string::npos; //The position where events should be inserted in the list.
+        unsigned int position = gd::String::npos; //The position where events should be inserted in the list.
 
         //Find where events should be inserted
         if (selection.HasSelectedEvents())
@@ -1778,4 +1778,3 @@ void EventsEditor::OnaddInstrIconPnlMouseLeave(wxMouseEvent& event)
     addInstrBt->Refresh();
     addInstrBt->Update();
 }
-

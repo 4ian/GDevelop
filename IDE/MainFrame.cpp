@@ -610,8 +610,8 @@ void MainFrame::OnClose( wxCloseEvent& event )
 {
     for(unsigned int i = 0;i<games.size();++i) {
         if ( games[i]->IsDirty() ) {
-            wxString fullMessage = wxString::Format(wxString(_("Project \"%s\" has been changed.\n\n")), games[i]->GetName());
-            fullMessage += wxString::Format(wxString(_("Do you want to save it in %s?")), games[i]->GetProjectFile());
+            wxString fullMessage = wxString::Format(wxString(_("Project \"%s\" has been changed.\n\n")), games[i]->GetName().ToWxString());
+            fullMessage += wxString::Format(wxString(_("Do you want to save it in %s?")), games[i]->GetProjectFile().ToWxString());
             int whatToDo = wxMessageBox(fullMessage, _("Project not saved"), wxYES_NO|wxCANCEL|wxCANCEL_DEFAULT);
 
             if (whatToDo == wxCANCEL) return;
@@ -810,7 +810,7 @@ void MainFrame::OnautoSaveTimerTrigger(wxTimerEvent& event)
         if (!filename.IsFileWritable()) continue;
 
         wxString autosaveFilename = filename.GetPath() + "/" + filename.GetName()+".gdg.autosave";
-        if ( !games[i]->SaveToFile(gd::ToString(autosaveFilename)) )
+        if ( !games[i]->SaveToFile(autosaveFilename) )
             gd::LogStatus( GD_T("Autosave failed!") );
     }
 }

@@ -19,7 +19,7 @@ public:
     /**
      * Write the string into the log file if the log file is activated.
      */
-    void WriteToLogFile(const std::string & log);
+    void WriteToLogFile(const gd::String & log);
 
     /**
      * Check if the log file is activated and get the log filename from wxConfigBase. Clear the log file if needed.
@@ -52,7 +52,7 @@ public:
 
 private:
 
-    std::string logFile;
+    gd::String logFile;
     bool logActivated;
 
     LogFileManager() {};

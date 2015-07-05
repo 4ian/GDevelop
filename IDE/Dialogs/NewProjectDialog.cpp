@@ -208,9 +208,9 @@ void NewProjectDialog::RefreshTemplateList()
             //Only add a template directory if there is a GDTemplate.gdg file inside it.
             if ( wxFileExists(currentDir+"/"+filename+"/GDTemplate.gdg") )
             {
-                std::string platform;
-                std::string name;
-                std::string description;
+                gd::String platform;
+                gd::String name;
+                gd::String description;
 
                 wxFileName descriptionFileName = wxFileName::FileName(currentDir+"/"+filename+"/GDTemplateDescription.txt");
                 descriptionFileName.MakeAbsolute();
@@ -225,9 +225,9 @@ void NewProjectDialog::RefreshTemplateList()
                             currentLine.erase( currentLine.length()-1, 1);
 
 
-                        if ( currentLineNb == 0 ) platform = currentLine;
-                        else if ( currentLineNb == 1 ) name = currentLine;
-                        else description += currentLine+"\n";
+                        if ( currentLineNb == 0 ) platform = gd::String::FromUTF8(currentLine);
+                        else if ( currentLineNb == 1 ) name = gd::String::FromUTF8(currentLine);
+                        else description += gd::String::FromUTF8(currentLine)+"\n";
                     }
                 }
 
@@ -244,7 +244,7 @@ void NewProjectDialog::RefreshTemplateList()
                     //Set the data to be associated with the item
                     wxFileName templateFileName = wxFileName::FileName(currentDir+"/"+filename+"/GDTemplate.gdg");
                     templateFileName.MakeAbsolute();
-                    gd::TreeItemStringData * associatedData = new gd::TreeItemStringData(gd::ToString(templateFileName.GetFullPath()), platform);
+                    gd::TreeItemStringData * associatedData = new gd::TreeItemStringData(templateFileName.GetFullPath(), platform);
                     templateList->SetItemPtrData(0, wxPtrToUInt(associatedData));
 
                 }
@@ -286,13 +286,13 @@ NewProjectDialog::~NewProjectDialog()
 
 void NewProjectDialog::OncreateProjectBtClick(wxCommandEvent& event)
 {
-    chosenFilename = gd::ToString(projectFileEdit->GetValue());
+    chosenFilename = projectFileEdit->GetValue();
     SendAnalyticsData();
     EndModal(1);
 }
 void NewProjectDialog::OntemplateListItemActivated(wxListEvent& event)
 {
-    chosenFilename = gd::ToString(projectFileEdit->GetValue());
+    chosenFilename = projectFileEdit->GetValue();
     SendAnalyticsData();
     EndModal(1);
 }

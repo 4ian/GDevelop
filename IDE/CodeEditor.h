@@ -13,6 +13,7 @@
 #include <string>
 #include <vector>
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
+#include "GDCore/Utf8String.h"
 namespace gd { class Project; }
 namespace gd { class Layout; }
 
@@ -20,7 +21,7 @@ class CodeEditor: public wxPanel
 {
 public:
 
-	CodeEditor(wxWindow* parent, std::string filename, gd::Project * game_, const gd::MainFrameWrapper & mainFrameWrapper_);
+	CodeEditor(wxWindow* parent, gd::String filename, gd::Project * game_, const gd::MainFrameWrapper & mainFrameWrapper_);
 	virtual ~CodeEditor();
 
 	//(*Declarations(CodeEditor)
@@ -33,7 +34,7 @@ public:
 	wxSTEditor* textEditor;
 	//*)
 
-	std::string filename; ///< File being edited.
+	gd::String filename; ///< File being edited.
 	gd::Project * game; ///< Game associated with the file. Can be NULL.
 
     /**
@@ -111,4 +112,3 @@ private:
 };
 
 #endif
-

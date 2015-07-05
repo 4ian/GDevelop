@@ -7,6 +7,7 @@
 #ifndef UPDATECHECKER_H
 #define UPDATECHECKER_H
 #include <string>
+#include "GDCore/Utf8String.h"
 
 /**
  * \brief Class to download and retrieve information
@@ -31,14 +32,14 @@ public:
     int newMinor;
     int newBuild;
     int newRevision;
-    std::string info;
-    std::string link;
+    gd::String info;
+    gd::String link;
 
-    std::string news;
-    std::string newsLinkLabel1;
-    std::string newsLinkLabel2;
-    std::string newsLink1;
-    std::string newsLink2;
+    gd::String news;
+    gd::String newsLinkLabel1;
+    gd::String newsLinkLabel2;
+    gd::String newsLink1;
+    gd::String newsLink2;
 
 private:
     /**
@@ -51,4 +52,3 @@ private:
 };
 
 #endif // UPDATECHECKER_H
-

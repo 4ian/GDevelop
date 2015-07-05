@@ -135,7 +135,7 @@ mainFrameWrapper(mainFrameWrapper_)
 
     gd::SkinHelper::ApplyCurrentSkin(m_mgr);
 
-    std::string name = externalLayout.GetAssociatedSettings().associatedLayout;
+    gd::String name = externalLayout.GetAssociatedSettings().associatedLayout;
     gd::Layout * scene = project.HasLayoutNamed(name) ? &project.GetLayout(name) : NULL;
 
     if ( scene != NULL )
@@ -268,7 +268,7 @@ void ExternalLayoutEditor::SetupForScene(gd::Layout & layout)
 
 void ExternalLayoutEditor::OnparentSceneComboBoxSelected(wxCommandEvent& event)
 {
-    std::string name = ToString(parentSceneComboBox->GetValue()) ;
+    gd::String name = parentSceneComboBox->GetValue();
     gd::Layout * scene = project.HasLayoutNamed(name) ? &project.GetLayout(name) : NULL;
 
     if ( parentSceneComboBox->GetSelection() == 0 ) //0 i.e. "No scene"
@@ -298,4 +298,3 @@ gd::Layout & ExternalLayoutEditor::GetAssociatedLayout()
 {
     return layoutEditorCanvas->GetLayout();
 }
-

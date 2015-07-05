@@ -14,12 +14,13 @@
 
 #include <string>
 #include <vector>
+#include "GDCore/Utf8String.h"
 
 class ChoixClavier: public wxDialog
 {
 public:
 
-    ChoixClavier(wxWindow* parent, std::string pTouche);
+    ChoixClavier(wxWindow* parent, gd::String pTouche);
     virtual ~ChoixClavier();
 
     //(*Declarations(ChoixClavier)
@@ -31,7 +32,7 @@ public:
     wxHyperlinkCtrl* helpBt;
     //*)
 
-    std::string selectedKey;
+    gd::String selectedKey;
 
 protected:
 
@@ -59,4 +60,3 @@ private:
 };
 
 #endif
-

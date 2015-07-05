@@ -13,6 +13,7 @@
 #include <wx/panel.h>
 //*)
 #include <string>
+#include "GDCore/Utf8String.h"
 #include <wx/ribbon/bar.h>
 #include <wx/ribbon/buttonbar.h>
 #include <wx/ribbon/gallery.h>
@@ -37,7 +38,7 @@ public:
     /**
      * Open a source file. Game can be NULL.
      */
-	void EditSourceFile(gd::Project * game, std::string filename, size_t line = std::string::npos);
+	void EditSourceFile(gd::Project * game, gd::String filename, size_t line = gd::String::npos);
 
     /**
      * Open a \a layout from a \a project.
@@ -247,11 +248,11 @@ private:
 	void OnRibbonAddExternalLayoutSelected(wxRibbonButtonBarEvent& event);
 	void AddExternalLayoutToGame(gd::Project * project);
 	void OnRibbonEditSelectionSelected(wxRibbonButtonBarEvent& event);
-	std::string AutodetectFileLanguage(wxString filename);
+	gd::String AutodetectFileLanguage(wxString filename);
     void UpdateRibbonButtonsState();
 
     wxTreeItemId selectedItem;
-    std::string itemTextBeforeEditing;
+    gd::String itemTextBeforeEditing;
 
     static wxRibbonButtonBar * projectRibbonBar;
     static wxRibbonButtonBar * operationsRibbonBar;
@@ -262,4 +263,3 @@ private:
 };
 
 #endif
-

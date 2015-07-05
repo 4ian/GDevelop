@@ -118,7 +118,7 @@ ReminderDialog::ReminderDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos
 	SetIcon(frameIcon);
 
     srand(static_cast<unsigned int>(time(NULL)));
-    imageId = gd::ToString(rand()%3 + 1);
+    imageId = gd::String::FromInt(rand()%3 + 1);
     imageBmp->SetBitmap(wxBitmap(wxImage("res/reminder-"+imageId+".png")));
 }
 

@@ -38,6 +38,7 @@
 #include <wx/msw/winundef.h>
 #endif
 #include "GDCore/IDE/Dialogs/ResourcesEditor.h"
+#include "GDCore/Utf8String.h"
 #include "EditorScene.h"
 #include "RecentList.h"
 namespace gd { class Project; }
@@ -95,7 +96,7 @@ public:
     /**
      *  \brief Open a game from its filename
      */
-    void Open(string filename);
+    void Open(gd::String filename);
 
     /**
      *  \briefOpen the new project dialog
@@ -347,4 +348,3 @@ private:
 };
 
 #endif // GDIDE_MAINFRAME_H
-

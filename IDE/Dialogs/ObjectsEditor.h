@@ -23,6 +23,7 @@
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/IDE/Dialogs/ObjectListDialogsHelper.h"
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasAssociatedEditor.h"
+#include "GDCore/Utf8String.h"
 class LayoutEditorPropertiesPnl;
 
 namespace gd {
@@ -184,7 +185,7 @@ private:
     gd::Object * GetSelectedObject();
     gd::ObjectGroup * GetSelectedGroup();
     void UpdateAssociatedPropertiesPanel();
-    void SelectItem(wxTreeItemId parent, std::string name, std::string dataStr1, std::string dataStr2);
+    void SelectItem(wxTreeItemId parent, gd::String name, gd::String dataStr1, gd::String dataStr2);
 
     wxTreeItemId GetLastLayoutObjectItem() const;
     wxTreeItemId GetLastGlobalObjectItem() const;
@@ -192,11 +193,11 @@ private:
     wxTreeItemId GetLastGlobalGroupItem() const;
 
     //Tools functions
-    bool HasGroupNamed(std::string name, const std::vector<gd::ObjectGroup> & groups) const;
-    gd::ObjectGroup & GetGroup(std::string name, std::vector<gd::ObjectGroup> & groups);
-    void RemoveGroup(std::string name, std::vector<gd::ObjectGroup> & groups);
+    bool HasGroupNamed(gd::String name, const std::vector<gd::ObjectGroup> & groups) const;
+    gd::ObjectGroup & GetGroup(gd::String name, std::vector<gd::ObjectGroup> & groups);
+    void RemoveGroup(gd::String name, std::vector<gd::ObjectGroup> & groups);
 
-    std::string GetExistingObjectsErrorMessage(unsigned int nameCheckResult, const std::vector<std::string> &layoutsWithSameName) const;
+    gd::String GetExistingObjectsErrorMessage(unsigned int nameCheckResult, const std::vector<gd::String> &layoutsWithSameName) const;
 
     gd::Project & project;
     gd::Layout & layout;
@@ -213,7 +214,7 @@ private:
     wxTreeItemId objectsRootItem;
     wxTreeItemId groupsRootItem;
 
-    std::string renamedItemOldName;
+    gd::String renamedItemOldName;
     wxTreeItemId lastSelectedItem;
 
     DECLARE_EVENT_TABLE()

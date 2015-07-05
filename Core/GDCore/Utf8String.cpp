@@ -55,6 +55,7 @@ String::String(const wxString &string) : m_string()
 String& String::operator=(const char *characters)
 {
     m_string = std::string(characters);
+    return *this;
 }
 
 String& String::operator=(const sf::String &string)

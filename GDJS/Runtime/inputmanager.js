@@ -19,8 +19,10 @@
 gdjs.InputManager = function()
 {
     this._pressedKeys = new Hashtable();
+    this._releasedKeys = new Hashtable();
     this._lastPressedKey = 0;
     this._pressedMouseButtons = new Array(5);
+    this._releasedMouseButtons = new Array(5);
     this._mouseX = 0;
     this._mouseY = 0;
     this._mouseWheelDelta = 0;
@@ -48,6 +50,7 @@ gdjs.InputManager.prototype.onKeyPressed = function(keyCode) {
  */
 gdjs.InputManager.prototype.onKeyReleased = function(keyCode) {
     this._pressedKeys.put(keyCode, false);
+    this._releasedKeys.put(keyCode, true);
 };
 
 /**
@@ -66,6 +69,15 @@ gdjs.InputManager.prototype.getLastPressedKey = function() {
  */
 gdjs.InputManager.prototype.isKeyPressed = function(keyCode) {
     return this._pressedKeys.containsKey(keyCode) && this._pressedKeys.get(keyCode);
+};
+
+/**
+ * Return true if the key corresponding to keyCode was released during the last frame.
+ * @method wasKeyReleased
+ * @param keyCode {Number} The key code to be tested.
+ */
+gdjs.InputManager.prototype.wasKeyReleased = function(keyCode) {
+    return this._releasedKeys.containsKey(keyCode) && this._releasedKeys.get(keyCode);
 };
 
 /**
@@ -124,6 +136,7 @@ gdjs.InputManager.prototype.getMouseY = function() {
  */
 gdjs.InputManager.prototype.onMouseButtonPressed = function(buttonCode) {
     this._pressedMouseButtons[buttonCode] = true;
+    this._releasedMouseButtons[buttonCode] = false;
 };
 
 /**
@@ -133,15 +146,25 @@ gdjs.InputManager.prototype.onMouseButtonPressed = function(buttonCode) {
  */
 gdjs.InputManager.prototype.onMouseButtonReleased = function(buttonCode) {
     this._pressedMouseButtons[buttonCode] = false;
+    this._releasedMouseButtons[buttonCode] = true;
 };
 
 /**
  * Return true if the mouse button corresponding to buttonCode is pressed.
  * @method isMouseButtonPressed
- * @param buttonCode {Number} The mouse button code.<br>0: Left button<br>1: Right button
+ * @param buttonCode {Number} The mouse button code (0: Left button, 1: Right button).
  */
 gdjs.InputManager.prototype.isMouseButtonPressed = function(buttonCode) {
     return this._pressedMouseButtons[buttonCode] !== undefined && this._pressedMouseButtons[buttonCode];
+};
+
+/**
+ * Return true if the mouse button corresponding to buttonCode was just released.
+ * @method isMouseButtonReleased
+ * @param buttonCode {Number} The mouse button code (0: Left button, 1: Right button).
+ */
+gdjs.InputManager.prototype.isMouseButtonReleased = function(buttonCode) {
+    return this._releasedMouseButtons[buttonCode] !== undefined && this._releasedMouseButtons[buttonCode];
 };
 
 /**
@@ -225,7 +248,9 @@ gdjs.InputManager.prototype.onTouchMove = function(identifier, x, y) {
 
 gdjs.InputManager.prototype.onTouchEnd = function(identifier) {
     this._endedTouches.push(identifier);
-    this._touches.remove(identifier);
+    if (this._touches.containsKey(identifier)) { //Postpone deletion at the end of the frame
+        this._touches.get(identifier).justEnded = true;
+    }
 
     if (this._touchSimulateMouse) {
         this.onMouseButtonReleased(0);
@@ -234,15 +259,15 @@ gdjs.InputManager.prototype.onTouchEnd = function(identifier) {
 
 gdjs.InputManager.prototype.getStartedTouchIdentifiers = function() {
     return this._startedTouches;
-}
+};
 
 gdjs.InputManager.prototype.popStartedTouch = function() {
     return this._startedTouches.shift();
-}
+};
 
 gdjs.InputManager.prototype.popEndedTouch = function() {
     return this._endedTouches.shift();
-}
+};
 
 /**
  * Set if touch events should simulate mouse events.
@@ -256,7 +281,7 @@ gdjs.InputManager.prototype.touchSimulateMouse = function(enable) {
     if (enable === undefined) enable = true;
 
     this._touchSimulateMouse = enable;
-}
+};
 
 /**
  * Notify the input manager that the frame ended, so anything that last
@@ -266,9 +291,20 @@ gdjs.InputManager.prototype.touchSimulateMouse = function(enable) {
  * @method onFrameEnded
  */
 gdjs.InputManager.prototype.onFrameEnded = function() {
+    //Only clear the ended touches at the end of the frame.
+    var identifiers = this._touches.keys();
+    for(var i = 0;i<identifiers.length;++i) {
+        var touch = this._touches.get(identifiers[i]);
+        if(touch.justEnded) {
+            this._touches.remove(identifiers[i]);
+        }
+    }
+
     this._startedTouches.length = 0;
     this._endedTouches.length = 0;
-}
+    this._releasedKeys.clear();
+    this._releasedMouseButtons.length = 0;
+};
 
 /**
  * Add the standard events handler.

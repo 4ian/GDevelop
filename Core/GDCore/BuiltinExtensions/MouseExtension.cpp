@@ -151,6 +151,17 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(gd::Plat
         .AddParameter("mouse", _("Button to test"))
         .MarkAsSimple();
 
+    extension.AddCondition("MouseButtonReleased",
+                   _("Mouse button released"),
+                   _("Return true if the specified button of the mouse was released."),
+                   _("_PARAM1_ mouse button was released"),
+                   _("Mouse and touch"),
+                   "res/conditions/mouse24.png",
+                   "res/conditions/mouse.png")
+        .AddCodeOnlyParameter("currentScene", "")
+        .AddParameter("mouse", _("Button to test"))
+        .MarkAsSimple();
+
     extension.AddCondition("TouchX",
                    _("Touch X position"),
                    _("Compare the X position of a specific touch."),

@@ -208,6 +208,7 @@ void RuntimeScene::ManageRenderTargetEvents()
     sf::Event event;
     while (renderWindow->pollEvent(event))
     {
+        std::cout << event.type << std::endl;
         if ( event.type == sf::Event::Closed )
         {
             //Handle window closing

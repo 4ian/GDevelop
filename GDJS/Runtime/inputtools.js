@@ -29,6 +29,20 @@ gdjs.evtTools.input.isKeyPressed = function(runtimeScene, key) {
 };
 
 /**
+ * Return true if the specified key was just released
+ *
+ * @method isKeyPressed
+ * @private
+ */
+gdjs.evtTools.input.wasKeyReleased = function(runtimeScene, key) {
+    if (gdjs.evtTools.input.keysNameToCode.hasOwnProperty(key)) {
+        return runtimeScene.getGame().getInputManager().wasKeyReleased(gdjs.evtTools.input.keysNameToCode[key]);
+    }
+
+    return false;
+};
+
+/**
  * Return the name of the last key pressed in the game
  * @method lastPressedKey
  * @private
@@ -162,6 +176,12 @@ gdjs.evtTools.input.anyKeyPressed = function(runtimeScene) {
 gdjs.evtTools.input.isMouseButtonPressed = function(runtimeScene, button) {
     if ( button === "Left" ) return runtimeScene.getGame().getInputManager().isMouseButtonPressed(0);
     if ( button === "Right" ) return runtimeScene.getGame().getInputManager().isMouseButtonPressed(1);
+    return false;
+};
+
+gdjs.evtTools.input.isMouseButtonReleased = function(runtimeScene, button) {
+    if ( button === "Left" ) return runtimeScene.getGame().getInputManager().isMouseButtonReleased(0);
+    if ( button === "Right" ) return runtimeScene.getGame().getInputManager().isMouseButtonReleased(1);
     return false;
 };
 

@@ -8,6 +8,7 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <set>
 #include <SFML/Window.hpp>
 
 /**
@@ -37,7 +38,7 @@ public:
     }
 
     /**
-     * @brief Constructor to specify a window to manage.
+     * @brief Constructor with a window to manage.
      */
     InputManager(sf::Window * win);
 
@@ -80,6 +81,11 @@ public:
     bool IsKeyPressed(std::string key) const;
 
     /**
+     * \brief Return true if the specified key name was just released.
+     */
+    bool WasKeyReleased(std::string key) const;
+
+    /**
      * \brief Return true if any key was pressed since the last call
      * to NextFrame.
      */
@@ -108,19 +114,34 @@ public:
     bool IsMouseButtonPressed(const std::string & button) const;
 
     /**
+     * @brief Return true if the specified mouse button was released in this frame.
+     */
+    bool IsMouseButtonReleased(const std::string & button) const;
+
+    /**
      * @brief Get the number of ticks the wheel moved during last frame.
      */
     int GetMouseWheelDelta() const;
+
+    static const std::map<std::string, int> & GetButtonNameToSfButtonMap();
+    static const std::map<int, std::string> & GetSfButtonToButtonNameMap();
     ///@}
 
 private:
     sf::Window * window;
+
     int lastPressedKey; ///< SFML key code of the last pressed key.
-    int mouseWheelDelta;
     bool keyWasPressed; ///< True if a key was pressed during the last step.
+    std::map<std::string, bool> keysPressed; ///< The keys pressed for this frame.
+    std::map<std::string, bool> oldKeysPressed; ///< The keys pressed during the last frame.
+    std::vector<sf::Uint32> charactersEntered; ///< The characters entered for this frame.
+
+    int mouseWheelDelta;
+    std::map<std::string, bool> buttonsPressed; ///< The buttons pressed for this frame.
+    std::map<std::string, bool> oldButtonsPressed; ///< The buttons pressed during the last frame.
+
     bool windowHasFocus; ///< True if the render target has the focus.
     bool disableInputWhenNotFocused; ///< True if input should be ignored when focus is lost.
-    std::vector<sf::Uint32> charactersEntered; ///< The characters entered during the last frame.
 };
 
 #endif

@@ -108,12 +108,12 @@ int main( int argc, char *p_argv[] )
         aes_cbc_decrypt(reinterpret_cast<const unsigned char*>(ibuffer), reinterpret_cast<unsigned char*>(obuffer),
             (uint8_t*)iv, size/AES_BLOCK_SIZE, &keySetting);
 
-        gd::String uncryptedSrc = obuffer;
+        std::string uncryptedSrc = std::string(obuffer, size);
         delete [] obuffer;
 
         cout << "Loading game data..." << endl;
         TiXmlDocument doc;
-        if ( !doc.Parse(uncryptedSrc.ToLocale().c_str()) )
+        if ( !doc.Parse(uncryptedSrc.c_str()) )
         {
             return AbortWithMessage("Unable to parse game data. Aborting.");
         }

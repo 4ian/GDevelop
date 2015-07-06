@@ -122,7 +122,7 @@ bool DatFile::Read (gd::String source)
     //Filling the header with 0
     memset (&m_header, 0, sizeof(m_header));
     //We open the DAT file to read it
-    datfile.open (source.ToLocale().c_str(), std::ifstream::in | std::ifstream::binary);
+    datfile.open (source.ToLocale(), std::ifstream::in | std::ifstream::binary);
     if (datfile.is_open())
     {
         //Getting to the Header position
@@ -156,7 +156,7 @@ bool DatFile::ContainsFile(const gd::String & filename)
 
     for (unsigned int i=0; i<m_header.nb_files;i++)
     {
-        if (m_entries[i].name == filename.c_str())
+        if (gd::String(m_entries[i].name) == filename)
             return true;
     }
 
@@ -179,7 +179,7 @@ char* DatFile::GetFile (gd::String filename)
     for (unsigned int i=0; i<m_header.nb_files;i++)
     {
         //If we found it
-        if (m_entries[i].name == filename.c_str())
+        if(gd::String(m_entries[i].name) == filename)
         {
             //We are allocating memory to the buffer
             m_buffer = new char[(m_entries[i].size)];
@@ -217,7 +217,7 @@ long int DatFile::GetFileSize (gd::String filename)
     for (unsigned int i=0; i<m_header.nb_files;i++)
     {
         //If we found it
-        if (m_entries[i].name == filename.c_str())
+        if (gd::String(m_entries[i].name) == filename)
         {
             //Returning the size of the file found
             return (m_entries[i].size);

@@ -349,7 +349,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
     gameDatFile.Create(files, tempDir, tempDir + "/gam.egd");
 
     //On supprime maintenant tout le superflu
-    {
+    /*{
         wxString file = wxFindFirstFile( tempDir + "/*" );
         while ( !file.empty() )
         {
@@ -357,12 +357,12 @@ void FullProjectCompiler::LaunchProjectCompilation()
             if ( filename.GetFullName() != "gam.egd" ) //On supprime tout sauf gam.egd
             {
                 if ( !wxRemoveFile( file ) )
-                    diagnosticManager.AddError(GD_T( "Unable to delete the file" ) + gd::utf8::FromWxString(file) + GD_T(" in compilation directory.\n" ));
+                    diagnosticManager.AddError(GD_T( "Unable to delete the file" ) + file + GD_T(" in compilation directory.\n" ));
             }
 
             file = wxFindNextFile();
         }
-    }
+    }*/
 
     //Link all the object files to the final object
     {

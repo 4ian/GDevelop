@@ -403,13 +403,7 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(const gd::String & parame
     }
     else
     {
-        if( !metadata.canUseUtf8 )
-            argOutput = "gd::utf8::ToLocaleString("; //Add the conversion function for gd::String parameters which doesn't support UTF8
-
         argOutput += gd::EventsCodeGenerator::GenerateParameterCodes(parameter, metadata, context, previousParameter, supplementaryParametersTypes);
-
-        if( !metadata.canUseUtf8 )
-            argOutput += ")"; //End of the conversion function
     }
 
     return argOutput;

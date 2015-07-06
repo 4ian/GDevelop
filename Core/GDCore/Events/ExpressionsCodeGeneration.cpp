@@ -67,13 +67,8 @@ void CallbacksForGeneratingExpressionCode::OnStaticFunction(gd::String functionN
         parametersStr += parametersCode[i];
     }
 
-    if(GetReturnType() == "string" && !expressionInfo.returnUtf8)
-        plainExpression += "gd::utf8::FromLocaleString("; //Add the conversion function if the expression returns locale strings
 
     plainExpression += expressionInfo.codeExtraInformation.functionCallName+"("+parametersStr+")";
-
-    if(GetReturnType() == "string" && !expressionInfo.returnUtf8)
-        plainExpression += ")";
 };
 
 void CallbacksForGeneratingExpressionCode::OnObjectFunction(gd::String functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo)
@@ -116,13 +111,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(gd::String functionN
         output = codeGenerator.GenerateObjectFunctionCall(realObjects[i], objInfo, expressionInfo.codeExtraInformation, parametersStr, output, context);
     }
 
-    if(GetReturnType() == "string" && !expressionInfo.returnUtf8)
-        plainExpression += "gd::utf8::FromLocaleString("; //Add the conversion function if the expression returns locale strings
-
     plainExpression += output;
-
-    if(GetReturnType() == "string" && !expressionInfo.returnUtf8)
-        plainExpression += ")";
 };
 
 void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(gd::String functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo)
@@ -166,13 +155,8 @@ void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(gd::String
         output = codeGenerator.GenerateObjectAutomatismFunctionCall(realObjects[i], parameters[1].GetPlainString(), autoInfo, expressionInfo.codeExtraInformation, parametersStr, output, context);
     }
 
-    if(GetReturnType() == "string" && !expressionInfo.returnUtf8)
-        plainExpression += "gd::utf8::FromLocaleString("; //Add the conversion function if the expression returns locale strings
 
     plainExpression += output;
-
-    if(GetReturnType() == "string" && !expressionInfo.returnUtf8)
-        plainExpression += ")";
 };
 
 bool CallbacksForGeneratingExpressionCode::OnSubMathExpression(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, gd::Expression & expression)

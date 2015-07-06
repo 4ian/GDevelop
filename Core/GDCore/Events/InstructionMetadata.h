@@ -53,11 +53,6 @@ public:
     bool IsOptional() const { return optional; }
 
     /**
-     * \brief Return true if the parameter can receive an UTF8 string (default behavior).
-     */
-    bool CanUseUtf8() const { return canUseUtf8; }
-
-    /**
      * \brief Return the description of the parameter
      */
     const gd::String & GetDescription() const { return description; }
@@ -76,7 +71,6 @@ public:
     gd::String type; ///< Parameter type
     gd::String supplementaryInformation; ///< Used if needed
     bool optional; ///< True if the parameter is optional
-    bool canUseUtf8; ///< True if the parameter can receive an UTF8 string (default behavior)
 
     gd::String description; ///< Description shown in editor
     bool codeOnly; ///< True if parameter is relative to code generation only, i.e. must not be shown in editor
@@ -181,17 +175,6 @@ public:
     InstructionMetadata & SetDefaultValue(gd::String defaultValue_)
     {
         if ( !parameters.empty() ) parameters.back().defaultValue = defaultValue_;
-        return *this;
-    };
-
-    /**
-     * \brief Declare the last added parameter not able to receivre UTF8 strings.
-     *
-     * \see AddParameter
-     */
-    InstructionMetadata & CantUseUtf8()
-    {
-        if ( !parameters.empty() ) parameters.back().canUseUtf8 = false;
         return *this;
     };
 

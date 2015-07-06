@@ -310,7 +310,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
 
         .AddParameter("object", _("Object"), "Sprite", false)
         .AddCodeOnlyParameter("currentScene", "")
-        .AddParameter("string", _("Name of the source image"), "",false).CantUseUtf8()
+        .AddParameter("string", _("Name of the source image"), "",false)
         .AddParameter("expression", _("X position"), "",false)
         .AddParameter("expression", _("Y position"), "",false)
         .AddParameter("yesorno", _("Should the copy take in account the source transparency\?"), "",false);

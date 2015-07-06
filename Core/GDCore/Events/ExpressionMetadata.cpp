@@ -24,7 +24,6 @@ fullname(fullname_),
 description(description_),
 group(group_),
 shown(true),
-returnUtf8(true),
 smallIconFilename(smallicon_),
 extensionNamespace(extensionNamespace_)
 {

@@ -54,7 +54,6 @@ usageComplexity(5)
 
 ParameterMetadata::ParameterMetadata() :
 optional(false),
-canUseUtf8(true),
 codeOnly(false)
 {
 }
@@ -84,10 +83,3 @@ InstructionMetadata & InstructionMetadata::AddCodeOnlyParameter(const gd::String
 }
 
 }
-
-
-
-
-
-
-

@@ -132,7 +132,8 @@ private:
 
     int lastPressedKey; ///< SFML key code of the last pressed key.
     bool keyWasPressed; ///< True if a key was pressed during the last step.
-    std::set<int> releasedKeys; ///< All SFML key code that were just released for this frame.
+    std::map<std::string, bool> keysPressed; ///< The keys pressed for this frame.
+    std::map<std::string, bool> oldKeysPressed; ///< The keys pressed during the last frame.
     std::vector<sf::Uint32> charactersEntered; ///< The characters entered for this frame.
 
     int mouseWheelDelta;

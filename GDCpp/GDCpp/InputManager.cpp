@@ -19,7 +19,14 @@ void InputManager::NextFrame()
 {
     keyWasPressed = false;
     charactersEntered.clear();
-    releasedKeys.clear();
+
+    oldKeysPressed = keysPressed;
+    keysPressed.clear();
+    const auto & keyMap = GetKeyNameToSfKeyMap();
+    for(auto it = keyMap.begin();it != keyMap.end();++it) {
+        keysPressed[it->first] =
+            sf::Keyboard::isKeyPressed(static_cast<sf::Keyboard::Key>(it->second));
+    }
 
 	mouseWheelDelta = 0;
     oldButtonsPressed = buttonsPressed;
@@ -41,8 +48,6 @@ void InputManager::HandleEvent(sf::Event & event)
         lastPressedKey = event.key.code;
         keyWasPressed = true;
     }
-	else if (event.type == sf::Event::KeyReleased)
-        releasedKeys.insert(event.key.code);
     else if (event.type == sf::Event::TextEntered)
     {
     	if (!windowHasFocus && disableInputWhenNotFocused)
@@ -63,22 +68,15 @@ bool InputManager::IsKeyPressed(std::string key) const
     if (!windowHasFocus && disableInputWhenNotFocused)
         return false;
 
-    const auto & keyMap = GetKeyNameToSfKeyMap();
-    auto it = keyMap.find(key);
-    if (it != keyMap.end())
-        return sf::Keyboard::isKeyPressed(static_cast<sf::Keyboard::Key>(it->second));
-
-    return false;
+    return keysPressed.find(key) != keysPressed.end() &&
+        keysPressed.find(key)->second;
 }
 
 bool InputManager::WasKeyReleased(std::string key) const
 {
-    const auto & keyMap = GetKeyNameToSfKeyMap();
-    auto it = keyMap.find(key);
-    if (it != keyMap.end())
-        return releasedKeys.find(it->second) != releasedKeys.end();
-
-    return false;
+    return oldKeysPressed.find(key) != oldKeysPressed.end() &&
+        oldKeysPressed.find(key)->second &&
+        !IsKeyPressed(key);
 }
 
 std::string InputManager::GetLastPressedKey() const

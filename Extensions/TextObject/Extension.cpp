@@ -67,7 +67,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension & extension)
                    "res/actions/font.png")
 
         .AddParameter("object", GD_T("Object"), "Text", false)
-        .AddParameter("police", GD_T("Font")).CantUseUtf8()
+        .AddParameter("police", GD_T("Font"))
         .SetFunctionName("ChangeFont").SetIncludeFile("TextObject/TextObject.h");
 
     obj.AddAction("Size",

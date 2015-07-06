@@ -22,7 +22,6 @@ class GD_CORE_API SerializerValue
 public:
 	SerializerValue();
 	SerializerValue(bool val);
-	SerializerValue(std::string val);
 	SerializerValue(const gd::String &val);
 	SerializerValue(int val);
 	SerializerValue(double val);
@@ -32,11 +31,6 @@ public:
 	 * Set the value, its type being a boolean.
 	 */
 	void SetBool(bool val);
-
-	/**
-	 * Set the value, its type being a std::string.
-	 */
-	void SetString(const std::string & val);
 
 	/**
 	 * Set the value, its type being a gd::String.
@@ -56,7 +50,7 @@ public:
 	/**
 	 * Set the value, its type being unknown, but representable as a string.
 	 */
-	void Set(const std::string & val);
+	void Set(const gd::String & val);
 
 	/**
 	 * Get the value, its type being a boolean.

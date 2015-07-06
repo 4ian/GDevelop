@@ -729,7 +729,7 @@ bool Project::LoadFromFile(const gd::String & filename)
     gd::SerializerElement rootElement;
 
     //COMPATIBILITY CODE WITH ANSI GDEVELOP ( <= 3.6.78 )
-    #if defined(GD_IDE_ONLY) //There should not be any problem with encoding in compiled games
+    /*#if defined(GD_IDE_ONLY) //There should not be any problem with encoding in compiled games
     //Get the declaration element
     TiXmlDeclaration * declXmlElement = hdl.FirstChild().ToNode()->ToDeclaration();
     if(strcmp(declXmlElement->Encoding(), "UTF-8") != 0)
@@ -768,7 +768,7 @@ bool Project::LoadFromFile(const gd::String & filename)
             std::cout << " -> Conversion ended !" << std::endl;
         }
     }
-    #endif
+    #endif*/
     //END OF COMPATIBILITY CODE
 
     //Load the root element

@@ -132,7 +132,7 @@ mainFrameWrapper(mainFrameWrapper_)
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&TextObjectEditor::OnokBtClick);
 	//*)
 
-	textEdit->ChangeValue(gd::utf8::ToWxString(object.GetString()));
+	textEdit->ChangeValue(object.GetString());
 	fontEdit->ChangeValue(object.GetFontFilename());
 	sizeEdit->SetValue(object.GetCharacterSize());
 	colorBt->SetBackgroundColour(wxColour(object.GetColorR(), object.GetColorG(), object.GetColorB()));
@@ -162,7 +162,7 @@ void TextObjectEditor::AdaptFontColor(wxButton *button)
 
 void TextObjectEditor::OnokBtClick(wxCommandEvent& event)
 {
-    object.SetString(gd::utf8::FromWxString(textEdit->GetValue()));
+    object.SetString(textEdit->GetValue());
     object.SetCharacterSize(sizeEdit->GetValue());
     object.SetSmooth(smoothCheck->GetValue());
     object.SetColor(static_cast<int>(colorBt->GetBackgroundColour().Red()),
@@ -172,7 +172,7 @@ void TextObjectEditor::OnokBtClick(wxCommandEvent& event)
     object.SetBold(boldToggleButton->GetValue());
     object.SetItalic(italicToggleButton->GetValue());
     object.SetUnderlined(underlineToggleButton->GetValue());
-    object.SetFontFilename(std::string(fontEdit->GetValue().mb_str()));
+    object.SetFontFilename(fontEdit->GetValue());
 
     EndModal(1);
 }
@@ -205,4 +205,3 @@ void TextObjectEditor::OnSizeEditChange(wxSpinEvent& event)
 {
 }
 #endif
-

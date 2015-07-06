@@ -71,9 +71,9 @@ void Serializer::FromXML(SerializerElement & element, const TiXmlElement * xmlEl
 	{
 		if ( attr->Name() != NULL )
 		{
-			gd::String name = attr->Name();
+			gd::String name = gd::String::FromUTF8(attr->Name());
 			if (attr->Value())
-				element.SetAttribute(name, gd::String(attr->Value()));
+				element.SetAttribute(name, gd::String::FromUTF8(attr->Value()));
 		}
 
 		attr = attr->Next();
@@ -84,7 +84,7 @@ void Serializer::FromXML(SerializerElement & element, const TiXmlElement * xmlEl
 	{
 		if (child->Value())
 		{
-			gd::String name = child->Value();
+			gd::String name = gd::String::FromUTF8(child->Value());
 			SerializerElement & childElement = element.AddChild(name);
 			FromXML(childElement, child);
 		}
@@ -95,7 +95,7 @@ void Serializer::FromXML(SerializerElement & element, const TiXmlElement * xmlEl
 	if (xmlElement->GetText())
 	{
 		SerializerValue value;
-		value.Set(xmlElement->GetText());
+		value.Set(gd::String::FromUTF8(xmlElement->GetText()));
 		element.SetValue(value);
 	}
 

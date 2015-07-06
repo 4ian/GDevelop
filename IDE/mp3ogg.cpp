@@ -124,7 +124,7 @@ void mp3ogg::OnFermerBtClick(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 /// Encodage en OGG
 ///
-/// Appel à LAME puis à OGGENC
+/// Appel ï¿½ LAME puis ï¿½ OGGENC
 ////////////////////////////////////////////////////////////
 void mp3ogg::OnEncoderBtClick(wxCommandEvent& event)
 {
@@ -137,7 +137,7 @@ void mp3ogg::OnEncoderBtClick(wxCommandEvent& event)
     wxExecute("lame \""+originalFile+"\" \""+originalFile+".wav\" --decode", wxEXEC_SYNC);
     wxExecute("oggenc \""+originalFile+".wav\"", wxEXEC_SYNC);
 
-    //Suppression du wav intermédiaire
+    //Suppression du wav intermï¿½diaire
     wxRemoveFile(originalFile+".wav");
 
     //Renommage du file.mp3.ogg en file.ogg
@@ -152,7 +152,7 @@ void mp3ogg::OnEncoderBtClick(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 /// Encodage en WAV
 ///
-/// Appel à LAME
+/// Appel ï¿½ LAME
 ////////////////////////////////////////////////////////////
 void mp3ogg::OnEncoderWAVBtClick(wxCommandEvent& event)
 {
@@ -171,4 +171,3 @@ void mp3ogg::OnEncoderWAVBtClick(wxCommandEvent& event)
 
     gd::LogMessage(GD_T("The encoding is finished. The WAV file is located in the same directory as the MP3 file."));
 }
-

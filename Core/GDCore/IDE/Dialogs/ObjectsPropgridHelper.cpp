@@ -68,7 +68,7 @@ void ObjectsPropgridHelper::RefreshFrom(const gd::Object * object, bool displaye
         const gd::Automatism & automatism = object->GetAutomatism(automatisms[i]);
         std::map<gd::String, gd::PropertyDescriptor> properties = automatism.GetProperties(project);
 
-        grid->AppendIn( "AUTO", new wxPropertyCategory(gd::ToString(automatism.GetName())) );
+        grid->AppendIn( "AUTO", new wxPropertyCategory(automatism.GetName()) );
         if ( properties.empty() || properties.find("PLEASE_ALSO_SHOW_EDIT_BUTTON_THANKS") != properties.end() )
         {
             //"Click to edit" is not shown if properties are not empty, except if the magic property is set.
@@ -158,7 +158,7 @@ bool ObjectsPropgridHelper::OnPropertySelected(gd::Object * object, gd::Layout *
                 //Update the grid:
                 if ( grid->GetProperty("OBJECT_VARIABLES_CATEGORY") != NULL)
                     grid->SetPropertyLabel("OBJECT_VARIABLES_CATEGORY",
-                        _("Object variables") + " (" + gd::ToString(object->GetVariables().Count()) + ")");
+                        _("Object variables") + " (" + gd::String::FromUInt(object->GetVariables().Count()) + ")");
             }
         }
         else if ( event.GetPropertyName() == "AUTO_ADD" )
@@ -241,7 +241,7 @@ bool ObjectsPropgridHelper::OnPropertyChanged(gd::Object * object, gd::Layout * 
     if ( event.GetPropertyName() == _("Object name") )
     {
         /*gd::String oldName = object->GetName();
-        gd::String newName = gd::ToString(event.GetPropertyValue().GetString());
+        gd::String newName = event.GetPropertyValue().GetString();
 
         //Be sure the name is valid
         if ( !project.ValidateObjectName(newName) )

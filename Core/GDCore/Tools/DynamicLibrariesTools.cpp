@@ -20,7 +20,7 @@ namespace gd
     Handle OpenLibrary(const char* path) {return LoadLibrary(path);}
     void* GetSymbol(Handle library, const char* name) { return (void*)GetProcAddress(library, name);}
     void CloseLibrary(Handle library) {FreeLibrary(library);}
-    std::string DynamicLibraryLastError()
+    gd::String DynamicLibraryLastError()
     {
         LPSTR lpMsgBuf;
         DWORD dw = GetLastError();

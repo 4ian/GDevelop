@@ -7,6 +7,7 @@
 #ifndef GDCORE_UTF8_STRING_H
 #define GDCORE_UTF8_STRING_H
 
+#include <functional>
 #include <iostream>
 #include <iterator>
 #include <string>
@@ -738,7 +739,7 @@ namespace std
     /**
      * std::hash specialization for gd::String
      */
-    template <> struct hash<gd::String>
+    template <> struct GD_CORE_API hash<gd::String>
     {
         size_t operator()(const gd::String & x) const
         {

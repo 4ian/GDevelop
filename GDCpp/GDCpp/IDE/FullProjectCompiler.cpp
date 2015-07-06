@@ -349,7 +349,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
     gameDatFile.Create(files, tempDir, tempDir + "/gam.egd");
 
     //On supprime maintenant tout le superflu
-    /*{
+    {
         wxString file = wxFindFirstFile( tempDir + "/*" );
         while ( !file.empty() )
         {
@@ -362,7 +362,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
 
             file = wxFindNextFile();
         }
-    }*/
+    }
 
     //Link all the object files to the final object
     {
@@ -575,7 +575,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
     //Prepare executables
     #if defined(WINDOWS)
     if ( windowsTarget )
-        ExecutableIconChanger::ChangeWindowsExecutableIcon(string(outDir+"/"+winExecutableName), game.winExecutableIconFile);
+        ExecutableIconChanger::ChangeWindowsExecutableIcon(outDir+"/"+winExecutableName, game.winExecutableIconFile);
     #endif
 
     diagnosticManager.OnMessage(GD_T( "Compilation finished" ));

@@ -192,7 +192,7 @@ void ChooseVariableDialog::UpdateTitle()
         else context = "Instance variables";
 
         SetTitle(wxString::Format(wxString(_("Edit the variables (%s)")),
-            context.c_str()));
+            context.ToWxString()));
         okBt->SetLabel(_("Ok"));
     }
 }
